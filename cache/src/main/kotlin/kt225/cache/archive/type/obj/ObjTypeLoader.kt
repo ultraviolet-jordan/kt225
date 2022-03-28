@@ -52,9 +52,14 @@ class ObjTypeLoader : TypeLoader<ObjType>() {
             in 35..39 -> type.options = type.options.toMutableList().apply {
                 this[opcode - 35] = readStringCp1252NullTerminated()
             }
-            40 -> repeat(readUByte().toInt()) {
-                discard(2) // Discard old color.
-                discard(2) // Discard new color.
+            40 -> {
+                val size = readUByte().toInt()
+                type.oldColors = List(size) { 0 }
+                type.newColors = List(size) { 0 }
+                repeat(size) {
+                    type.oldColors = type.oldColors.toMutableList().apply { this[it] = readUShort().toInt() }
+                    type.newColors = type.newColors.toMutableList().apply { this[it] = readUShort().toInt() }
+                }
             }
             78 -> type.maleModel2 = readUShort().toInt()
             79 -> type.femaleModel2 = readUShort().toInt()
@@ -66,8 +71,12 @@ class ObjTypeLoader : TypeLoader<ObjType>() {
             97 -> type.linkedId = readUShort().toInt()
             98 -> type.certificateId = readUShort().toInt()
             in 100..109 -> {
-                discard(2) // Discard stack id.
-                discard(2) // Discard stack amount.
+                if (type.stackId.isEmpty()) {
+                    type.stackId = List(10) { 0 }
+                    type.stackAmount = List(10) { 0 }
+                }
+                type.stackId = type.stackId.toMutableList().apply { this[opcode - 100] = readUShort().toInt() }
+                type.stackAmount = type.stackAmount.toMutableList().apply { this[opcode - 100] = readUShort().toInt() }
             }
             else -> throw IllegalArgumentException("Missing opcode $opcode.")
         }

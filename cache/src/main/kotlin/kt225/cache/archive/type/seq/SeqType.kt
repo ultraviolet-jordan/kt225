@@ -13,4 +13,9 @@ data class SeqType(
     var shieldOverride: Int = -1,
     var weaponOverride: Int = -1,
     var replays: Int = 99,
+    var frameCount: Int = 0,
+    var primaryFrames: List<Int> = emptyList(),
+    var secondaryFrames: List<Int> = emptyList(),
+    var frameDelay: List<Int> = emptyList(),
+    var labelGroups: List<Int> = emptyList()
 ) : Type(id)

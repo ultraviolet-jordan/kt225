@@ -2,12 +2,11 @@ package kt225.application
 
 import io.ktor.application.Application
 import io.ktor.server.engine.commandLineEnvironment
-import java.util.TimeZone
 import kt225.cache.archive.type.obj.ObjTypeLoader
-import kt225.cache.archive.type.seq.SeqTypeLoader
 import kt225.cache.cacheModule
 import org.koin.ktor.ext.inject
 import org.koin.ktor.ext.modules
+import java.util.TimeZone
 
 /**
  * @author Jordan Abraham
@@ -19,7 +18,7 @@ fun Application.module() {
     installKoin()
 
     val objs by inject<ObjTypeLoader>()
-     objs.entries.forEach(::println)
+    objs.entries.forEach(::println)
 }
 
 fun Application.installKoin() {

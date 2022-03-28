@@ -21,14 +21,26 @@ class SeqTypeLoader : TypeLoader<SeqType>() {
     override tailrec fun ByteReadPacket.decode(type: SeqType): SeqType {
         when (val opcode = readUByte().toInt()) {
             0 -> return type
-            1 -> repeat(readUByte().toInt()) {
-                discard(2) // skip primaryFrames
-                discard(2) // skip secondaryFrames
-                discard(2) // skip frameDelay
+            1 -> {
+                type.frameCount = readUByte().toInt()
+                type.primaryFrames = List(type.frameCount) { 0 }
+                type.secondaryFrames = List(type.frameCount) { 0 }
+                type.frameDelay = List(type.frameCount) { 0 }
+                repeat(type.frameCount) {
+                    type.primaryFrames = type.primaryFrames.toMutableList().apply { this[it] = readUShort().toInt() }
+                    type.secondaryFrames = type.secondaryFrames.toMutableList().apply { this[it] = readUShort().toInt().let { v -> if (v == 65535) -1 else v } }
+                    type.frameDelay = type.frameDelay.toMutableList().apply { this[it] = readUShort().toInt().let { v -> if (v == 0) 1 else v } }
+                }
             }
             2 -> type.delay = readUShort().toInt()
-            3 -> repeat(readUByte().toInt()) {
-                discard(1) // skip labelGroups
+            3 -> {
+                val size = readUByte().toInt()
+                type.labelGroups = buildList {
+                    repeat(size) {
+                        add(readUByte().toInt())
+                    }
+                    add(9999999)
+                }
             }
             4 -> type.renderPadding = true
             5 -> type.priority = readUByte().toInt()
