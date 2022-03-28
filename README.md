@@ -6,3 +6,4 @@
 ## Getting Started
 - Place cache archive files in " /cache/src/main/resources/archives/ " directory.
 - Place cache song files in " /cache/src/main/resources/songs/ " directory.
+- Place cache map files in " /cache/src/main/resources/maps/ " directory.

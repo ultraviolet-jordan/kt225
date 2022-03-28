@@ -1,9 +1,9 @@
 package kt225.cache.archive
 
-import bzip2.BZip2InputStream
 import io.ktor.utils.io.core.ByteReadPacket
 import io.ktor.utils.io.core.readInt
 import io.ktor.utils.io.core.readUShort
+import kt225.cache.decompressBzip2
 import kt225.shared.readUMedium
 import java.util.zip.CRC32
 
@@ -42,7 +42,7 @@ internal class DecodedArchive(
         return ByteArray(unpackedSizes[index]).also {
             when {
                 // If not decompressed yet, decompress with bzip2 here.
-                !decompressed -> BZip2InputStream.read(it, unpackedSizes[index], data, packedSizes[index], offsets[index])
+                !decompressed -> data.decompressBzip2(it, unpackedSizes[index], packedSizes[index], offsets[index])
                 // If we are already decompressed then just copy.
                 else -> data.copyInto(it, 0, offsets[index], unpackedSizes[index])
             }
@@ -62,7 +62,7 @@ internal class DecodedArchive(
         val packed = buffer.readUMedium()
         return if (unpacked != packed) {
             // Decompress with bzip2 then return new wrapped buffer.
-            data = ByteArray(unpacked).also { BZip2InputStream.read(it, unpacked, src, packed, 6) }
+            data = ByteArray(unpacked).also { src.decompressBzip2(it, unpacked, packed, 6) }
             decompressed = true
             ByteReadPacket(data)
         } else {

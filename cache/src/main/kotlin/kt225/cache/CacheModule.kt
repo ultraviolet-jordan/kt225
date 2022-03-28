@@ -1,5 +1,6 @@
 package kt225.cache
 
+import bzip2.BZip2InputStream
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.response.respondBytes
@@ -18,10 +19,11 @@ import kt225.cache.archive.Sounds
 import kt225.cache.archive.Textures
 import kt225.cache.archive.Title
 import kt225.cache.archive.WordEnc
-import kt225.cache.archive.type.config.loc.LocTypeLoader
-import kt225.cache.archive.type.config.npc.NpcTypeLoader
-import kt225.cache.archive.type.config.obj.ObjTypeLoader
-import kt225.cache.archive.type.config.seq.SeqTypeLoader
+import kt225.cache.type.config.loc.LocTypeLoader
+import kt225.cache.type.config.npc.NpcTypeLoader
+import kt225.cache.type.config.obj.ObjTypeLoader
+import kt225.cache.type.config.seq.SeqTypeLoader
+import kt225.cache.type.map.MapTypeLoader
 import org.koin.dsl.module
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -34,6 +36,7 @@ val cacheModule = module(createdAtStart = true) {
     single { ObjTypeLoader() }
     single { NpcTypeLoader() }
     single { LocTypeLoader() }
+    single { MapTypeLoader() }
 }
 
 /**
@@ -54,7 +57,12 @@ private val crcs = arrayOf(
 /**
  * The cache songs.
  */
-private val songs = songsResource()
+private val songs by lazy(::songsResource)
+
+/**
+ * The cache maps.
+ */
+internal val maps by lazy(::mapsResource)
 
 fun Application.installHttpServer() {
     embeddedServer(Netty, port = 80) {
@@ -116,4 +124,18 @@ internal fun songsResource() = buildMap {
         val stream = object {}.javaClass.getResourceAsStream("/songs/${it.fileName}") ?: return@forEach
         put(it.fileName.toString().take(10), stream.readAllBytes())
     }
+}
+
+/**
+ * Gets all the map files from the resource directory.
+ */
+internal fun mapsResource() = buildMap {
+    Files.walk(Paths.get(object {}.javaClass.getResource("/maps/")!!.toURI())).forEach {
+        val stream = object {}.javaClass.getResourceAsStream("/maps/${it.fileName}") ?: return@forEach
+        put(it.fileName.toString(), stream.readAllBytes())
+    }
+}
+
+fun ByteArray.decompressBzip2(dest: ByteArray, destLength: Int, srcLen: Int, srcOffset: Int) {
+    BZip2InputStream.read(dest, destLength, this, srcLen, srcOffset)
 }

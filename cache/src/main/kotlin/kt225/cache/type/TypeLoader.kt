@@ -1,4 +1,4 @@
-package kt225.cache.archive.type
+package kt225.cache.type
 
 import io.ktor.utils.io.core.ByteReadPacket
 

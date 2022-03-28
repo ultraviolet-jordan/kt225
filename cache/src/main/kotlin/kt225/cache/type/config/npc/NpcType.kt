@@ -1,6 +1,6 @@
-package kt225.cache.archive.type.config.npc
+package kt225.cache.type.config.npc
 
-import kt225.cache.archive.type.Type
+import kt225.cache.type.Type
 
 /**
  * @author Jordan Abraham

@@ -1,6 +1,6 @@
-package kt225.cache.archive.type.config.seq
+package kt225.cache.type.config.seq
 
-import kt225.cache.archive.type.Type
+import kt225.cache.type.Type
 
 /**
  * @author Jordan Abraham

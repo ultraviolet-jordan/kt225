@@ -15,3 +15,5 @@ fun ByteReadPacket.readStringCp1252NullTerminated() = buildString {
 fun ByteReadPacket.readUShortLittleEndian() = readUByte().toInt() or (readUByte().toInt() shl 8)
 
 fun ByteReadPacket.readUMedium() = (readUByte().toInt() shl 16) or readUShort().toInt()
+
+fun ByteReadPacket.readUShortSmart() = if (tryPeek() < 128) readUByte().toInt() else readUShort().toInt() - 0x8000

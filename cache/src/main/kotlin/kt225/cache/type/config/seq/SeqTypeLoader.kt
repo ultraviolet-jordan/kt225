@@ -1,10 +1,10 @@
-package kt225.cache.archive.type.config.seq
+package kt225.cache.type.config.seq
 
 import io.ktor.utils.io.core.ByteReadPacket
 import io.ktor.utils.io.core.readUByte
 import io.ktor.utils.io.core.readUShort
 import kt225.cache.archive.Config
-import kt225.cache.archive.type.TypeLoader
+import kt225.cache.type.TypeLoader
 
 /**
  * @author Jordan Abraham

@@ -1,6 +1,6 @@
-package kt225.cache.archive.type.config.obj
+package kt225.cache.type.config.obj
 
-import kt225.cache.archive.type.Type
+import kt225.cache.type.Type
 
 /**
  * @author Jordan Abraham
