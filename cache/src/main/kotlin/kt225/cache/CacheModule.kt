@@ -23,6 +23,7 @@ import kt225.cache.type.config.loc.LocTypeLoader
 import kt225.cache.type.config.npc.NpcTypeLoader
 import kt225.cache.type.config.obj.ObjTypeLoader
 import kt225.cache.type.config.seq.SeqTypeLoader
+import kt225.cache.type.config.spotanim.SpotAnimTypeLoader
 import kt225.cache.type.map.MapTypeLoader
 import org.koin.dsl.module
 import java.nio.file.Files
@@ -37,6 +38,7 @@ val cacheModule = module(createdAtStart = true) {
     single { NpcTypeLoader() }
     single { LocTypeLoader() }
     single { MapTypeLoader() }
+    single { SpotAnimTypeLoader() }
 }
 
 /**
