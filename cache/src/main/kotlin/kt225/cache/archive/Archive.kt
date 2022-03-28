@@ -1,7 +1,7 @@
 package kt225.cache.archive
 
 import io.ktor.utils.io.core.ByteReadPacket
-import kt225.cache.resource
+import kt225.cache.archiveResource
 import kt225.shared.readUMedium
 import java.io.DataInputStream
 import java.io.InputStream
@@ -9,14 +9,14 @@ import java.io.InputStream
 /**
  * @author Jordan Abraham
  */
-internal object ConfigArchive : Archive(resource("config"))
-internal object InterfaceArchive : Archive(resource("interface"))
-internal object MediaArchive : Archive(resource("media"))
-internal object ModelsArchive : Archive(resource("models"))
-internal object SoundsArchive : Archive(resource("sounds"))
-internal object TexturesArchive : Archive(resource("textures"))
-internal object TitleArchive : Archive(resource("title"))
-internal object WordEncArchive : Archive(resource("wordenc"))
+internal object ConfigArchive : Archive(archiveResource("config"))
+internal object InterfaceArchive : Archive(archiveResource("interface"))
+internal object MediaArchive : Archive(archiveResource("media"))
+internal object ModelsArchive : Archive(archiveResource("models"))
+internal object SoundsArchive : Archive(archiveResource("sounds"))
+internal object TexturesArchive : Archive(archiveResource("textures"))
+internal object TitleArchive : Archive(archiveResource("title"))
+internal object WordEncArchive : Archive(archiveResource("wordenc"))
 
 internal typealias Config = ConfigArchive
 internal typealias Interface = InterfaceArchive
