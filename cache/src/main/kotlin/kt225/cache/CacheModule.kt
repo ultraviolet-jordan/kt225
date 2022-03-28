@@ -24,6 +24,7 @@ import kt225.cache.type.config.npc.NpcTypeLoader
 import kt225.cache.type.config.obj.ObjTypeLoader
 import kt225.cache.type.config.seq.SeqTypeLoader
 import kt225.cache.type.config.spotanim.SpotAnimTypeLoader
+import kt225.cache.type.config.varp.VarpTypeLoader
 import kt225.cache.type.map.MapTypeLoader
 import org.koin.dsl.module
 import java.nio.file.Files
@@ -39,6 +40,7 @@ val cacheModule = module(createdAtStart = true) {
     single { LocTypeLoader() }
     single { MapTypeLoader() }
     single { SpotAnimTypeLoader() }
+    single { VarpTypeLoader() }
 }
 
 /**
@@ -138,6 +140,6 @@ internal fun mapsResource() = buildMap {
     }
 }
 
-fun ByteArray.decompressBzip2(dest: ByteArray, destLength: Int, srcLen: Int, srcOffset: Int) {
-    BZip2InputStream.read(dest, destLength, this, srcLen, srcOffset)
+fun ByteArray.decompressBzip2(dest: ByteArray, destLength: Int, srcLength: Int, srcOffset: Int) {
+    BZip2InputStream.read(dest, destLength, this, srcLength, srcOffset)
 }
