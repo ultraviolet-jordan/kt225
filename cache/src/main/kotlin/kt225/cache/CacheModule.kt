@@ -18,11 +18,12 @@ import kt225.cache.archive.Sounds
 import kt225.cache.archive.Textures
 import kt225.cache.archive.Title
 import kt225.cache.archive.WordEnc
-import kt225.cache.archive.type.obj.ObjTypeLoader
-import kt225.cache.archive.type.seq.SeqTypeLoader
+import kt225.cache.archive.type.config.obj.ObjTypeLoader
+import kt225.cache.archive.type.config.seq.SeqTypeLoader
 import org.koin.dsl.module
 import java.nio.file.Files
 import java.nio.file.Paths
+import kt225.cache.archive.type.config.npc.NpcTypeLoader
 
 /**
  * @author Jordan Abraham
@@ -30,6 +31,7 @@ import java.nio.file.Paths
 val cacheModule = module(createdAtStart = true) {
     single { SeqTypeLoader() }
     single { ObjTypeLoader() }
+    single { NpcTypeLoader() }
 }
 
 /**
@@ -84,6 +86,7 @@ fun Application.installHttpServer() {
                 call.respondBytes { WordEnc.archive.bytes() }
             }
             get("/sounds${crcs[8]}") {
+                println("hello world")
                 call.respondBytes { Sounds.archive.bytes() }
             }
             get("/songs/{file}") {

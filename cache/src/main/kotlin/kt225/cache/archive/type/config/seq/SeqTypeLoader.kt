@@ -1,4 +1,4 @@
-package kt225.cache.archive.type.seq
+package kt225.cache.archive.type.config.seq
 
 import io.ktor.utils.io.core.ByteReadPacket
 import io.ktor.utils.io.core.readUByte

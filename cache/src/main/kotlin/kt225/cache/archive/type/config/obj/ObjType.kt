@@ -1,4 +1,4 @@
-package kt225.cache.archive.type.obj
+package kt225.cache.archive.type.config.obj
 
 import kt225.cache.archive.type.Type
 
@@ -39,5 +39,5 @@ data class ObjType(
     var stackId: List<Int> = emptyList(),
     var stackAmount: List<Int> = emptyList(),
     var linkedId: Int = -1,
-    var certificateId: Int = -1,
+    var certificateId: Int = -1
 ) : Type(id)
