@@ -16,6 +16,7 @@ allprojects {
             implementation(kotlin("stdlib"))
             implementation(deps.bundles.ktor)
             implementation(deps.bundles.koin)
+            implementation(deps.bundles.logger)
         }
     }
 

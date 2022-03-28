@@ -49,6 +49,9 @@ internal class DecodedArchive(
         }
     }
 
+    fun crc() = crc32.value.toInt()
+    fun bytes() = src.clone()
+
     /**
      * Checks if this archive file needs to be decompressed then decompresses if so.
      */
@@ -90,5 +93,5 @@ internal class DecodedArchive(
         }
     }
 
-    private fun String.archiveHash(): Int = uppercase().fold(0) { hash, char -> hash * 61 + char.code - 32 }
+    private fun String.archiveHash() = uppercase().fold(0) { hash, char -> hash * 61 + char.code - 32 }
 }
