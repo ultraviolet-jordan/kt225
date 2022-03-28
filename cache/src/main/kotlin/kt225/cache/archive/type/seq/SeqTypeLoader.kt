@@ -11,12 +11,12 @@ import kt225.cache.archive.type.TypeLoader
  */
 class SeqTypeLoader : TypeLoader<SeqType>() {
 
-    override fun load(): Map<Int, SeqType> = buildMap {
-        val buffer = ByteReadPacket(Config.archive.read("seq.dat"))
-        repeat(buffer.readUShort().toInt()) {
-            put(it, buffer.decode(SeqType(it)))
-        }
-        buffer.release()
+    init {
+        ByteReadPacket(Config.archive.read("seq.dat")).also {
+            repeat(it.readUShort().toInt()) { index ->
+                entries[index] = it.decode(SeqType(index))
+            }
+        }.release()
     }
 
     override tailrec fun ByteReadPacket.decode(type: SeqType): SeqType {

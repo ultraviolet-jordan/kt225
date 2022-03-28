@@ -9,9 +9,9 @@ import java.io.InputStream
 /**
  * @author Jordan Abraham
  */
-object Config : Archive(cacheResource("config"))
+internal object Config : Archive(cacheResource("config"))
 
-open class Archive(
+internal open class Archive(
     private val src: InputStream
 ) {
     /**

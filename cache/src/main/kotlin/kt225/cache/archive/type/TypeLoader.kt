@@ -6,9 +6,11 @@ import io.ktor.utils.io.core.ByteReadPacket
  * @author Jordan Abraham
  */
 abstract class TypeLoader<T : Type> {
-    val entries by lazy(::load)
+    protected val entries = mutableMapOf<Int, T>()
 
-    abstract fun load(): Map<Int, T>
     abstract fun ByteReadPacket.decode(type: T): T
     open fun postLoadEntryType(type: T) {}
+
+    fun size() = entries.size
+    fun entries(): Collection<T> = entries.values
 }

@@ -13,12 +13,12 @@ import kt225.shared.readStringCp1252NullTerminated
  */
 class ObjTypeLoader : TypeLoader<ObjType>() {
 
-    override fun load(): Map<Int, ObjType> = buildMap {
-        val buffer = ByteReadPacket(Config.archive.read("obj.dat"))
-        repeat(buffer.readUShort().toInt()) {
-            put(it, buffer.decode(ObjType(it)))
-        }
-        buffer.release()
+    init {
+        ByteReadPacket(Config.archive.read("obj.dat")).also {
+            repeat(it.readUShort().toInt()) { index ->
+                entries[index] = it.decode(ObjType(index))
+            }
+        }.release()
     }
 
     override tailrec fun ByteReadPacket.decode(type: ObjType): ObjType {

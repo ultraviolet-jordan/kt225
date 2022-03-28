@@ -10,7 +10,7 @@ import java.util.zip.CRC32
 /**
  * @author Jordan Abraham
  */
-class DecodedArchive(
+internal class DecodedArchive(
     private val src: ByteArray
 ) {
     private var decompressed: Boolean = false
@@ -40,8 +40,10 @@ class DecodedArchive(
         if (index == -1) return byteArrayOf()
         return ByteArray(unpackedSizes[index]).also {
             when {
+                // If not decompressed yet, decompress with bzip2 here.
                 !decompressed -> BZip2InputStream.read(it, unpackedSizes[index], data, packedSizes[index], offsets[index])
-                else -> System.arraycopy(data, offsets[index], it, 0, unpackedSizes[index])
+                // If we are already decompressed then just copy.
+                else -> data.copyInto(it, 0, offsets[index], unpackedSizes[index])
             }
         }
     }
