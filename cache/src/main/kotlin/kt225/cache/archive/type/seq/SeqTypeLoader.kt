@@ -10,6 +10,7 @@ import kt225.cache.archive.type.TypeLoader
  * @author Jordan Abraham
  */
 class SeqTypeLoader : TypeLoader<SeqType>() {
+
     override fun load(): Map<Int, SeqType> = buildMap {
         val buffer = ByteReadPacket(Config.archive.read("seq.dat"))
         repeat(buffer.readUShort().toInt()) {

@@ -28,10 +28,8 @@ open class Archive(
         val header = stream.decodeHeader()
         val buffer = ByteReadPacket(header).also { it.discard(3) }
         val size = buffer.readUMedium() + 6
-        val data = stream.decode(header, size)
         buffer.release()
-        stream.close()
-        return DecodedArchive(data)
+        return DecodedArchive(stream.decode(header, size).also { stream.close() })
     }
 
     /**
@@ -50,13 +48,22 @@ open class Archive(
     private fun DataInputStream.decode(header: ByteArray, size: Int): ByteArray {
         require(header.size == 6)
         require(size > 0)
-        val data = ByteArray(size)
-        header.copyInto(data)
-        var offset = header.size
-        while (offset < size) {
-            val remaining = (size - offset).let { if (it > 1000) 1000 else it }
-            offset += read(data, offset, remaining)
-        }
-        return data
+        // No loop required. =)
+        return decodeRecursively(
+            data = header.copyInto(ByteArray(size)),
+            offset = header.size,
+            size = size
+        )
+    }
+
+    private tailrec fun DataInputStream.decodeRecursively(data: ByteArray, offset: Int, size: Int): ByteArray {
+        if (offset >= size) return data
+        val remaining = (size - offset).let { if (it > 1000) 1000 else it }
+        val nextOffset = offset + read(data, offset, remaining)
+        return decodeRecursively(
+            data = data,
+            offset = nextOffset,
+            size = size
+        )
     }
 }

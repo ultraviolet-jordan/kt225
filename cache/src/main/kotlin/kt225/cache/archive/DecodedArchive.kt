@@ -14,11 +14,10 @@ class DecodedArchive(
     private val src: ByteArray
 ) {
     private var decompressed: Boolean = false
-    private var fileCount: Int = 0
-    private var fileHash: IntArray = intArrayOf()
-    private var fileUnpackedSize: IntArray = intArrayOf()
-    private var filePackedSize: IntArray = intArrayOf()
-    private var fileOffset: IntArray = intArrayOf()
+    private var hashes: IntArray = intArrayOf()
+    private var unpackedSizes: IntArray = intArrayOf()
+    private var packedSizes: IntArray = intArrayOf()
+    private var offsets: IntArray = intArrayOf()
     private var crc32: CRC32 = CRC32()
     private var data: ByteArray = byteArrayOf()
 
@@ -36,60 +35,57 @@ class DecodedArchive(
      * Reads an internal file from this decoded archive file.
      */
     fun read(name: String): ByteArray {
-        val hash = name.nameHash()
-        repeat(fileCount) {
-            if (fileHash[it] == hash) {
-                val dest = ByteArray(fileUnpackedSize[it])
-                if (!decompressed) {
-                    BZip2InputStream.read(dest, fileUnpackedSize[it], data, filePackedSize[it], fileOffset[it])
-                } else {
-                    System.arraycopy(data, fileOffset[it], dest, 0, fileUnpackedSize[it])
-                }
-                return dest
+        // Don't have to loop here like the client does. =)
+        val index = hashes.indexOf(name.archiveHash())
+        if (index == -1) return byteArrayOf()
+        return ByteArray(unpackedSizes[index]).also {
+            when {
+                !decompressed -> BZip2InputStream.read(it, unpackedSizes[index], data, packedSizes[index], offsets[index])
+                else -> System.arraycopy(data, offsets[index], it, 0, unpackedSizes[index])
             }
         }
-        return byteArrayOf()
     }
 
+    /**
+     * Checks if this archive file needs to be decompressed then decompresses if so.
+     */
     private fun decodeCompression(): ByteReadPacket {
         val buffer = ByteReadPacket(src)
         require(buffer.remaining >= 6)
         val unpacked = buffer.readUMedium()
         val packed = buffer.readUMedium()
         return if (unpacked != packed) {
+            // Decompress with bzip2 then return new wrapped buffer.
             data = ByteArray(unpacked).also { BZip2InputStream.read(it, unpacked, src, packed, 6) }
             decompressed = true
             ByteReadPacket(data)
         } else {
+            // Just use this buffer since we don't need to decompress.
             data = src
             buffer
         }
     }
 
+    /**
+     * Decodes through the archive and sets up the file pointer arrays.
+     */
     private fun ByteReadPacket.decodeFiles() {
         require(remaining >= 2)
-        fileCount = readUShort().toInt()
-        require(remaining >= fileCount * 10)
-        fileHash = IntArray(fileCount)
-        fileUnpackedSize = IntArray(fileCount)
-        filePackedSize = IntArray(fileCount)
-        fileOffset = IntArray(fileCount)
-        var offset = 8 + fileCount * 10
-        repeat(fileCount) {
-            fileHash[it] = readInt()
-            fileUnpackedSize[it] = readUMedium()
-            filePackedSize[it] = readUMedium()
-            fileOffset[it] = offset
-            offset += filePackedSize[it]
+        val size = readUShort().toInt()
+        require(remaining >= size * 10)
+        hashes = IntArray(size)
+        unpackedSizes = IntArray(size)
+        packedSizes = IntArray(size)
+        offsets = IntArray(size)
+        var offset = 8 + size * 10
+        repeat(size) {
+            hashes[it] = readInt()
+            unpackedSizes[it] = readUMedium()
+            packedSizes[it] = readUMedium()
+            offsets[it] = offset
+            offset += packedSizes[it]
         }
     }
 
-    private fun String.nameHash(): Int {
-        var hash = 0
-        val name = uppercase()
-        name.indices.forEach {
-            hash = hash * 61 + name[it].code - 32
-        }
-        return hash
-    }
+    private fun String.archiveHash(): Int = uppercase().fold(0) { hash, char -> hash * 61 + char.code - 32 }
 }
