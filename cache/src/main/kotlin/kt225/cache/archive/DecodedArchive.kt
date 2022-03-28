@@ -29,6 +29,7 @@ internal class DecodedArchive(
         crc32.reset()
         crc32.update(data)
         buffer.decodeFiles()
+        buffer.release()
     }
 
     /**
