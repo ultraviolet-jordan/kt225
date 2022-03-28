@@ -1,12 +1,10 @@
 package kt225.cache.archive.type.config.npc
 
 import io.ktor.utils.io.core.ByteReadPacket
-import io.ktor.utils.io.core.readInt
 import io.ktor.utils.io.core.readUByte
 import io.ktor.utils.io.core.readUShort
 import kt225.cache.archive.Config
 import kt225.cache.archive.type.TypeLoader
-import kt225.cache.archive.type.config.obj.ObjType
 import kt225.shared.readStringCp1252NullTerminated
 
 /**

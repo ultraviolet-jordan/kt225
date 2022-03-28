@@ -18,12 +18,13 @@ import kt225.cache.archive.Sounds
 import kt225.cache.archive.Textures
 import kt225.cache.archive.Title
 import kt225.cache.archive.WordEnc
+import kt225.cache.archive.type.config.loc.LocTypeLoader
+import kt225.cache.archive.type.config.npc.NpcTypeLoader
 import kt225.cache.archive.type.config.obj.ObjTypeLoader
 import kt225.cache.archive.type.config.seq.SeqTypeLoader
 import org.koin.dsl.module
 import java.nio.file.Files
 import java.nio.file.Paths
-import kt225.cache.archive.type.config.npc.NpcTypeLoader
 
 /**
  * @author Jordan Abraham
@@ -32,6 +33,7 @@ val cacheModule = module(createdAtStart = true) {
     single { SeqTypeLoader() }
     single { ObjTypeLoader() }
     single { NpcTypeLoader() }
+    single { LocTypeLoader() }
 }
 
 /**
