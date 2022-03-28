@@ -18,6 +18,15 @@ internal object TexturesArchive : Archive(resource("textures"))
 internal object TitleArchive : Archive(resource("title"))
 internal object WordEncArchive : Archive(resource("wordenc"))
 
+internal typealias Config = ConfigArchive
+internal typealias Interface = InterfaceArchive
+internal typealias Media = MediaArchive
+internal typealias Models = ModelsArchive
+internal typealias Sounds = SoundsArchive
+internal typealias Textures = TexturesArchive
+internal typealias Title = TitleArchive
+internal typealias WordEnc = WordEncArchive
+
 internal open class Archive(
     private val src: InputStream
 ) {

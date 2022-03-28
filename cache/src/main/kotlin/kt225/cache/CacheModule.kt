@@ -11,14 +11,14 @@ import io.ktor.utils.io.core.buildPacket
 import io.ktor.utils.io.core.readBytes
 import io.ktor.utils.io.core.writeInt
 import kt225.cache.archive.Archive
-import kt225.cache.archive.ConfigArchive
-import kt225.cache.archive.InterfaceArchive
-import kt225.cache.archive.MediaArchive
-import kt225.cache.archive.ModelsArchive
-import kt225.cache.archive.SoundsArchive
-import kt225.cache.archive.TexturesArchive
-import kt225.cache.archive.TitleArchive
-import kt225.cache.archive.WordEncArchive
+import kt225.cache.archive.Config
+import kt225.cache.archive.Interface
+import kt225.cache.archive.Media
+import kt225.cache.archive.Models
+import kt225.cache.archive.Sounds
+import kt225.cache.archive.Textures
+import kt225.cache.archive.Title
+import kt225.cache.archive.WordEnc
 import kt225.cache.archive.type.obj.ObjTypeLoader
 import kt225.cache.archive.type.seq.SeqTypeLoader
 import org.koin.dsl.module
@@ -30,15 +30,6 @@ val cacheModule = module(createdAtStart = true) {
     single { SeqTypeLoader() }
     single { ObjTypeLoader() }
 }
-
-internal typealias Config = ConfigArchive
-internal typealias Interface = InterfaceArchive
-internal typealias Media = MediaArchive
-internal typealias Models = ModelsArchive
-internal typealias Sounds = SoundsArchive
-internal typealias Textures = TexturesArchive
-internal typealias Title = TitleArchive
-internal typealias WordEnc = WordEncArchive
 
 private val crcs = arrayOf(
     0,
