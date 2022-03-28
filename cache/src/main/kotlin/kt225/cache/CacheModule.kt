@@ -62,28 +62,28 @@ fun Application.installHttpServer() {
                 call.respondBytes { buffer.readBytes() }
                 buffer.release()
             }
-            get("/title${Title.archive.crc()}") {
+            get("/title${crcs[1]}") {
                 call.respondBytes { Title.archive.bytes() }
             }
-            get("/config${Config.archive.crc()}") {
+            get("/config${crcs[2]}") {
                 call.respondBytes { Config.archive.bytes() }
             }
-            get("/interface${Interface.archive.crc()}") {
+            get("/interface${crcs[3]}") {
                 call.respondBytes { Interface.archive.bytes() }
             }
-            get("/media${Media.archive.crc()}") {
+            get("/media${crcs[4]}") {
                 call.respondBytes { Media.archive.bytes() }
             }
-            get("/models${Models.archive.crc()}") {
+            get("/models${crcs[5]}") {
                 call.respondBytes { Models.archive.bytes() }
             }
-            get("/textures${Textures.archive.crc()}") {
+            get("/textures${crcs[6]}") {
                 call.respondBytes { Textures.archive.bytes() }
             }
-            get("/wordenc${WordEnc.archive.crc()}") {
+            get("/wordenc${crcs[7]}") {
                 call.respondBytes { WordEnc.archive.bytes() }
             }
-            get("/sounds${Sounds.archive.crc()}") {
+            get("/sounds${crcs[8]}") {
                 call.respondBytes { Sounds.archive.bytes() }
             }
             get("/songs/{file}") {
@@ -91,6 +91,7 @@ fun Application.installHttpServer() {
                 val file = call.parameters["file"] ?: return@get
                 // Take the first 10 characters to find the song file in our resources.
                 val song = songs[file.take(10)] ?: return@get
+                // TODO Validate crc for songs ?
                 call.respondBytes { song }
             }
         }
