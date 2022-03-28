@@ -7,7 +7,7 @@ import kt225.cache.type.Type
  */
 data class SpotAnimType(
     override val id: Int,
-    var modelIndex: Int = 0,
+    var modelId: Int = 0,
     var sequenceId: Int = -1,
     var disposeAlpha: Boolean = false,
     var oldColors: List<Int> = List(6) { 0 },

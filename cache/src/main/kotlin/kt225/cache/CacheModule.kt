@@ -20,6 +20,7 @@ import kt225.cache.archive.Textures
 import kt225.cache.archive.Title
 import kt225.cache.archive.WordEnc
 import kt225.cache.type.config.flo.FloTypeLoader
+import kt225.cache.type.config.idk.IdkTypeLoader
 import kt225.cache.type.config.loc.LocTypeLoader
 import kt225.cache.type.config.npc.NpcTypeLoader
 import kt225.cache.type.config.obj.ObjTypeLoader
@@ -43,6 +44,7 @@ val cacheModule = module(createdAtStart = true) {
     single { SpotAnimTypeLoader() }
     single { VarpTypeLoader() }
     single { FloTypeLoader() }
+    single { IdkTypeLoader() }
 }
 
 /**

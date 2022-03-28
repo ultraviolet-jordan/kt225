@@ -27,6 +27,6 @@ data class NpcType(
     var options: List<String> = List(5) { "null" },
     var oldColors: List<Int> = emptyList(),
     var newColors: List<Int> = emptyList(),
-    var modelIndices: List<Int> = emptyList(),
-    var headModelIndices: List<Int> = emptyList()
+    var modelIds: List<Int> = emptyList(),
+    var headModelIds: List<Int> = emptyList()
 ) : Type(id)

@@ -24,7 +24,7 @@ class ObjTypeLoader : TypeLoader<ObjType>() {
     override tailrec fun ByteReadPacket.decode(type: ObjType): ObjType {
         when (val opcode = readUByte().toInt()) {
             0 -> return type
-            1 -> type.modelIndex = readUShort().toInt()
+            1 -> type.modelId = readUShort().toInt()
             2 -> type.name = readStringCp1252NullTerminated()
             3 -> type.description = readStringCp1252NullTerminated()
             4 -> type.iconZoom = readUShort().toInt()

@@ -26,10 +26,10 @@ class LocTypeLoader : TypeLoader<LocType>() {
             0 -> return type
             1 -> {
                 val size = readUByte().toInt()
-                type.modelIndices = List(size) { 0 }
+                type.modelIds = List(size) { 0 }
                 type.modelTypes = List(size) { 0 }
                 repeat(size) {
-                    type.modelIndices = type.modelIndices.toMutableList().apply { this[it] = readUShort().toInt() }
+                    type.modelIds = type.modelIds.toMutableList().apply { this[it] = readUShort().toInt() }
                     type.modelTypes = type.modelTypes.toMutableList().apply { this[it] = readUByte().toInt() }
                 }
             }

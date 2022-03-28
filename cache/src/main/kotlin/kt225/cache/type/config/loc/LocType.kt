@@ -7,7 +7,7 @@ import kt225.cache.type.Type
  */
 data class LocType(
     override val id: Int,
-    var modelIndices: List<Int> = emptyList(),
+    var modelIds: List<Int> = emptyList(),
     var modelTypes: List<Int> = emptyList(),
     var name: String = "null",
     var description: String = "null",

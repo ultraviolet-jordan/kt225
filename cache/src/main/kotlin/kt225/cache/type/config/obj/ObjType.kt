@@ -7,7 +7,7 @@ import kt225.cache.type.Type
  */
 data class ObjType(
     override val id: Int,
-    var modelIndex: Int = 0,
+    var modelId: Int = 0,
     var name: String = "null",
     var description: String = "null",
     var oldColors: List<Int> = emptyList(),

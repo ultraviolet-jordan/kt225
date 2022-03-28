@@ -25,9 +25,9 @@ class NpcTypeLoader : TypeLoader<NpcType>() {
             0 -> return type
             1 -> {
                 val size = readUByte().toInt()
-                type.modelIndices = List(size) { 0 }
+                type.modelIds = List(size) { 0 }
                 repeat(size) {
-                    type.modelIndices = type.modelIndices.toMutableList().apply { this[it] = readUShort().toInt() }
+                    type.modelIds = type.modelIds.toMutableList().apply { this[it] = readUShort().toInt() }
                 }
             }
             2 -> type.name = readStringCp1252NullTerminated()
@@ -57,9 +57,9 @@ class NpcTypeLoader : TypeLoader<NpcType>() {
             }
             60 -> {
                 val size = readUByte().toInt()
-                type.headModelIndices = List(size) { 0 }
+                type.headModelIds = List(size) { 0 }
                 repeat(size) {
-                    type.headModelIndices = type.headModelIndices.toMutableList().apply { this[it] = readUShort().toInt() }
+                    type.headModelIds = type.headModelIds.toMutableList().apply { this[it] = readUShort().toInt() }
                 }
             }
             90 -> discard(2) // Unused
