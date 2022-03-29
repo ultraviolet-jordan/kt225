@@ -5,6 +5,7 @@ import io.ktor.application.install
 import io.ktor.server.engine.commandLineEnvironment
 import kt225.cache.cacheModule
 import kt225.cache.installHttpServer
+import kt225.game.installGameServer
 import org.koin.ktor.ext.Koin
 import java.util.TimeZone
 
@@ -17,6 +18,7 @@ fun Application.module() {
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
     installKoin()
     installHttpServer()
+    installGameServer()
 }
 
 fun Application.installKoin() {

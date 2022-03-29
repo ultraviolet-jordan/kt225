@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(deps.cryptography)
     implementation(project(":cache"))
-    implementation(project(":game"))
+    implementation(project(":shared"))
 }

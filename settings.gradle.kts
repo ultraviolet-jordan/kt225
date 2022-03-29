@@ -2,6 +2,7 @@ rootProject.name = "kt225"
 
 dependencyResolutionManagement {
     repositories(RepositoryHandler::mavenCentral)
+    repositories { maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") } }
 
     versionCatalogs {
         create("deps") {
@@ -10,12 +11,14 @@ dependencyResolutionManagement {
             version("koin", "3.1.5")
             version("slf4j", "1.7.32")
             version("kotlin-inline-logger", "1.0.4")
+            version("cryptography", "1.0.10-SNAPSHOT")
 
             library("ktor-server-netty", "io.ktor", "ktor-server-netty").versionRef("ktor")
             library("koin-core", "io.insert-koin", "koin-core").versionRef("koin")
             library("koin-ktor", "io.insert-koin", "koin-ktor").versionRef("koin")
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
             library("kotlin-inline-logger", "com.michael-bull.kotlin-inline-logger", "kotlin-inline-logger").versionRef("kotlin-inline-logger")
+            library("cryptography", "com.runetopic.cryptography", "cryptography").versionRef("cryptography")
 
             bundle("ktor", listOf("ktor-server-netty"))
             bundle("koin", listOf("koin-core", "koin-ktor"))
@@ -29,3 +32,4 @@ dependencyResolutionManagement {
 include("cache")
 include("application")
 include("shared")
+include("game")

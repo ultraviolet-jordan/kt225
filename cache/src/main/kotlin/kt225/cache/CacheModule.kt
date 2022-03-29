@@ -50,7 +50,7 @@ val cacheModule = module(createdAtStart = true) {
 /**
  * The cache archives crcs.
  */
-private val crcs = arrayOf(
+val crcs = intArrayOf(
     0,
     Title.archive.crc(),
     Config.archive.crc(),
@@ -70,7 +70,7 @@ private val songs by lazy(::songsResource)
 /**
  * The cache maps.
  */
-internal val maps by lazy(::mapsResource)
+val maps by lazy(::mapsResource)
 
 fun Application.installHttpServer() {
     embeddedServer(Netty, port = 80) {
