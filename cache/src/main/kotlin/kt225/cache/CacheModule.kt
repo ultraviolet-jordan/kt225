@@ -104,7 +104,6 @@ fun Application.installHttpServer() {
                 call.respondBytes { WordEnc.archive.bytes() }
             }
             get("/sounds${crcs[8]}") {
-                println("hello world")
                 call.respondBytes { Sounds.archive.bytes() }
             }
             get("/songs/{file}") {

@@ -11,16 +11,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kt225.game.client.Client
 import kt225.game.client.io.readLogin
-import org.koin.dsl.module
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 
 /**
  * @author Jordan Abraham
  */
-val gameModule = module(createdAtStart = true) {
-}
-
 fun Application.installGameServer() = runBlocking {
     val dispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
     val selector = ActorSelectorManager(dispatcher)

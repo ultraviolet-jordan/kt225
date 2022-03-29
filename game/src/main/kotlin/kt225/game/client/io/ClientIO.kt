@@ -8,6 +8,7 @@ import io.ktor.utils.io.core.readInt
 import io.ktor.utils.io.core.readUByte
 import io.ktor.utils.io.core.writeInt
 import io.ktor.utils.io.core.writeShort
+import io.ktor.utils.io.readPacket
 import kt225.cache.crcs
 import kt225.cache.maps
 import kt225.game.client.Client
@@ -76,8 +77,8 @@ suspend fun Client.readLogin() {
     writeLogin(clientKeys.toISAAC(), serverKeys.toISAAC())
 }
 
-val x = 3093
-val z = 3491
+val x = 3222
+val z = 3222
 val zoneX = x shr 3
 val zoneZ = z shr 3
 
@@ -88,18 +89,18 @@ private suspend fun Client.writeLogin(clientCipher: ISAAC, serverCipher: ISAAC) 
         writeShort(zoneX.toShort())
         writeShort(zoneZ.toShort())
 
-        ((zoneX - 6) / 8..(zoneX + 6) / 8).forEach { xInZone ->
-            ((zoneZ - 6) / 8..(zoneZ + 6) / 8).forEach { yInZone ->
-                writeByte(xInZone.toByte())
-                writeByte(yInZone.toByte())
+        ((zoneX - 6) / 8..(zoneX + 6) / 8).forEach { xOffset ->
+            ((zoneZ - 6) / 8..(zoneZ + 6) / 8).forEach { yOffset ->
+                writeByte(xOffset.toByte())
+                writeByte(yOffset.toByte())
                 val crc1 = CRC32()
                 crc1.reset()
-                crc1.update(maps["m${xInZone}_$yInZone"]!!)
-                writeInt(crc1.value.toInt()) // Map crc.
+                crc1.update(maps["m${xOffset}_$yOffset"]!!)
+                writeInt(crc1.value.toInt())
                 val crc2 = CRC32()
                 crc2.reset()
-                crc2.update(maps["l${xInZone}_$yInZone"]!!)
-                writeInt(crc2.value.toInt()) // Loc crc.
+                crc2.update(maps["l${xOffset}_$yOffset"]!!)
+                writeInt(crc2.value.toInt())
             }
         }
     }
@@ -113,43 +114,89 @@ private suspend fun Client.writeLogin(clientCipher: ISAAC, serverCipher: ISAAC) 
     readPackets(clientCipher, serverCipher)
 }
 
+val sizes = intArrayOf(
+    0, 0, 2, 0, -1, 0, 6, 4, 2, 2,
+    0, 8, 0, 0, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 2, 0, 0,
+    3, 6, 0, 0, 0, 0, 0, 0, 6, 0,
+    6, 0, 0, 0, 0, 0, 0, 0, 8, 0,
+    0, 0, 13, 2, 0, 0, 0, 0, 0, 6,
+    0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
+    0, 6, 0, 0, 0, 6, 0, 0, 0, 8,
+    0, -1, 0, 0, 0, 0, 0, 0, 4, 0,
+    0, 0, 0, -1, 0, 0, 6, 6, 0, 0,
+    2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 2, 0, 0, 6, 0, 8, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    12, 0, 0, 6, 4, 0, 0, 0, 8, 0,
+    6, 0, 0, 0, 0, 0, -1, 0, 9, 0,
+    3, 0, 0, 0, 0, 2, 0, 6, 3, 6,
+    0, 0, 0, 0, 2, -1, 0, 0, 0, 0,
+    0, 8, 6, 0, 0, 1, 2, 4, 6, 0,
+    0, -1, 0, 0, 0, 2, 0, 0, 0, 6,
+    10, 0, 0, 0, 2, 6, 0, 0, 0, 0,
+    6, 0, 8, 0, 0, 0, 2, 0, 0, 0,
+    0, 6, 6, 0, 0, 3, 0, 0, 0, -1,
+    6, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1, 0, 4, 4, 4, 1, 12,
+    0, 0, 0, 0, 3, 6, 0, 6, 8, 0,
+    0, 0, 0, 0, 0, 0
+)
+
 private suspend fun Client.readPackets(clientCipher: ISAAC, serverCipher: ISAAC) {
     while (true) {
-        if (readChannel.isClosedForRead) break
         val opcode = (0xff and (readChannel.readByte().toInt() and 0xff) - clientCipher.getNext())
         if (opcode > 248) continue
-        println(opcode)
+        val available = readChannel.availableForRead
+        val size = when (val size = sizes[opcode]) {
+            -1 -> if (available >= 1) readChannel.readByte().toInt() and 0xff else available
+            -2 -> if (available >= 2) readChannel.readShort().toInt() and 0xffff else available
+            else -> size
+        }
+        readChannel.readPacket(size) // Just take it like this.
         if (opcode == 150) {
-            readChannel.discard(1)
-            ((zoneX - 6) / 8..(zoneX + 6) / 8).forEach { xInZone ->
-                ((zoneZ - 6) / 8..(zoneZ + 6) / 8).forEach { yInZone ->
+            ((zoneX - 6) / 8..(zoneX + 6) / 8).forEach { xOffset ->
+                ((zoneZ - 6) / 8..(zoneZ + 6) / 8).forEach { yOffset ->
                     // data_land
                     val data_land_buffer = buildPacket {
-                        writeByte(xInZone.toByte())
-                        writeByte(yInZone.toByte())
-                        val mapData = maps["m${xInZone}_$yInZone"]!!
+                        writeByte(xOffset.toByte())
+                        writeByte(yOffset.toByte())
+                        val mapData = maps["m${xOffset}_$yOffset"]!!
                         writeShort(0)
                         writeShort(mapData.size.toShort())
                         writeBytes(mapData)
                     }
                     // data_loc
                     val data_loc_buffer = buildPacket {
-                        writeByte(xInZone.toByte())
-                        writeByte(yInZone.toByte())
-                        val locData = maps["l${xInZone}_$yInZone"]!!
+                        writeByte(xOffset.toByte())
+                        writeByte(yOffset.toByte())
+                        val locData = maps["l${xOffset}_$yOffset"]!!
                         writeShort(0)
                         writeShort(locData.size.toShort())
                         writeBytes(locData)
                     }
 
                     val data_land_done_buffer = buildPacket {
-                        writeByte(xInZone.toByte())
-                        writeByte(yInZone.toByte())
+                        writeByte(xOffset.toByte())
+                        writeByte(yOffset.toByte())
                     }
 
                     val data_loc_done_buffer = buildPacket {
-                        writeByte(xInZone.toByte())
-                        writeByte(yInZone.toByte())
+                        writeByte(xOffset.toByte())
+                        writeByte(yOffset.toByte())
+                    }
+
+                    val player_info_buffer = buildPacket {
+                        withBitAccess {
+                            writeBit(true)
+                            writeBits(2, 3)
+                            writeBits(2, 0)
+                            writeBits(7, x - 8 * (zoneX - 6))
+                            writeBits(7, z - 8 * (zoneZ - 6))
+                            writeBits(1, 1)
+                            writeBits(1, 0)
+                            writeBits(8, 0)
+                        }
                     }
 
                     writeChannel.apply {
@@ -166,10 +213,14 @@ private suspend fun Client.readPackets(clientCipher: ISAAC, serverCipher: ISAAC)
 
                         writeByte((0xff and 20 + serverCipher.getNext()).toByte())
                         writePacket(data_loc_done_buffer)
+
+                        writeByte((0xff and 184 + serverCipher.getNext()).toByte())
+                        writeShort(player_info_buffer.remaining.toShort())
+                        writePacket(player_info_buffer)
                     }.flush()
                 }
             }
-        } else if (opcode == 108) {
+        } else if (opcode == 108) { // keep alive
             val player_info_buffer = buildPacket {
                 withBitAccess {
                     writeBit(true)
@@ -187,12 +238,6 @@ private suspend fun Client.readPackets(clientCipher: ISAAC, serverCipher: ISAAC)
                 writeShort(player_info_buffer.remaining.toShort())
                 writePacket(player_info_buffer)
             }.flush()
-        } else if (opcode == 236) {
-            readChannel.discard(4)
-        } else if (opcode == 215) {
-            readChannel.discard(3)
-        } else if (opcode == 244) {
-            readChannel.discard(3)
         }
     }
 }
