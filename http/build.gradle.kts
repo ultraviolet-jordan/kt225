@@ -9,9 +9,10 @@ dependencies {
     implementation(deps.bundles.ktor)
     implementation(deps.slf4j.simple)
     implementation(deps.guice)
-    implementation(deps.cryptography)
+
+    implementation(project(":cache"))
 }
 
 application {
-    mainClass.set("kt225.game.ApplicationKt")
+    mainClass.set("kt225.http.ApplicationKt")
 }

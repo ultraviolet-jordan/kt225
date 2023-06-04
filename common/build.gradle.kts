@@ -5,7 +5,5 @@ plugins {
 }
 
 dependencies {
-    implementation(deps.guice)
-
-    implementation(project(":common"))
+    implementation(deps.apache.commons)
 }

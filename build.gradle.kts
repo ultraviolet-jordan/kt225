@@ -1,10 +1,12 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain
 
 @Suppress("DSL_SCOPE_VIOLATION")
 // https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(deps.plugins.jvm)
+    alias(deps.plugins.versions)
 }
 
 group = "org.example"
@@ -14,24 +16,29 @@ allprojects {
     plugins.withType<KotlinPluginWrapper> {
         dependencies {
             implementation(kotlin("stdlib"))
-            implementation(deps.bundles.ktor)
-            implementation(deps.bundles.koin)
-            implementation(deps.bundles.logger)
         }
     }
 
-    with(tasks) {
-        withType<Test> {
-            dependencies {
-                testImplementation(kotlin("test"))
+    tasks.withType<Test> {
+        dependencies {
+            testImplementation(kotlin("test"))
+        }
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlin {
+            jvmToolchain {
+                languageVersion.set(JavaLanguageVersion.of(18))
             }
         }
-        withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = "1.8"
-            kotlinOptions.freeCompilerArgs = listOf(
-                "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
-            )
-        }
+    }
+
+    tasks.withType<UsesKotlinJavaToolchain>().configureEach {
+        kotlinJavaToolchain.toolchain.use(
+            project.extensions.getByType<JavaToolchainService>().launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(18))
+            }
+        )
     }
 }
 

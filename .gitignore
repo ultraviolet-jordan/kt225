@@ -1,0 +1,7 @@
+build/
+.idea/
+.gradle/
+/cache/src/main/resources/archives/*
+/cache/src/main/resources/songs/*
+/cache/src/main/resources/maps/*
+!.gitkeep
