@@ -42,8 +42,8 @@ class HttpModule(
 ) : KotlinModule() {
     override fun configure() {
         bind<ApplicationArguments>().toInstance(ApplicationArguments(args))
-        bind<ApplicationEnvironment>().toProvider<ApplicationEnvironmentProvider>()
-        bind<ApplicationEngine>().toProvider<ApplicationEngineProvider>()
+        bind<ApplicationEnvironment>().toProvider<ApplicationEnvironmentProvider>().asEagerSingleton()
+        bind<ApplicationEngine>().toProvider<ApplicationEngineProvider>().asEagerSingleton()
 
         bind<ConfigResource>().toProvider<ConfigResourceProvider>()
         bind<InterfaceResource>().toProvider<InterfaceResourceProvider>()

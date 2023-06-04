@@ -11,8 +11,8 @@ dependencies {
     implementation(deps.guice)
     implementation(deps.cryptography)
 
-    implementation(project(":common"))
     implementation(project(":cache"))
+    implementation(project(":common"))
 }
 
 application {

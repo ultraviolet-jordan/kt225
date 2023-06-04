@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
-    implementation(deps.apache.commons)
     implementation(deps.bundles.ktor)
+
+    implementation(project(":common"))
 }

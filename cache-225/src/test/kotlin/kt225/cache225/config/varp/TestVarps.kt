@@ -5,7 +5,6 @@ import com.google.inject.Injector
 import dev.misfitlabs.kotlinguice4.getInstance
 import kt225.cache.CacheModule
 import kt225.cache.archive.config.varp.Varps
-import kt225.cache225.Cache225Module
 import kt225.common.buffer.RSByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertEquals

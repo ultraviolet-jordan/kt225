@@ -14,14 +14,19 @@ fun main(args: Array<String>) {
         CacheModule(),
         GameModule(args)
     )
+
     val applicationEnvironment = injector.getInstance<ApplicationEnvironment>()
     val applicationEngine = injector.getInstance<ApplicationEngine>()
     val server = injector.getInstance<GameServer>()
+    val synchronizer = injector.getInstance<GameSynchronizer>()
+    Runtime.getRuntime().addShutdownHook(ShutdownHook(applicationEnvironment.log, applicationEngine, server, synchronizer))
+
     try {
-        Runtime.getRuntime().addShutdownHook(ShutdownHook(applicationEnvironment.log, applicationEngine))
+        synchronizer.start()
         server.bind()
     } catch (exception: Exception) {
         exception.printStackTrace()
         server.close()
+        synchronizer.stop()
     }
 }
