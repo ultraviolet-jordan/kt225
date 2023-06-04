@@ -6,6 +6,6 @@ import kt225.common.buffer.RSByteBuffer
 /**
  * @author Jordan Abraham
  */
-interface EntryProvider<E, T> : Provider<T> {
+interface EntryProvider<E : EntryType, T> : Provider<T> {
     fun RSByteBuffer.decode(type: E): E
 }

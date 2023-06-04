@@ -4,8 +4,8 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.cache.archive.EntryProvider
 import kt225.cache.archive.config.ConfigArchive
+import kt225.cache.archive.config.varp.Varps
 import kt225.common.buffer.RSByteBuffer
-import java.util.TreeMap
 
 /**
  * @author Jordan Abraham
@@ -13,9 +13,9 @@ import java.util.TreeMap
 @Singleton
 class VarpsProvider @Inject constructor(
     private val configArchive: ConfigArchive
-) : EntryProvider<VarpEntry, Varps> {
+) : EntryProvider<VarpEntryType, Varps> {
 
-    override tailrec fun RSByteBuffer.decode(type: VarpEntry): VarpEntry {
+    override tailrec fun RSByteBuffer.decode(type: VarpEntryType): VarpEntryType {
         when (val opcode = readUByte()) {
             0 -> return type
             5 -> type.type = readUShort()
@@ -27,9 +27,7 @@ class VarpsProvider @Inject constructor(
     override fun get(): Varps = Varps().also {
         val buffer = configArchive.file("varp.dat")?.buffer() ?: error("varp.dat file not found.")
         repeat(buffer.readUShort()) { varpId ->
-            it[varpId] = buffer.decode(VarpEntry(varpId))
+            it[varpId] = buffer.decode(VarpEntryType(varpId))
         }
     }
 }
-
-class Varps : MutableMap<Int, VarpEntry> by TreeMap()
