@@ -4,6 +4,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.utils.IOUtils
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.math.BigInteger
 import java.nio.ByteBuffer
 
 /**
@@ -22,6 +23,8 @@ class RSByteBuffer(
     fun gstr(): String = String(readUChars(untilStringTerminator())).also {
         discard(1)
     }
+
+    fun gArrayBuffer(size: Int): ByteArray = ByteArray(size) { buffer.get() }
 
     fun p1(value: Int) {
         buffer.put(value.toByte())
@@ -47,6 +50,12 @@ class RSByteBuffer(
         buffer.put(10)
     }
 
+    fun pArrayBuffer(bytes: ByteArray) {
+        for (byte in bytes) {
+            buffer.put(byte)
+        }
+    }
+
     fun remaining(): Int = buffer.remaining()
 
     fun discard(amount: Int) {
@@ -54,6 +63,8 @@ class RSByteBuffer(
     }
 
     fun array(): ByteArray = buffer.array()
+
+    fun position(): Int = buffer.position()
 
     fun flip(): RSByteBuffer {
         buffer.flip()
@@ -81,6 +92,12 @@ class RSByteBuffer(
         return ByteArrayOutputStream()
             .apply { BZip2CompressorInputStream(ByteArrayInputStream(dest)).use { IOUtils.copy(it, this) } }
             .toByteArray()
+    }
+
+    fun rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteArray {
+        val length = g1()
+        val rsa = gArrayBuffer(length)
+        return BigInteger(rsa).modPow(exponent, modulus).toByteArray()
     }
 
     private tailrec fun untilStringTerminator(length: Int = 0): Int {

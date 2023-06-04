@@ -10,6 +10,9 @@ dependencies {
     implementation(deps.slf4j.simple)
     implementation(deps.guice)
     implementation(deps.cryptography)
+
+    implementation(project(":common"))
+    implementation(project(":cache"))
 }
 
 application {
