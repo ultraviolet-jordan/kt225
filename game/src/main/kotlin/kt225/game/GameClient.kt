@@ -104,19 +104,16 @@ class GameClient(
         val username = rsa.gstr()
         val password = rsa.gstr()
 
-        logger.info("$uid")
-        logger.info(username)
-        logger.info(password)
-
         writeLoginResponse(ResponseOpcodeId.LOGIN_SUCCESS_OPCODE, false)
+        acceptGame(properties, clientSeed, serverSeed, uid, username, password)
+    }
 
+    override suspend fun acceptGame(properties: Int, clientSeed: IntArray, serverSeed: IntArray, uid: Int, username: String, password: String) {
         val player = EntityPlayer(this, world)
-
         world.requestLogin(player)
 
         this.clientIsaac = clientSeed.toISAAC()
         this.serverIsaac = serverSeed.toISAAC()
-
         while (true) {
             val packet = withTimeout(Duration.ofSeconds(30)) { awaitPacket() } ?: continue
         }
@@ -131,15 +128,20 @@ class GameClient(
     }
 
     override suspend fun awaitPacket(): Packet? {
-        val id = readPacketId()
-        if (id < 0 || id > PacketLengths.lengths.size) {
+        val id = ((readChannel.readByte().toInt() and 0xFF) - clientIsaac!!.getNext() and 0xff)
+        if (id > PacketLengths.lengths.size) {
             readChannel.discard(readChannel.availableForRead.toLong())
             return null
         }
-        val size = readPacketSize(PacketLengths.lengths[id])
-        val buffer = RSByteBuffer(readChannel.readPacket(size).readBytes(size))
+        val serverLength = PacketLengths.lengths[id]
+        val clientLength = when {
+            serverLength != -1 && serverLength != -2 -> serverLength
+            serverLength == -1 -> (readChannel.readByte().toInt() and 0xFF)
+            else -> (readChannel.readShort().toInt() and 0xFFFF)
+        }
+        val buffer = RSByteBuffer(readChannel.readPacket(clientLength).readBytes(clientLength))
 
-        logger.info("Incoming Packet: Id=$id, Size=$size")
+        logger.info("Incoming Packet: Id=$id, ServerLength=$serverLength, ClientLength=$clientLength")
         return null
     }
 
@@ -153,15 +155,6 @@ class GameClient(
 
     override fun processWritePool() {
         TODO("Not yet implemented")
-    }
-
-    override suspend fun readPacketId(): Int = ((readChannel.readByte().toInt() and 0xFF) - clientIsaac!!.getNext() and 0xff)
-
-    override suspend fun readPacketSize(length: Int): Int {
-        if (length != -1 && length != -2) {
-            return length
-        }
-        return if (length == -1) (readChannel.readByte().toInt() and 0xFF) else (readChannel.readShort().toInt() and 0xFFFF)
     }
 
     override fun flushWriteChannel() {

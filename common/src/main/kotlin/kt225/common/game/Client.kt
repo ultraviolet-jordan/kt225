@@ -9,10 +9,9 @@ import kt225.common.packet.Packet
 interface Client {
     suspend fun acceptHandshake()
     suspend fun acceptLogin(buffer: RSByteBuffer)
+    suspend fun acceptGame(properties: Int, clientSeed: IntArray, serverSeed: IntArray, uid: Int, username: String, password: String)
     suspend fun writeLoginResponse(responseId: Int, flush: Boolean)
     suspend fun awaitPacket(): Packet?
-    suspend fun readPacketId(): Int
-    suspend fun readPacketSize(length: Int): Int
     fun processReadPool()
     fun writePacket(packet: Packet)
     fun processWritePool()
