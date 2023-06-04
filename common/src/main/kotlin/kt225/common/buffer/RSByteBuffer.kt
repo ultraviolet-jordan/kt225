@@ -14,15 +14,51 @@ class RSByteBuffer(
 ) {
     constructor(array: ByteArray) : this(ByteBuffer.wrap(array))
 
-    fun readUByte(): Int = buffer.get().toInt() and 0xFF
+    fun g1(): Int = buffer.get().toInt() and 0xFF
+    fun g2(): Int = buffer.short.toInt() and 0xFFFF
+    fun g3(): Int = (buffer.get().toInt() and 0xFF shl 16) or (buffer.short.toInt() and 0xFFFF)
+    fun g4(): Int = buffer.int
 
-    fun readUShort(): Int = buffer.short.toInt() and 0xFFFF
+    fun gstr(): String = String(readUChars(untilStringTerminator())).also {
+        discard(1)
+    }
 
-    fun readU24BitInt(): Int = (buffer.get().toInt() and 0xFF shl 16) or (buffer.short.toInt() and 0xFFFF)
+    fun p1(value: Int) {
+        buffer.put(value.toByte())
+    }
 
-    fun readInt(): Int = buffer.int
+    fun p2(value: Int) {
+        buffer.putShort(value.toShort())
+    }
+
+    fun p3(value: Int) {
+        buffer.put((value shr 16).toByte())
+        buffer.putShort(value.toShort())
+    }
+
+    fun p4(value: Int) {
+        buffer.putInt(value)
+    }
+
+    fun pjstr(value: String) {
+        for (char in value) {
+            buffer.put(char.code.toByte())
+        }
+        buffer.put(10)
+    }
 
     fun remaining(): Int = buffer.remaining()
+
+    fun discard(amount: Int) {
+        buffer.position(buffer.position() + amount)
+    }
+
+    fun array(): ByteArray = buffer.array()
+
+    fun flip(): RSByteBuffer {
+        buffer.flip()
+        return this
+    }
 
     fun copyInto(
         array: ByteArray,
@@ -46,4 +82,11 @@ class RSByteBuffer(
             .apply { BZip2CompressorInputStream(ByteArrayInputStream(dest)).use { IOUtils.copy(it, this) } }
             .toByteArray()
     }
+
+    private tailrec fun untilStringTerminator(length: Int = 0): Int {
+        if (buffer[buffer.position() + length].toInt() == 10) return length
+        return untilStringTerminator(length + 1)
+    }
+
+    private fun readUChars(n: Int): CharArray = CharArray(n) { (buffer.get().toInt() and 0xFF).toChar() }
 }

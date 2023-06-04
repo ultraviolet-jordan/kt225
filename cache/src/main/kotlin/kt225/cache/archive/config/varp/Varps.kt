@@ -6,4 +6,4 @@ import java.util.TreeMap
 /**
  * @author Jordan Abraham
  */
-class Varps : MutableMap<Int, EntryType> by TreeMap()
+class Varps<T : EntryType> : MutableMap<Int, T> by TreeMap()

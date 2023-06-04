@@ -7,5 +7,13 @@ import kt225.cache.archive.EntryType
  */
 data class VarpEntryType(
     val id: Int,
-    var type: Int = 0
+    var opcode1: Int = 0,
+    var opcode2: Int = 0,
+    var opcode3: Boolean = false,
+    var opcode4: Boolean = true,
+    var clientCode: Int = 0,
+    var opcode6: Boolean = false,
+    var opcode7: Int = 0,
+    var opcode8: Boolean = false,
+    var opcode10: String? = null
 ) : EntryType

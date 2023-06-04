@@ -17,8 +17,8 @@ abstract class CacheArchive {
         crc32.update(bytes)
         val buffer = RSByteBuffer(bytes)
         require(buffer.remaining() >= 6)
-        val decompressedLength = buffer.readU24BitInt()
-        val compressedLength = buffer.readU24BitInt()
+        val decompressedLength = buffer.g3()
+        val compressedLength = buffer.g3()
         val noCompression = decompressedLength == compressedLength
 
         val decompressed = when {
@@ -27,14 +27,14 @@ abstract class CacheArchive {
         }
 
         require(decompressed.remaining() >= 2)
-        val size = decompressed.readUShort()
+        val size = decompressed.g2()
 
         require(decompressed.remaining() >= size * 10)
         var offset = 8 + size * 10
         repeat(size) { fileId ->
-            val fileNameHash = decompressed.readInt()
-            val fileDecompressedLength = decompressed.readU24BitInt()
-            val fileCompressedLength = decompressed.readU24BitInt()
+            val fileNameHash = decompressed.g4()
+            val fileDecompressedLength = decompressed.g3()
+            val fileCompressedLength = decompressed.g3()
             val fileData = when {
                 noCompression -> decompressed.decompressBzip2(fileDecompressedLength, fileCompressedLength, offset)
                 else -> ByteArray(fileDecompressedLength).also { decompressed.copyInto(it, 0, offset, fileDecompressedLength) }
