@@ -25,6 +25,4 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
         buffer.writeBits(8, 0)
         buffer.accessBytes()
     }
-
-    override fun variableLength(packet: PlayerInfoPacket): Int = Byte.MAX_VALUE.toInt()
 }

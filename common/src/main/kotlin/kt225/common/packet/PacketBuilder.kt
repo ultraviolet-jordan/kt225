@@ -10,6 +10,4 @@ abstract class PacketBuilder<out T : Packet>(
     val length: Int
 ) {
     abstract fun buildPacket(packet: @UnsafeVariance T, buffer: RSByteBuffer)
-
-    open fun variableLength(packet: @UnsafeVariance T): Int = length
 }

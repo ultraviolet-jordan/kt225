@@ -20,6 +20,4 @@ class DataLocPacketBuilder : PacketBuilder<DataLocPacket>(
         buffer.p2(packet.length)
         buffer.pArrayBuffer(packet.bytes)
     }
-
-    override fun variableLength(packet: DataLocPacket): Int = 6 + packet.bytes.size
 }

@@ -20,6 +20,4 @@ class DataLandPacketBuilder : PacketBuilder<DataLandPacket>(
         buffer.p2(packet.length)
         buffer.pArrayBuffer(packet.bytes)
     }
-
-    override fun variableLength(packet: DataLandPacket): Int = 6 + packet.bytes.size
 }

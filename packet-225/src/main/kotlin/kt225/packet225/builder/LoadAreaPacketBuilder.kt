@@ -36,12 +36,4 @@ class LoadAreaPacketBuilder @Inject constructor(
             }
         }
     }
-
-    override fun variableLength(packet: LoadAreaPacket): Int {
-        val zoneX = packet.zoneX
-        val zoneZ = packet.zoneZ
-        val zonesX = ((zoneX - 6) / 8..(zoneX + 6) / 8)
-        val zonesZ = ((zoneZ - 6) / 8..(zoneZ + 6) / 8)
-        return 4 + (zonesX.count() * zonesZ.count() * 10)
-    }
 }
