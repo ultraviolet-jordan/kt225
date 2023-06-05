@@ -5,8 +5,8 @@ import kt225.common.game.entity.player.Player
 /**
  * @author Jordan Abraham
  */
-abstract class PacketHandler<T : Packet>(
+abstract class PacketHandler<out T : Packet>(
     val groupId: Int
 ) {
-    abstract fun handlePacket(packet: T, player: Player)
+    abstract fun handlePacket(packet: @UnsafeVariance T, player: Player)
 }

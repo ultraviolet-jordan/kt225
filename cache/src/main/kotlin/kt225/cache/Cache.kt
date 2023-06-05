@@ -4,8 +4,7 @@ package kt225.cache
  * @author Jordan Abraham
  */
 class Cache(
-    private val archives: Map<Int, CacheArchive?>,
-    val songs: Map<String, ByteArray>
+    private val archives: Map<Int, CacheArchive?>
 ) {
     fun openArchives() {
         archives.values.forEach {

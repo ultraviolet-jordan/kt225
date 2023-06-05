@@ -26,6 +26,7 @@ class GameWorld : World() {
         if (loginRequests.isEmpty()) return
 
         loginRequests.forEach {
+            players.add(it)
             it.init()
             it.login()
         }
@@ -39,6 +40,8 @@ class GameWorld : World() {
     }
 
     override fun online(): Boolean = online
+
+    override fun players(): List<Player> = players.filter(Player::online)
 
     override fun stop() {
         this.online = false

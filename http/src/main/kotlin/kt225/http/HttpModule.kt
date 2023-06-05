@@ -18,8 +18,6 @@ import kt225.http.routing.media.MediaRouting
 import kt225.http.routing.models.ModelsResource
 import kt225.http.routing.models.ModelsResourceProvider
 import kt225.http.routing.models.ModelsRouting
-import kt225.http.routing.songs.SongsResourceList
-import kt225.http.routing.songs.SongsResourceProvider
 import kt225.http.routing.songs.SongsRouting
 import kt225.http.routing.sounds.SoundsResource
 import kt225.http.routing.sounds.SoundsResourceProvider
@@ -49,7 +47,6 @@ class HttpModule(
         bind<InterfaceResource>().toProvider<InterfaceResourceProvider>()
         bind<MediaResource>().toProvider<MediaResourceProvider>()
         bind<ModelsResource>().toProvider<ModelsResourceProvider>()
-        bind<SongsResourceList>().toProvider<SongsResourceProvider>()
         bind<SoundsResource>().toProvider<SoundsResourceProvider>()
         bind<TexturesResource>().toProvider<TexturesResourceProvider>()
         bind<TitleResource>().toProvider<TitleResourceProvider>()

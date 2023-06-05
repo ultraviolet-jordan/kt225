@@ -1,13 +1,13 @@
 package kt225.common.packet
 
-import io.ktor.utils.io.ByteReadChannel
+import kt225.common.buffer.RSByteBuffer
 
 /**
  * @author Jordan Abraham
  */
-abstract class PacketReader<T : Packet>(
+abstract class PacketReader<out T : Packet>(
     val id: Int,
     val length: Int
 ) {
-    abstract suspend fun readPacket(readChannel: ByteReadChannel, length: Int): T?
+    abstract suspend fun readPacket(buffer: RSByteBuffer, length: Int): T?
 }

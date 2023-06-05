@@ -1,25 +1,28 @@
-package kt225.http.routing.songs
+package kt225.cache.maps
 
 /**
  * @author Jordan Abraham
  */
-data class SongsResource(
+data class MapResource(
     val name: String,
-    val bytes: ByteArray
+    val bytes: ByteArray,
+    val crc: Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as SongsResource
+        other as MapResource
 
         if (name != other.name) return false
-        return bytes.contentEquals(other.bytes)
+        if (!bytes.contentEquals(other.bytes)) return false
+        return crc == other.crc
     }
 
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + bytes.contentHashCode()
+        result = 31 * result + crc
         return result
     }
 }

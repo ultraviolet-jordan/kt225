@@ -13,6 +13,7 @@ dependencies {
 
     implementation(project(":cache"))
     implementation(project(":common"))
+    implementation(project(":packet-225"))
 }
 
 application {

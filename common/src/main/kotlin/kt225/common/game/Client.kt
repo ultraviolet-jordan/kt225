@@ -12,9 +12,10 @@ interface Client {
     suspend fun acceptGame(properties: Int, clientSeed: IntArray, serverSeed: IntArray, uid: Int, username: String, password: String)
     suspend fun writeLoginResponse(responseId: Int, flush: Boolean)
     suspend fun awaitPacket(): Packet?
-    fun processReadPool()
+    fun flushReadQueue()
     fun writePacket(packet: Packet)
-    fun processWritePool()
+    fun flushWriteQueue()
     fun flushWriteChannel()
+    fun availableForWrite(): Int
     fun close()
 }

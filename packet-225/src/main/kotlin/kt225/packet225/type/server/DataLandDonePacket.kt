@@ -5,4 +5,7 @@ import kt225.common.packet.Packet
 /**
  * @author Jordan Abraham
  */
-class RebuildNormalPacket : Packet
+data class DataLandDonePacket(
+    val x: Int,
+    val z: Int
+) : Packet

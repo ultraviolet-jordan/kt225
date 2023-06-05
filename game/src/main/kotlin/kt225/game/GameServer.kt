@@ -14,6 +14,8 @@ import kotlinx.coroutines.runBlocking
 import kt225.cache.Cache
 import kt225.common.game.Server
 import kt225.common.game.world.World
+import kt225.common.packet.Packet
+import kt225.common.packet.PacketReader
 import java.util.concurrent.TimeUnit
 
 /**
@@ -25,7 +27,8 @@ class GameServer @Inject constructor(
     private val applicationEngine: ApplicationEngine,
     private val applicationEnvironment: ApplicationEnvironment,
     private val cache: Cache,
-    private val world: World
+    private val world: World,
+    private val gamePacketConfiguration: GamePacketConfiguration
 ) : Server {
     override fun bind() = runBlocking {
         val logger = applicationEnvironment.log
@@ -37,7 +40,10 @@ class GameServer @Inject constructor(
                 socket = socket,
                 crcs = cache.crcs(),
                 environment = applicationEnvironment,
-                world = world
+                world = world,
+                packetBuilders = gamePacketConfiguration.builders,
+                packetReaders = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id),
+                packetHandlers = gamePacketConfiguration.handlers
             )
             launch(Dispatchers.IO) {
                 logger.info("Connection from ${socket.remoteAddress}")

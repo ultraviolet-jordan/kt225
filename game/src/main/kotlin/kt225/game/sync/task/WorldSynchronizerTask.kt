@@ -2,6 +2,7 @@ package kt225.game.sync.task
 
 import kt225.common.game.world.World
 import kt225.game.sync.SynchronizerTask
+import kt225.packet225.type.server.PlayerInfoPacket
 
 /**
  * @author Jordan Abraham
@@ -11,6 +12,11 @@ class WorldSynchronizerTask(
 ) : SynchronizerTask {
     override fun cycle(tick: Int) {
         world.processLoginRequests()
-        // world.processLogoutRequests()
+
+        val players = world.players()
+        for (player in players) {
+            player.client.writePacket(PlayerInfoPacket())
+            player.client.flushWriteQueue()
+        }
     }
 }

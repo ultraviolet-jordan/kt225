@@ -12,4 +12,5 @@ abstract class Player(
     world: World
 ) : Entity(world) {
     abstract fun init()
+    abstract fun online(): Boolean
 }
