@@ -27,8 +27,8 @@ class LoadAreaPacketBuilder @Inject constructor(
         val zonesX = ((zoneX - 6) / 8..(zoneX + 6) / 8)
         val zonesZ = ((zoneZ - 6) / 8..(zoneZ + 6) / 8)
 
-        for (x in zonesX) {
-            for (z in zonesZ) {
+        zonesX.forEach { x ->
+            zonesZ.forEach { z ->
                 buffer.p1(x)
                 buffer.p1(z)
                 buffer.p4(maps.firstOrNull { it.name == "m${x}_$z" }?.crc ?: 0)

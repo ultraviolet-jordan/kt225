@@ -20,33 +20,32 @@ class RequestMapPacketHandler @Inject constructor(
 ) : PacketHandler<RequestMapPacket>(
     groupId = 0
 ) {
-    override fun handlePacket(packet: RequestMapPacket, player: Player) {
-        player.sendRequestedMaps(packet.requestedLands, maxLength = 250)
-        player.sendRequestedMaps(packet.requestedLocs, maxLength = 250)
-    }
+    private val bytesLengthLimit = 250
 
-    private fun Player.sendRequestedMaps(requested: Map<String, Pair<Int, Int>>, maxLength: Int) {
-        requested.forEach { entry ->
-            val map = maps.firstOrNull { it.name == entry.key } ?: return@forEach
-            val x = entry.value.first
-            val z = entry.value.second
+    override fun handlePacket(packet: RequestMapPacket, player: Player) {
+        val client = player.client
+
+        packet.mapRequests.forEach { request ->
+            val map = maps.firstOrNull { it.name == request.name } ?: return@forEach
+            val x = request.x
+            val z = request.z
             val bytes = map.bytes
             val length = bytes.size
-            val type = map.name[0].toString()
+            val type = request.type
 
-            val slices = (length / maxLength) + 1
+            val slices = (length / bytesLengthLimit) + 1
             repeat(slices) { slice ->
-                val offset = slice * (maxLength - 1)
-                val sliceLength = minOf((slice + 1) * maxLength, length)
+                val offset = slice * (bytesLengthLimit - 1)
+                val sliceLength = minOf((slice + 1) * bytesLengthLimit, length)
                 val sliceBytes = bytes.sliceArray(offset until sliceLength)
                 when (type) {
-                    "m" -> client.writePacket(DataLandPacket(x, z, offset, length, sliceBytes))
-                    "l" -> client.writePacket(DataLocPacket(x, z, offset, length, sliceBytes))
+                    0 -> client.writePacket(DataLandPacket(x, z, offset, length, sliceBytes))
+                    1 -> client.writePacket(DataLocPacket(x, z, offset, length, sliceBytes))
                 }
             }
             when (type) {
-                "m" -> client.writePacket(DataLandDonePacket(x, z))
-                "l" -> client.writePacket(DataLocDonePacket(x, z))
+                0 -> client.writePacket(DataLandDonePacket(x, z))
+                1 -> client.writePacket(DataLocDonePacket(x, z))
             }
         }
     }

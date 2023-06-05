@@ -3,6 +3,7 @@ package kt225.packet225.reader
 import com.google.inject.Singleton
 import kt225.common.buffer.RSByteBuffer
 import kt225.common.packet.PacketReader
+import kt225.common.packet.server.MapRequest
 import kt225.packet225.type.client.RequestMapPacket
 
 /**
@@ -15,18 +16,18 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
 ) {
     override suspend fun readPacket(buffer: RSByteBuffer, length: Int): RequestMapPacket? {
         val size = buffer.capacity() / 3
-        val requestedLands = HashMap<String, Pair<Int, Int>>()
-        val requestedLocs = HashMap<String, Pair<Int, Int>>()
-        repeat(size) {
-            val type = buffer.g1()
-            val x = buffer.g1()
-            val z = buffer.g1()
-            if (type == 0) {
-                requestedLands["m${x}_$z"] = x to z
-            } else {
-                requestedLocs["l${x}_$z"] = x to z
+        if (size == 0) {
+            return null
+        }
+        val mapRequests = buildList {
+            repeat(size) {
+                val type = buffer.g1()
+                val x = buffer.g1()
+                val z = buffer.g1()
+                val name = "${if (type == 0) "m" else "l"}${x}_$z"
+                add(MapRequest(type, x, z, name))
             }
         }
-        return RequestMapPacket(requestedLands, requestedLocs)
+        return RequestMapPacket(mapRequests)
     }
 }
