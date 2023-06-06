@@ -35,7 +35,6 @@ class WorldSynchronizerTask(
             client.writePacket(PlayerInfoPacket(player, players, highDefinitionRenders, lowDefinitionRenders))
             player.renderer().clear()
             client.flushWriteQueue()
-            player.needsPlacement = false // TODO This is temporary.
         }
 
         playerSynchronizerRenderer.clear()

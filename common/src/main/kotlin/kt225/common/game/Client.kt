@@ -16,6 +16,5 @@ interface Client {
     fun writePacket(packet: Packet)
     fun flushWriteQueue()
     fun flushWriteChannel()
-    fun availableForWrite(): Int
     fun close()
 }

@@ -32,13 +32,13 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
     private fun BitAccess.updateLocalPlayer(player: Player, packet: PlayerInfoPacket, viewport: Viewport) {
         val index = player.index
         val rendering = packet.highDefinitionRenders[index] != null
-        val activityType = activityType(player, rendering)
+        val activityType = activityType(viewport, player, rendering)
         if (activityType == null) {
             pBit(1, 0)
             return
         }
         pBit(1, 1)
-        activityType.pBits(this, packet, player, rendering)
+        activityType.pBits(this, packet, viewport, player, rendering)
         if (rendering) {
             viewport.localRenderUpdates.add(index)
         }
@@ -66,16 +66,16 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
         viewport.localRenderUpdates.clear()
     }
 
-    private fun activityType(player: Player, rendering: Boolean): ActivityType? = when {
-        player.needsPlacement && rendering -> ActivityType.Placement
+    private fun activityType(viewport: Viewport, player: Player, rendering: Boolean): ActivityType? = when {
+        viewport.players[player.index] != player && rendering -> ActivityType.Placement
         else -> null
     }
 
     private sealed interface ActivityType {
-        fun pBits(bitAccess: BitAccess, packet: PlayerInfoPacket, player: Player, rendering: Boolean)
+        fun pBits(bitAccess: BitAccess, packet: PlayerInfoPacket, viewport: Viewport, player: Player, rendering: Boolean)
 
         object Placement : ActivityType {
-            override fun pBits(bitAccess: BitAccess, packet: PlayerInfoPacket, player: Player, rendering: Boolean) {
+            override fun pBits(bitAccess: BitAccess, packet: PlayerInfoPacket, viewport: Viewport, player: Player, rendering: Boolean) {
                 val position = player.position
                 bitAccess.pBit(2, 3)
                 bitAccess.pBit(2, position.plane)
@@ -83,6 +83,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
                 bitAccess.pBit(7, position.z - position.zoneOriginZ)
                 bitAccess.pBit(1, 1)
                 bitAccess.pBit(1, if (rendering) 1 else 0)
+                viewport.players[player.index] = player
             }
         }
     }

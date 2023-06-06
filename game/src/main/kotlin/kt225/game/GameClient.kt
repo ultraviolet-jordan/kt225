@@ -222,7 +222,7 @@ class GameClient(
                 writeChannelQueue.p2(size)
             }
             writeChannelQueue.position(endPos)
-            logger.info("Write packet: Id=${builder.id}, Size=$size, $packet")
+            logger.info("Write packet: Id=${builder.id}, Size=$size")
         } catch (exception: Exception) {
             close()
             logger.error(exception.stackTraceToString())
@@ -242,8 +242,6 @@ class GameClient(
     override fun flushWriteChannel() {
         writeChannel.flush()
     }
-
-    override fun availableForWrite(): Int = writeChannelQueue.remaining()
 
     override fun close() {
         socket.close()

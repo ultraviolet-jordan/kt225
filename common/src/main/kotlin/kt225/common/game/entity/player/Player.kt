@@ -14,8 +14,6 @@ abstract class Player(
 ) : Entity(world) {
     val viewport = Viewport()
 
-    var needsPlacement = true
-
     open fun init(position: Position) {
         this.position = position
         this.lastPosition = position
