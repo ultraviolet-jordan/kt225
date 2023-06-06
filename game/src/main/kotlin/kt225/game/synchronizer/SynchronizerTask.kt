@@ -1,4 +1,4 @@
-package kt225.game.sync
+package kt225.game.synchronizer
 
 /**
  * @author Jordan Abraham

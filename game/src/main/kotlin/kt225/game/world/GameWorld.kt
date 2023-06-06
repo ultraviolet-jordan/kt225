@@ -1,12 +1,14 @@
 package kt225.game.world
 
 import kt225.common.game.entity.player.Player
+import kt225.common.game.world.Position
 import kt225.common.game.world.World
 
 /**
  * @author Jordan Abraham
  */
 class GameWorld : World() {
+    private val players: Array<Player?> = arrayOfNulls(2048)
     private var online = false
 
     override fun start() {
@@ -26,8 +28,8 @@ class GameWorld : World() {
         if (loginRequests.isEmpty()) return
 
         loginRequests.forEach {
-            players.add(it)
-            it.init()
+            players[players.indexOf(null)] = it
+            it.init(Position.Default)
             it.login()
         }
         loginRequests.clear()
@@ -41,7 +43,7 @@ class GameWorld : World() {
 
     override fun online(): Boolean = online
 
-    override fun players(): List<Player> = players.filter(Player::online)
+    override fun players(): Array<Player?> = players
 
     override fun stop() {
         this.online = false

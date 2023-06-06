@@ -5,7 +5,7 @@ import com.google.inject.Injector
 import dev.misfitlabs.kotlinguice4.getInstance
 import kt225.cache.CacheModule
 import kt225.cache.archive.config.varp.Varps
-import kt225.common.buffer.RSByteBuffer
+import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -30,7 +30,7 @@ class TestVarps {
 
         varps.values.forEach {
             val encoded = provider.encode(it).array()
-            val decoded = provider.decode(RSByteBuffer(encoded), VarpEntryType(it.id))
+            val decoded = provider.decode(ByteBuffer.wrap(encoded), VarpEntryType(it.id))
 
             assertEquals(it.id, decoded.id)
             assertEquals(it.opcode1, decoded.opcode1)

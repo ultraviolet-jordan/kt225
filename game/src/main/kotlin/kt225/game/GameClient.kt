@@ -7,11 +7,15 @@ import io.ktor.network.sockets.openReadChannel
 import io.ktor.network.sockets.openWriteChannel
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.util.logging.Logger
-import io.ktor.utils.io.core.readBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
-import kt225.common.buffer.RSByteBuffer
+import kt225.common.buffer.g1
+import kt225.common.buffer.g4
+import kt225.common.buffer.gstr
+import kt225.common.buffer.p1
+import kt225.common.buffer.p2
+import kt225.common.buffer.rsaDecrypt
 import kt225.common.game.Client
 import kt225.common.game.world.World
 import kt225.common.packet.Packet
@@ -50,7 +54,7 @@ class GameClient(
     private val writeChannel = socket.openWriteChannel()
 
     private val readChannelQueue = ConcurrentHashMap<Int, ArrayBlockingQueue<PacketGroup>>()
-    private val writeChannelQueue = RSByteBuffer(ByteBuffer.allocateDirect(100_000))
+    private val writeChannelQueue = ByteBuffer.allocateDirect(100_000)
 
     private val exponent = environment.config.property("game.rsa.exponent").getString()
     private val modulus = environment.config.property("game.rsa.modulus").getString()
@@ -71,24 +75,23 @@ class GameClient(
                 return
             }
 
-            val payloadLength = readChannel.readByte().toInt() and 0xFF
-            val payload = ByteBuffer.allocate(payloadLength)
-            val readBytes = readChannel.readFully(payload)
-            payload.flip()
-            if (readBytes != payloadLength) {
+            val length = readChannel.readByte().toInt() and 0xFF
+            val buffer = ByteBuffer.allocate(length)
+            val readBytes = readChannel.readFully(buffer)
+            if (readBytes != length) {
                 writeLoginResponse(COULD_NOT_COMPLETE_LOGIN, true)
                 close()
                 return
             }
 
-            acceptLogin(RSByteBuffer(payload))
+            acceptLogin(buffer.flip())
         } catch (exception: Exception) {
             close()
             logger.error(exception.stackTraceToString())
         }
     }
 
-    override suspend fun acceptLogin(buffer: RSByteBuffer) {
+    override suspend fun acceptLogin(buffer: ByteBuffer) {
         val version = buffer.g1()
         if (version != 225) {
             writeLoginResponse(RUNESCAPE_HAS_BEEN_UPDATED, true)
@@ -105,7 +108,7 @@ class GameClient(
             return
         }
 
-        val rsa = RSByteBuffer(buffer.rsaDecrypt(BigInteger(exponent), BigInteger(modulus)))
+        val rsa = ByteBuffer.wrap(buffer.rsaDecrypt(BigInteger(exponent), BigInteger(modulus)))
 
         if (rsa.g1() != 10) {
             writeLoginResponse(BAD_SESSION_ID, true)
@@ -178,7 +181,13 @@ class GameClient(
             return null
         }
 
-        val buffer = RSByteBuffer(readChannel.readPacket(clientLength).readBytes(clientLength))
+        val buffer = ByteBuffer.allocate(clientLength)
+        val readBytes = readChannel.readFully(buffer)
+        if (readBytes != clientLength) {
+            logger.info("Packet buffer read bytes mismatch. Read bytes was $readBytes and payload length was $clientLength")
+            readChannel.discard(readChannel.availableForRead.toLong())
+            return null
+        }
         val packet = reader.readPacket(buffer, clientLength) ?: return null
 
         logger.info("Incoming Packet: Id=$id, ServerLength=$serverLength, ClientLength=$clientLength")

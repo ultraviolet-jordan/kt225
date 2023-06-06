@@ -1,6 +1,6 @@
 package kt225.common.packet
 
-import kt225.common.buffer.RSByteBuffer
+import java.nio.ByteBuffer
 
 /**
  * @author Jordan Abraham
@@ -9,5 +9,5 @@ abstract class PacketReader<out T : Packet>(
     val id: Int,
     val length: Int
 ) {
-    abstract suspend fun readPacket(buffer: RSByteBuffer, length: Int): T?
+    abstract suspend fun readPacket(buffer: ByteBuffer, length: Int): T?
 }

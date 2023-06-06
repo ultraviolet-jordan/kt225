@@ -1,6 +1,10 @@
 package kt225.cache
 
-import kt225.common.buffer.RSByteBuffer
+import kt225.common.buffer.decompressBzip2
+import kt225.common.buffer.g2
+import kt225.common.buffer.g3
+import kt225.common.buffer.g4
+import java.nio.ByteBuffer
 import java.util.TreeMap
 import java.util.zip.CRC32
 
@@ -15,7 +19,7 @@ abstract class CacheArchive {
 
     fun decode(bytes: ByteArray) {
         crc32.update(bytes)
-        val buffer = RSByteBuffer(bytes)
+        val buffer = ByteBuffer.wrap(bytes)
         require(buffer.remaining() >= 6)
         val decompressedLength = buffer.g3()
         val compressedLength = buffer.g3()
@@ -23,7 +27,7 @@ abstract class CacheArchive {
 
         val decompressed = when {
             noCompression -> buffer
-            else -> RSByteBuffer(buffer.decompressBzip2(decompressedLength, compressedLength, 6))
+            else -> ByteBuffer.wrap(buffer.decompressBzip2(decompressedLength, compressedLength, 6))
         }
 
         require(decompressed.remaining() >= 2)
@@ -37,7 +41,7 @@ abstract class CacheArchive {
             val fileCompressedLength = decompressed.g3()
             val fileData = when {
                 noCompression -> decompressed.decompressBzip2(fileDecompressedLength, fileCompressedLength, offset)
-                else -> ByteArray(fileDecompressedLength).also { decompressed.copyInto(it, 0, offset, fileDecompressedLength) }
+                else -> ByteArray(fileDecompressedLength).also { decompressed.array().copyInto(it, 0, offset, fileDecompressedLength) }
             }
             files[fileId] = CacheFile(fileNameHash, fileDecompressedLength, fileCompressedLength, offset, fileData)
             offset += fileCompressedLength

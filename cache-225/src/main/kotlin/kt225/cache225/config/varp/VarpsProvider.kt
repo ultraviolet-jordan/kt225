@@ -5,7 +5,14 @@ import com.google.inject.Singleton
 import kt225.cache.archive.EntryProvider
 import kt225.cache.archive.config.ConfigArchive
 import kt225.cache.archive.config.varp.Varps
-import kt225.common.buffer.RSByteBuffer
+import kt225.common.buffer.g1
+import kt225.common.buffer.g2
+import kt225.common.buffer.g4
+import kt225.common.buffer.gstr
+import kt225.common.buffer.p1
+import kt225.common.buffer.p2
+import kt225.common.buffer.p4
+import kt225.common.buffer.pjstr
 import java.nio.ByteBuffer
 
 /**
@@ -16,7 +23,7 @@ class VarpsProvider @Inject constructor(
     private val configArchive: ConfigArchive
 ) : EntryProvider<VarpEntryType, Varps<VarpEntryType>> {
 
-    override tailrec fun decode(buffer: RSByteBuffer, type: VarpEntryType): VarpEntryType {
+    override tailrec fun decode(buffer: ByteBuffer, type: VarpEntryType): VarpEntryType {
         when (val opcode = buffer.g1()) {
             0 -> return type
             1 -> type.opcode1 = buffer.g1()
@@ -33,7 +40,7 @@ class VarpsProvider @Inject constructor(
         return decode(buffer, type)
     }
 
-    override fun encode(type: VarpEntryType): RSByteBuffer {
+    override fun encode(type: VarpEntryType): ByteBuffer {
         var allocation = 1
         if (type.opcode1 != 0) {
             allocation += 1 + 1
@@ -63,7 +70,7 @@ class VarpsProvider @Inject constructor(
         if (opcode10 != null) {
             allocation += (1 + opcode10.length + 1)
         }
-        val buffer = RSByteBuffer(ByteBuffer.allocate(allocation))
+        val buffer = ByteBuffer.allocate(allocation)
         if (type.opcode1 != 0) {
             buffer.p1(1)
             buffer.p1(type.opcode1)

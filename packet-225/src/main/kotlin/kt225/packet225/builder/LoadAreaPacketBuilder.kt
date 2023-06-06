@@ -3,9 +3,12 @@ package kt225.packet225.builder
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.cache.maps.Maps
-import kt225.common.buffer.RSByteBuffer
+import kt225.common.buffer.p1
+import kt225.common.buffer.p2
+import kt225.common.buffer.p4
 import kt225.common.packet.PacketBuilder
 import kt225.packet225.type.server.LoadAreaPacket
+import java.nio.ByteBuffer
 
 /**
  * @author Jordan Abraham
@@ -17,7 +20,7 @@ class LoadAreaPacketBuilder @Inject constructor(
     id = 237,
     length = -2
 ) {
-    override fun buildPacket(packet: LoadAreaPacket, buffer: RSByteBuffer) {
+    override fun buildPacket(packet: LoadAreaPacket, buffer: ByteBuffer) {
         val zoneX = packet.zoneX
         val zoneZ = packet.zoneZ
 
