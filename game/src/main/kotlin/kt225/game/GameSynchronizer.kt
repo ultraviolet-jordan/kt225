@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import io.ktor.server.application.ApplicationEnvironment
 import kt225.common.game.Synchronizer
 import kt225.common.game.world.World
+import kt225.game.synchronizer.task.PlayerSynchronizerTask
 import kt225.game.synchronizer.task.WorldSynchronizerTask
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -23,7 +24,8 @@ class GameSynchronizer @Inject constructor(
     private var tick = 0
 
     private val syncTask = setOf(
-        WorldSynchronizerTask(world, playerSynchronizerRenderer)
+        WorldSynchronizerTask(world),
+        PlayerSynchronizerTask(world, playerSynchronizerRenderer)
     )
 
     override fun start() {

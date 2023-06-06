@@ -8,7 +8,6 @@ import kt225.common.packet.Packet
  */
 data class PlayerInfoPacket(
     val observing: Player,
-    val players: Array<Player?>,
     val highDefinitionRenders: Array<ByteArray?>,
     val lowDefinitionRenders: Array<ByteArray?>
 ) : Packet {
@@ -19,14 +18,12 @@ data class PlayerInfoPacket(
         other as PlayerInfoPacket
 
         if (observing != other.observing) return false
-        if (!players.contentEquals(other.players)) return false
         if (!highDefinitionRenders.contentDeepEquals(other.highDefinitionRenders)) return false
         return lowDefinitionRenders.contentDeepEquals(other.lowDefinitionRenders)
     }
 
     override fun hashCode(): Int {
         var result = observing.hashCode()
-        result = 31 * result + players.contentHashCode()
         result = 31 * result + highDefinitionRenders.contentDeepHashCode()
         result = 31 * result + lowDefinitionRenders.contentDeepHashCode()
         return result

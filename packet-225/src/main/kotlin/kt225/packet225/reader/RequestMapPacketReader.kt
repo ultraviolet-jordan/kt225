@@ -17,6 +17,7 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
 ) {
     override suspend fun readPacket(buffer: ByteBuffer, length: Int): RequestMapPacket? {
         val size = buffer.capacity() / 3
+        println(size)
         if (size == 0) {
             return null
         }
@@ -26,6 +27,7 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
                 val x = buffer.g1()
                 val z = buffer.g1()
                 val name = "${if (type == 0) "m" else "l"}${x}_$z"
+                println(name)
                 add(MapRequest(type, x, z, name))
             }
         }

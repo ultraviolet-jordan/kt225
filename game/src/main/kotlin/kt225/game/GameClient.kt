@@ -7,6 +7,7 @@ import io.ktor.network.sockets.openReadChannel
 import io.ktor.network.sockets.openWriteChannel
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.util.logging.Logger
+import io.ktor.utils.io.core.readBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.time.withTimeout
@@ -185,10 +186,12 @@ class GameClient(
         val readBytes = readChannel.readFully(buffer)
         if (readBytes != clientLength) {
             logger.info("Packet buffer read bytes mismatch. Read bytes was $readBytes and payload length was $clientLength")
-            readChannel.discard(readChannel.availableForRead.toLong())
             return null
         }
-        val packet = reader.readPacket(buffer, clientLength) ?: return null
+        val packet = reader.readPacket(buffer.flip(), clientLength) ?: return null
+
+//        val buffer = ByteBuffer.wrap(readChannel.readPacket(clientLength).readBytes(clientLength))
+//        val packet = reader.readPacket(buffer, clientLength) ?: return null
 
         logger.info("Incoming Packet: Id=$id, ServerLength=$serverLength, ClientLength=$clientLength")
         return packet

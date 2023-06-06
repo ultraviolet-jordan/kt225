@@ -1,5 +1,6 @@
 package kt225.common.game.entity
 
+import kt225.common.game.entity.animator.Animator
 import kt225.common.game.entity.render.Renderer
 import kt225.common.game.world.Position
 import kt225.common.game.world.World
@@ -23,4 +24,5 @@ abstract class Entity(
 
     abstract fun login()
     abstract fun renderer(): Renderer
+    abstract fun animator(): Animator
 }

@@ -41,9 +41,13 @@ class GameWorld : World() {
         // TODO Logout requests
     }
 
-    override fun online(): Boolean = online
+    override fun online(): Boolean {
+        return online
+    }
 
-    override fun players(): Array<Player?> = players
+    override fun players(): Array<Player?> {
+        return players
+    }
 
     override fun stop() {
         this.online = false

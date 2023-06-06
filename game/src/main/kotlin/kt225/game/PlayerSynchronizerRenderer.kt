@@ -15,7 +15,8 @@ import java.nio.ByteBuffer
 @Singleton
 class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
     highDefinitionRenders = arrayOfNulls(2048),
-    lowDefinitionRenders = arrayOfNulls(2048)
+    lowDefinitionRenders = arrayOfNulls(2048),
+    animatorRenders = arrayOfNulls(2048)
 ) {
     override fun renderEntity(entity: Player) {
         val renderer = entity.renderer()
@@ -23,19 +24,21 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
             highDefinitionRenders[entity.index] = buildHighDefinitionUpdates(entity, renderer.highDefinitionRenderBlocks)
         }
         lowDefinitionRenders[entity.index] = buildLowDefinitionUpdates(renderer.lowDefinitionRenderBlocks)
+        animatorRenders[entity.index] = entity.animator().block()
     }
 
     override fun clear() {
         highDefinitionRenders.fill(null)
         lowDefinitionRenders.fill(null)
+        animatorRenders.fill(null)
     }
 
     private fun buildHighDefinitionUpdates(player: Player, blocks: Array<HighDefinitionRenderBlock<*>?>): ByteArray {
         val mask = blocks.calculateMask(0x80)
         val size = blocks.calculateSize(mask)
         return ByteBuffer.allocate(size).also {
-            it.p1(mask and 256)
-            if (mask > 256) {
+            it.p1(mask and 0xFF)
+            if (mask >= 256) {
                 it.p1(mask shr 8)
             }
             for (block in blocks) {
@@ -43,7 +46,7 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
                     continue
                 }
                 val start = it.position()
-                block.builder().buildRenderBlock(it, block.renderType())
+                block.builder.buildRenderBlock(it, block.renderType)
                 val end = it.position()
                 player.renderer().capture(block, it.array().sliceArray(start until end))
             }
@@ -54,8 +57,8 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
         val mask = blocks.calculateMask(0x80)
         val size = blocks.calculateSize(mask)
         return ByteBuffer.allocate(size).also {
-            it.p1(mask and 256)
-            if (mask > 256) {
+            it.p1(mask and 0xFF)
+            if (mask >= 256) {
                 it.p1(mask shr 8)
             }
             for (block in blocks) {

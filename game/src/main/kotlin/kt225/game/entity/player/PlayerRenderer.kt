@@ -27,7 +27,7 @@ class PlayerRenderer : Renderer(
     }
 
     override fun <R : RenderType> capture(block: HighDefinitionRenderBlock<R>, bytes: ByteArray) {
-        lowDefinitionRenderBlocks[block.builder().mask] = LowDefinitionRenderBlock(block.renderType(), block.builder(), bytes)
+        lowDefinitionRenderBlocks[block.builder.mask] = LowDefinitionRenderBlock(block.renderType, block.builder, bytes)
     }
 
     override fun needsRendering(): Boolean = highDefinitionRenderBlocks.any { it != null }

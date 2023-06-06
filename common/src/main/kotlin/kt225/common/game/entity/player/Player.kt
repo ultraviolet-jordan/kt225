@@ -14,11 +14,11 @@ abstract class Player(
 ) : Entity(world) {
     val viewport = Viewport()
 
+    var online = false
+
     open fun init(position: Position) {
         this.position = position
         this.lastPosition = position
         this.scenePosition = position
     }
-
-    abstract fun online(): Boolean
 }
