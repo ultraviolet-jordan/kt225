@@ -15,5 +15,5 @@ value class MapSquareLocalPosition(
 
     val x: Int get() = packed shr 6 and 0x3f
     val z: Int get() = packed and 0x3f
-    val plane: Int get() = (packed shr 12)
+    val plane: Int get() = packed shr 12
 }
