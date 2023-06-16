@@ -9,6 +9,7 @@ import kt225.cache.map.Maps
 import kt225.common.buffer.decompressBzip2
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1s
+import kt225.common.buffer.g4
 import kt225.common.buffer.gSmart1or2
 import java.nio.ByteBuffer
 
@@ -42,9 +43,9 @@ class MapSquaresProvider @Inject constructor(
                 require(packedEntry.z == landZ)
 
                 val entry = MapSquareEntryType(packedEntry, type = 0)
-                decode(ByteBuffer.wrap(land.bytes).decompressBzip2(land.bytes.size - 4, 4), entry)
+                decode(ByteBuffer.wrap(land.bytes).decompress(), entry)
                 entry.type = 1
-                decode(ByteBuffer.wrap(loc.bytes).decompressBzip2(loc.bytes.size - 4, 4), entry)
+                decode(ByteBuffer.wrap(loc.bytes).decompress(), entry)
                 it[landId] = entry
             }
         }
@@ -63,13 +64,13 @@ class MapSquaresProvider @Inject constructor(
         for (plane in 0 until 4) {
             for (x in 0 until 64) {
                 for (z in 0 until 64) {
-                    entry.lands[(x and 0x3f shl 6) or (z and 0x3f) or (plane shl 12)] = loadTerrain()
+                    entry.lands[(x and 0x3f shl 6) or (z and 0x3f) or (plane shl 12)] = decodeLand()
                 }
             }
         }
     }
 
-    private tailrec fun ByteBuffer.loadTerrain(
+    private tailrec fun ByteBuffer.decodeLand(
         height: Int = 0,
         overlayId: Int = 0,
         overlayPath: Int = 0,
@@ -87,7 +88,7 @@ class MapSquaresProvider @Inject constructor(
                 underlayId = underlayId
             )
         }
-        else -> loadTerrain(
+        else -> decodeLand(
             height = height,
             overlayId = if (opcode in 2..49) g1s() else overlayId,
             overlayPath = if (opcode in 2..49) (opcode - 2) / 4 else overlayPath,
@@ -99,14 +100,18 @@ class MapSquaresProvider @Inject constructor(
 
     private fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareEntryType, locId: Int = -1) {
         val offset = gSmart1or2()
-        if (offset == 0) return
+        if (offset == 0) {
+            return
+        }
         decodeLoc(entry, locId + offset, 0)
         return decodeMapSquareLocs(entry, locId + offset)
     }
 
     private tailrec fun ByteBuffer.decodeLoc(entry: MapSquareEntryType, locId: Int, packedLocation: Int) {
         val offset = gSmart1or2()
-        if (offset == 0) return
+        if (offset == 0) {
+            return
+        }
         val attributes = g1()
         val shape = attributes shr 2
         val rotation = attributes and 0x3
@@ -133,5 +138,12 @@ class MapSquaresProvider @Inject constructor(
             }
         }
         return decodeLoc(entry, locId, packed)
+    }
+
+    private fun ByteBuffer.decompress(): ByteBuffer {
+        val decompressedLength = g4()
+        val buffer = decompressBzip2(capacity() - 4, 4)
+        require(decompressedLength == buffer.capacity())
+        return buffer
     }
 }

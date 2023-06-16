@@ -19,33 +19,48 @@ abstract class CacheArchive {
 
     fun decode(bytes: ByteArray) {
         crc32.update(bytes)
-        val buffer = ByteBuffer.wrap(bytes)
-        require(buffer.remaining() >= 6)
-        val decompressedLength = buffer.g3()
-        val compressedLength = buffer.g3()
-        val noCompression = decompressedLength == compressedLength
+        val input = ByteBuffer.wrap(bytes)
+        require(input.remaining() >= 6)
+        val decompressedLength = input.g3()
+        val compressedLength = input.g3()
+        val needsDecompressing = decompressedLength != compressedLength
 
-        val decompressed = when {
-            noCompression -> buffer
-            else -> buffer.decompressBzip2(compressedLength, 6)
+        val buffer = when {
+            needsDecompressing -> input.decompressBzip2(compressedLength, 6)
+            else -> input
         }
 
-        require(decompressed.remaining() >= 2)
-        val size = decompressed.g2()
-
-        require(decompressed.remaining() >= size * 10)
-        var offset = 8 + size * 10
-        repeat(size) { fileId ->
-            val fileNameHash = decompressed.g4()
-            val fileDecompressedLength = decompressed.g3()
-            val fileCompressedLength = decompressed.g3()
-            val fileData = when {
-                noCompression -> decompressed.decompressBzip2(fileCompressedLength, offset).array()
-                else -> ByteArray(fileDecompressedLength).also { decompressed.array().copyInto(it, 0, offset, fileDecompressedLength) }
-            }
-            files[fileId] = CacheFile(fileNameHash, fileDecompressedLength, fileCompressedLength, offset, fileData)
-            offset += fileCompressedLength
+        if (needsDecompressing) {
+            require(decompressedLength == buffer.capacity())
         }
+
+        require(buffer.remaining() >= 2)
+        buffer.decodeFiles(buffer.g2(), needsDecompressing).also {
+            files.putAll(it.filterNotNull().associateBy(CacheFile::id))
+        }
+    }
+
+    private tailrec fun ByteBuffer.decodeFiles(
+        length: Int,
+        needsDecompressing: Boolean,
+        fileId: Int = 0,
+        offset: Int = 8 + length * 10,
+        files: Array<CacheFile?> = arrayOfNulls(length)
+    ): Array<CacheFile?> {
+        if (fileId == length) {
+            return files
+        }
+        require(remaining() >= 10)
+        val nameHash = g4()
+        val decompressedLength = g3()
+        val compressedLength = g3()
+        val data = when {
+            needsDecompressing -> ByteArray(decompressedLength).also { array().copyInto(it, 0, offset, decompressedLength) }
+            else -> decompressBzip2(compressedLength, offset).array()
+        }
+        require(decompressedLength == data.size)
+        files[fileId] = CacheFile(fileId, nameHash, decompressedLength, compressedLength, offset, data)
+        return decodeFiles(length, needsDecompressing, fileId + 1, offset + compressedLength)
     }
 
     fun file(fileId: Int): CacheFile? = files[fileId]

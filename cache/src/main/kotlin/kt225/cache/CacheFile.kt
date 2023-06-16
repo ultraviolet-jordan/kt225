@@ -6,6 +6,7 @@ import java.nio.ByteBuffer
  * @author Jordan Abraham
  */
 data class CacheFile(
+    val id: Int,
     val nameHash: Int,
     val decompressedLength: Int,
     val compressedLength: Int,
