@@ -15,16 +15,16 @@ import java.util.zip.CRC32
 @Singleton
 class SongsProvider : Provider<Songs> {
     override fun get(): Songs = Songs().also {
-        val songsURI = javaClass.getResource("/songs/")!!.toURI()
-        val songsPath = try {
-            Paths.get(songsURI)
+        val uri = javaClass.getResource("/songs/")!!.toURI()
+        val start = try {
+            Paths.get(uri)
         } catch (exception: FileSystemNotFoundException) {
-            FileSystems.newFileSystem(songsURI, HashMap<String, String>()).getPath("/songs/")
+            FileSystems.newFileSystem(uri, HashMap<String, String>()).getPath("/songs/")
         }
-        Files.walk(songsPath).forEach { path ->
-            val resource = javaClass.getResourceAsStream("/songs/${path.fileName}") ?: return@forEach
-            val bytes = resource.readAllBytes()
-            resource.close()
+        Files.walk(start).forEach { path ->
+            val stream = javaClass.getResourceAsStream("/songs/${path.fileName}") ?: return@forEach
+            val bytes = stream.readAllBytes()
+            stream.close()
             val crc32 = CRC32()
             crc32.update(bytes)
             it.add(SongResource(path.fileName.toString().take(10), bytes, crc32.value.toInt()))

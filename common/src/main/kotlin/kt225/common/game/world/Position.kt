@@ -15,7 +15,7 @@ value class Position(
 
     val mapSquareX get() = (x shr 6)
     val mapSquareZ get() = (z shr 6)
-    val mapSquareId get() = (mapSquareX shl 8) or mapSquareZ
+    val mapSquareId get() = mapSquareX shl 8 or mapSquareZ
 
     val zoneX get() = (x shr 3)
     val zoneZ get() = (z shr 3)

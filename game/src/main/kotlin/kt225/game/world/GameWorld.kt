@@ -1,5 +1,7 @@
 package kt225.game.world
 
+import kt225.cache.map.MapSquares
+import kt225.cache225.map.MapSquareEntryType
 import kt225.common.game.entity.player.Player
 import kt225.common.game.world.Position
 import kt225.common.game.world.World
@@ -11,7 +13,9 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * @author Jordan Abraham
  */
-class GameWorld : World(
+class GameWorld(
+    private val mapSquares: MapSquares<MapSquareEntryType>
+) : World(
     players = arrayOfNulls(2048),
     loginRequests = ConcurrentHashMap.newKeySet(),
     logoutRequests = ConcurrentHashMap.newKeySet()
@@ -19,6 +23,7 @@ class GameWorld : World(
     private var online = false
 
     override fun start() {
+        println(mapSquares.size)
         this.online = true
     }
 

@@ -2,7 +2,7 @@ package kt225.packet.handler
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import kt225.cache.maps.Maps
+import kt225.cache.map.Maps
 import kt225.common.game.Client
 import kt225.common.packet.PacketHandler
 import kt225.packet.type.client.RequestMapPacket

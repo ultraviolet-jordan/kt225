@@ -1,4 +1,4 @@
-package kt225.cache.archive
+package kt225.cache
 
 /**
  * @author Jordan Abraham

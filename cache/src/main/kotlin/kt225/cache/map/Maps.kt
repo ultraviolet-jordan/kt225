@@ -1,4 +1,4 @@
-package kt225.cache.maps
+package kt225.cache.map
 
 /**
  * @author Jordan Abraham

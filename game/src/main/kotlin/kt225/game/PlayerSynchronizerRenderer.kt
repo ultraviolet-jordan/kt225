@@ -37,7 +37,7 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
         val mask = blocks.calculateMask(0x80)
         val size = blocks.calculateSize(mask)
         return ByteBuffer.allocate(size).also {
-            it.p1(mask and 0xFF)
+            it.p1(mask and 0xff)
             if (mask >= 256) {
                 it.p1(mask shr 8)
             }
@@ -57,7 +57,7 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
         val mask = blocks.calculateMask(0x80)
         val size = blocks.calculateSize(mask)
         return ByteBuffer.allocate(size).also {
-            it.p1(mask and 0xFF)
+            it.p1(mask and 0xff)
             if (mask >= 256) {
                 it.p1(mask shr 8)
             }

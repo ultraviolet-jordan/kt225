@@ -26,8 +26,8 @@ class LoginDecoder @Inject constructor(
     private val modulus = environment.config.property("game.rsa.modulus").getString()
 
     override suspend fun decode(session: Session, channel: ByteReadChannel) {
-        val loginType = channel.readByte().toInt() and 0xFF
-        val length = channel.readByte().toInt() and 0xFF
+        val loginType = channel.readByte().toInt() and 0xff
+        val length = channel.readByte().toInt() and 0xff
         val buffer = ByteBuffer.allocate(length)
         val bytes = channel.readFully(buffer).also {
             buffer.flip()

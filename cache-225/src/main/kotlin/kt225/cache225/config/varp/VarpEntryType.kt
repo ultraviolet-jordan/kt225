@@ -1,6 +1,6 @@
 package kt225.cache225.config.varp
 
-import kt225.cache.archive.EntryType
+import kt225.cache.EntryType
 
 /**
  * @author Jordan Abraham

@@ -30,7 +30,7 @@ class GameClient(
     override fun writePacket(packet: Packet) {
         val builder = session.builders[packet::class] ?: return
 
-        writeChannelQueue.p1(builder.id + serverIsaac.getNext() and 0xFF)
+        writeChannelQueue.p1(builder.id + serverIsaac.getNext() and 0xff)
 
         if (builder.length != -1 && builder.length != -2) {
             builder.buildPacket(packet, writeChannelQueue)

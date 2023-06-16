@@ -17,8 +17,8 @@ import kt225.cache.archive.title.TitleArchive
 import kt225.cache.archive.title.TitleArchiveProvider
 import kt225.cache.archive.wordenc.WordEncArchive
 import kt225.cache.archive.wordenc.WordEncArchiveProvider
-import kt225.cache.maps.Maps
-import kt225.cache.maps.MapsProvider
+import kt225.cache.map.MapProvider
+import kt225.cache.map.Maps
 import kt225.cache.song.Songs
 import kt225.cache.song.SongsProvider
 
@@ -37,6 +37,6 @@ object CacheModule : KotlinModule() {
         bind<TitleArchive>().toProvider<TitleArchiveProvider>().asEagerSingleton()
         bind<WordEncArchive>().toProvider<WordEncArchiveProvider>().asEagerSingleton()
         bind<Songs>().toProvider<SongsProvider>().asEagerSingleton()
-        bind<Maps>().toProvider<MapsProvider>().asEagerSingleton()
+        bind<Maps>().toProvider<MapProvider>().asEagerSingleton()
     }
 }

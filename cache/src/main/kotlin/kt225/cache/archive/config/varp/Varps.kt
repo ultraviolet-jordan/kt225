@@ -1,6 +1,6 @@
 package kt225.cache.archive.config.varp
 
-import kt225.cache.archive.EntryType
+import kt225.cache.EntryType
 import java.util.TreeMap
 
 /**

@@ -11,10 +11,14 @@ import kotlin.math.min
 /**
  * @author Jordan Abraham
  */
-fun ByteBuffer.g1(): Int = get().toInt() and 0xFF
-fun ByteBuffer.g2(): Int = short.toInt() and 0xFFFF
-fun ByteBuffer.g3(): Int = (get().toInt() and 0xFF shl 16) or (short.toInt() and 0xFFFF)
+fun ByteBuffer.g1(): Int = get().toInt() and 0xff
+fun ByteBuffer.g1s(): Int = get().toInt()
+fun ByteBuffer.g2(): Int = short.toInt() and 0xffff
+fun ByteBuffer.g3(): Int = (get().toInt() and 0xff shl 16) or (short.toInt() and 0xffff)
 fun ByteBuffer.g4(): Int = int
+
+fun ByteBuffer.gSmart1or2(): Int = if ((this[position()].toInt() and 0xff) < 128) g1() else g2() - 32768
+fun ByteBuffer.gSmart1or2s(): Int = if ((this[position()].toInt() and 0xff) < 128) g1() - 64 else g2() - 49152
 
 fun ByteBuffer.gstr(): String = String(readUChars(untilStringTerminator())).also {
     discard(1)
@@ -87,7 +91,7 @@ private tailrec fun ByteBuffer.untilStringTerminator(length: Int = 0): Int {
     return untilStringTerminator(length + 1)
 }
 
-private fun ByteBuffer.readUChars(n: Int): CharArray = CharArray(n) { (get().toInt() and 0xFF).toChar() }
+private fun ByteBuffer.readUChars(n: Int): CharArray = CharArray(n) { (get().toInt() and 0xff).toChar() }
 
 inline fun ByteBuffer.withBitAccess(block: BitAccess.() -> Unit) {
     val bitAccess = BitAccess(this)
