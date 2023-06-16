@@ -52,10 +52,3 @@ class MapProvider : Provider<Maps> {
         }
     }
 }
-
-fun main() {
-    val x = 50
-    val z = 50
-    val id = x shl 8 or z
-    println(id)
-}

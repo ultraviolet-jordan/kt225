@@ -9,7 +9,6 @@ import kt225.cache.map.Maps
 import kt225.common.buffer.decompressBzip2
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1s
-import kt225.common.buffer.g4
 import kt225.common.buffer.gSmart1or2
 import java.nio.ByteBuffer
 
@@ -43,9 +42,9 @@ class MapSquaresProvider @Inject constructor(
                 require(packedEntry.z == landZ)
 
                 val entry = MapSquareEntryType(packedEntry, type = 0)
-                decode(decompress(land.bytes), entry)
+                decode(ByteBuffer.wrap(land.bytes).decompressBzip2(land.bytes.size - 4, 4), entry)
                 entry.type = 1
-                decode(decompress(loc.bytes), entry)
+                decode(ByteBuffer.wrap(loc.bytes).decompressBzip2(loc.bytes.size - 4, 4), entry)
                 it[landId] = entry
             }
         }
@@ -80,10 +79,12 @@ class MapSquaresProvider @Inject constructor(
     ): MapSquareLandTile = when (val opcode = g1()) {
         0, 1 -> { // This isn't perfect according to the client code but i cba.
             MapSquareLandTile(
-                height = MapSquareLandTileHeight(if (opcode == 1) g1().let { if (it == 1) 0 else it } else height),
-                overlay = MapSquareLandTileOverlay(overlayId, overlayPath, overlayRotation),
-                collision = MapSquareLandTileCollision(flags),
-                underlay = MapSquareLandTileUnderlay(underlayId)
+                height = if (opcode == 1) g1().let { if (it == 1) 0 else it } else height,
+                overlayId = overlayId,
+                overlayPath = overlayPath,
+                overlayRotation = overlayRotation,
+                collision = flags,
+                underlayId = underlayId
             )
         }
         else -> loadTerrain(
@@ -115,7 +116,7 @@ class MapSquaresProvider @Inject constructor(
         val z = packed and 0x3f
         val plane = (packed shr 12).let {
             // Check for bridges.
-            if (entry.lands[(x and 0x3f shl 6) or (z and 0x3f) or (1 shl 12)]!!.collision.flags and 0x2 == 2) it - 1 else it
+            if (entry.lands[(x and 0x3f shl 6) or (z and 0x3f) or (1 shl 12)]!!.collision and 0x2 == 2) it - 1 else it
         }
         // New adjusted packed location after adjusting for bridge.
         val adjusted = (x and 0x3f shl 6) or (z and 0x3f) or (plane shl 12)
@@ -132,13 +133,5 @@ class MapSquaresProvider @Inject constructor(
             }
         }
         return decodeLoc(entry, locId, packed)
-    }
-
-    private fun decompress(bytes: ByteArray): ByteBuffer {
-        val bytesLength = bytes.size
-        val buffer = ByteBuffer.wrap(bytes)
-        val decompressedLength = buffer.g4()
-        val fixedLength = if (bytesLength - 4 < decompressedLength) decompressedLength else bytesLength - 4
-        return ByteBuffer.wrap(buffer.decompressBzip2(fixedLength, bytesLength - 4, 4))
     }
 }

@@ -7,7 +7,14 @@ package kt225.cache225.map
 value class MapSquareLocTile(
     private val packed: Long
 ) {
-    constructor(id: Int, x: Int, z: Int, level: Int, shape: Int, rotation: Int) : this(((id and 0x1ffff) or ((shape and 0x1f) shl 17) or ((rotation and 0x3) shl 22)).toLong() or (((z and 0x3fff) or ((x and 0x3fff) shl 14) or ((level and 0x3) shl 28)).toLong() shl 24))
+    constructor(
+        id: Int,
+        x: Int,
+        z: Int,
+        level: Int,
+        shape: Int,
+        rotation: Int
+    ) : this(((id and 0x1ffff) or ((shape and 0x1f) shl 17) or ((rotation and 0x3) shl 22)).toLong() or (((z and 0x3fff) or ((x and 0x3fff) shl 14) or ((level and 0x3) shl 28)).toLong() shl 24))
 
     val id: Int get() = (packed and 0x1ffff).toInt()
     val shape: Int get() = (packed shr 17 and 0x1f).toInt()

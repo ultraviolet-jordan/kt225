@@ -27,7 +27,7 @@ abstract class CacheArchive {
 
         val decompressed = when {
             noCompression -> buffer
-            else -> ByteBuffer.wrap(buffer.decompressBzip2(decompressedLength, compressedLength, 6))
+            else -> buffer.decompressBzip2(compressedLength, 6)
         }
 
         require(decompressed.remaining() >= 2)
@@ -40,7 +40,7 @@ abstract class CacheArchive {
             val fileDecompressedLength = decompressed.g3()
             val fileCompressedLength = decompressed.g3()
             val fileData = when {
-                noCompression -> decompressed.decompressBzip2(fileDecompressedLength, fileCompressedLength, offset)
+                noCompression -> decompressed.decompressBzip2(fileCompressedLength, offset).array()
                 else -> ByteArray(fileDecompressedLength).also { decompressed.array().copyInto(it, 0, offset, fileDecompressedLength) }
             }
             files[fileId] = CacheFile(fileNameHash, fileDecompressedLength, fileCompressedLength, offset, fileData)

@@ -64,20 +64,30 @@ fun ByteBuffer.discard(amount: Int) {
     position(position() + amount)
 }
 
-fun ByteBuffer.decompressBzip2(decompressedLength: Int, compressedLength: Int, startIndex: Int): ByteArray {
+fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int): ByteBuffer {
     val header = byteArrayOf(
         'B'.code.toByte(),
         'Z'.code.toByte(),
         'h'.code.toByte(),
         '1'.code.toByte()
     )
-    val dest = ByteArray(decompressedLength + header.size + startIndex).also {
-        header.copyInto(it, 0, 0, header.size)
-        array().copyInto(it, header.size, startIndex, compressedLength + startIndex)
+
+    val dest = ByteArray(length + 4).also {
+        header.copyInto(it)
+        array().copyInto(it, header.size, startIndex, length + startIndex)
     }
-    return ByteArrayOutputStream()
-        .apply { BZip2CompressorInputStream(ByteArrayInputStream(dest)).use { IOUtils.copy(it, this) } }
-        .toByteArray()
+
+    val input = ByteArrayInputStream(dest)
+    val compressor = BZip2CompressorInputStream(input)
+    val output = ByteArrayOutputStream().apply {
+        IOUtils.copy(compressor, this)
+    }
+    val bytes = output.toByteArray()
+    output.close()
+    compressor.close()
+    input.close()
+
+    return ByteBuffer.wrap(bytes)
 }
 
 fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteArray {

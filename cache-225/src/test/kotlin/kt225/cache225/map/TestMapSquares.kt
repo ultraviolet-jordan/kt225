@@ -18,7 +18,8 @@ class TestMapSquares {
         val injector: Injector = Guice.createInjector(CacheModule, Cache225Module)
         val maps = injector.getInstance<MapSquares<MapSquareEntryType>>()
 
-        val map = maps[12850]
-        println(map)
+        val map = maps[12850] ?: return
+        val land = map.lands
+        println(land[2]?.height)
     }
 }
