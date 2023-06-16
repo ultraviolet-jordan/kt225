@@ -75,25 +75,29 @@ class MapSquaresProvider @Inject constructor(
         overlayId: Int = 0,
         overlayPath: Int = 0,
         overlayRotation: Int = 0,
-        flags: Int = 0,
+        collision: Int = 0,
         underlayId: Int = 0
-    ): MapSquareLandTile = when (val opcode = g1()) {
-        0, 1 -> { // This isn't perfect according to the client code but i cba.
-            MapSquareLandTile(
-                height = if (opcode == 1) g1().let { if (it == 1) 0 else it } else height,
-                overlayId = overlayId,
-                overlayPath = overlayPath,
-                overlayRotation = overlayRotation,
-                collision = flags,
-                underlayId = underlayId
-            )
+    ): MapSquareLandTile {
+        val opcode = g1()
+        if (opcode == 0 || opcode == 1) {
+            val adjustedHeight = if (opcode == 1) g1().let { if (it == 1) 0 else it } else height
+            val land = MapSquareLandTile(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
+
+            // Checks the bitpacking.
+            require(land.height == adjustedHeight)
+            require(land.overlayId == overlayId)
+            require(land.overlayPath == overlayPath)
+            require(land.overlayRotation == overlayRotation)
+            require(land.collision == collision)
+            require(land.underlayId == underlayId)
+            return land
         }
-        else -> decodeLand(
+        return decodeLand(
             height = height,
             overlayId = if (opcode in 2..49) g1s() else overlayId,
             overlayPath = if (opcode in 2..49) (opcode - 2) / 4 else overlayPath,
             overlayRotation = if (opcode in 2..49) opcode - 2 and 3 else overlayRotation,
-            flags = if (opcode in 50..81) opcode - 49 else flags,
+            collision = if (opcode in 50..81) opcode - 49 else collision,
             underlayId = if (opcode > 81) opcode - 81 else underlayId
         )
     }
@@ -136,6 +140,15 @@ class MapSquaresProvider @Inject constructor(
                 }
                 else -> throw AssertionError("Size is too many. 5 capacity.")
             }
+
+            // Checks the bitpacking.
+            val loc = entry.locs[adjusted]?.last()
+            require(loc?.id == locId)
+            require(loc?.x == x)
+            require(loc?.z == z)
+            require(loc?.plane == plane)
+            require(loc?.rotation == rotation)
+            require(loc?.shape == shape)
         }
         return decodeLoc(entry, locId, packed)
     }
