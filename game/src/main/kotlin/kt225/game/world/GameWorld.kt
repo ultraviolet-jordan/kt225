@@ -8,6 +8,7 @@ import kt225.common.game.world.World
 import kt225.common.network.LoginRequest
 import kt225.game.GameClient
 import kt225.game.entity.player.EntityPlayer
+import kt225.game.world.map.CollisionManager
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -20,10 +21,12 @@ class GameWorld(
     loginRequests = ConcurrentHashMap.newKeySet(),
     logoutRequests = ConcurrentHashMap.newKeySet()
 ) {
+    private val collisionManager = CollisionManager()
+
     private var online = false
 
     override fun start() {
-        println(mapSquares.size)
+        collisionManager.applyCollision(mapSquares)
         this.online = true
     }
 
