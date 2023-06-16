@@ -24,4 +24,8 @@ abstract class Entity(
         protected set
 
     abstract fun login()
+
+    fun reset() {
+        mapSquareChanged = false
+    }
 }

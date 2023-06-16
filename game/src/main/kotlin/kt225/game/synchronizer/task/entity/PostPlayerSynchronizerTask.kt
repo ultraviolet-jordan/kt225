@@ -13,5 +13,6 @@ class PostPlayerSynchronizerTask(
         player.client.flushWriteQueue()
         player.renderer.clear()
         player.animator.clear()
+        player.reset()
     }
 }
