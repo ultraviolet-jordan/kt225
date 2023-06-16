@@ -7,12 +7,12 @@ import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquares
 import kt225.cache.map.Maps
 import kt225.common.buffer.decompressBzip2
+import kt225.common.buffer.discard
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1s
 import kt225.common.buffer.g4
 import kt225.common.buffer.gSmart1or2
 import java.nio.ByteBuffer
-import kt225.common.buffer.discard
 
 /**
  * @author Jordan Abraham
@@ -38,12 +38,12 @@ class MapSquaresProvider @Inject constructor(
                 require(landX == loc.x)
                 require(landZ == loc.z)
 
-                val packedEntry = MapSquareEntry(landId, landX, landZ)
-                require(packedEntry.id == landId)
-                require(packedEntry.x == landX)
-                require(packedEntry.z == landZ)
+                val mapSquare = MapSquare(landId, landX, landZ)
+                require(mapSquare.id == landId)
+                require(mapSquare.x == landX)
+                require(mapSquare.z == landZ)
 
-                val entry = MapSquareEntryType(packedEntry, type = 0)
+                val entry = MapSquareEntryType(mapSquare, type = 0)
                 decode(ByteBuffer.wrap(land.bytes).decompress(), entry)
                 entry.type = 1
                 decode(ByteBuffer.wrap(loc.bytes).decompress(), entry)
