@@ -11,7 +11,7 @@ dependencyResolutionManagement {
             version("ktor", "2.3.1")
             version("slf4j", "2.0.7")
             version("cryptography", "1.2.0-SNAPSHOT")
-            version("versions", "0.46.0")
+            version("versions", "0.47.0")
             version("guice", "1.6.0")
             version("apache-commons", "1.23.0")
 

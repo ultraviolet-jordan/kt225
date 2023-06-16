@@ -28,7 +28,7 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlin {
             jvmToolchain {
-                languageVersion.set(JavaLanguageVersion.of(18))
+                languageVersion.set(JavaLanguageVersion.of(17))
             }
         }
     }
@@ -36,7 +36,7 @@ allprojects {
     tasks.withType<UsesKotlinJavaToolchain>().configureEach {
         kotlinJavaToolchain.toolchain.use(
             project.extensions.getByType<JavaToolchainService>().launcherFor {
-                languageVersion.set(JavaLanguageVersion.of(18))
+                languageVersion.set(JavaLanguageVersion.of(17))
             }
         )
     }
