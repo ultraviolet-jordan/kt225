@@ -102,7 +102,7 @@ class MapSquaresProvider @Inject constructor(
         )
     }
 
-    private fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareEntryType, locId: Int = -1) {
+    private tailrec fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareEntryType, locId: Int = -1) {
         val offset = gSmart1or2()
         if (offset == 0) {
             return
