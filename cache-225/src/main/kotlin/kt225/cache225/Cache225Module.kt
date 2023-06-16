@@ -8,7 +8,7 @@ import kt225.cache225.config.varp.VarpsProvider
 /**
  * @author Jordan Abraham
  */
-class Cache225Module : KotlinModule() {
+object Cache225Module : KotlinModule() {
     override fun configure() {
         bind<Varps<VarpEntryType>>().toProvider<VarpsProvider>()
     }

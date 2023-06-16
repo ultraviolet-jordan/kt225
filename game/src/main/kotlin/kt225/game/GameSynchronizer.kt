@@ -5,8 +5,9 @@ import com.google.inject.Singleton
 import io.ktor.server.application.ApplicationEnvironment
 import kt225.common.game.Synchronizer
 import kt225.common.game.world.World
-import kt225.game.synchronizer.task.PlayerSynchronizerTask
+import kt225.game.synchronizer.task.EntitySynchronizer
 import kt225.game.synchronizer.task.WorldSynchronizerTask
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
@@ -17,32 +18,34 @@ import kotlin.system.measureTimeMillis
 @Singleton
 class GameSynchronizer @Inject constructor(
     private val applicationEnvironment: ApplicationEnvironment,
-    private val executorService: ScheduledExecutorService,
+    private val gameExecutor: ScheduledExecutorService,
+    private val entityExecutor: ExecutorService,
     private val world: World,
-    private val playerSynchronizerRenderer: PlayerSynchronizerRenderer
+    renderer: PlayerSynchronizerRenderer
 ) : Synchronizer {
     private var tick = 0
 
-    private val syncTask = setOf(
+    private val tasks = setOf(
         WorldSynchronizerTask(world),
-        PlayerSynchronizerTask(world, playerSynchronizerRenderer)
+        EntitySynchronizer(world, renderer, entityExecutor)
     )
 
     override fun start() {
         world.start()
-        executorService.scheduleAtFixedRate(this, 0, 600, TimeUnit.MILLISECONDS)
+        gameExecutor.scheduleAtFixedRate(this, 0, 600, TimeUnit.MILLISECONDS)
     }
 
     override fun stop() {
         world.stop()
-        executorService.shutdown()
+        entityExecutor.shutdown()
+        gameExecutor.shutdown()
     }
 
     override fun run() {
         try {
             val time = measureTimeMillis {
                 ++tick
-                for (task in syncTask) {
+                for (task in tasks) {
                     task.cycle(tick)
                 }
             }

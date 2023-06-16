@@ -1,7 +1,7 @@
 package kt225.game.synchronizer.task
 
+import kt225.common.game.synchronizer.SynchronizerTask
 import kt225.common.game.world.World
-import kt225.game.synchronizer.SynchronizerTask
 
 /**
  * @author Jordan Abraham

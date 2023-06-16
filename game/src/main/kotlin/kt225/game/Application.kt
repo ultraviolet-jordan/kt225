@@ -5,15 +5,17 @@ import dev.misfitlabs.kotlinguice4.getInstance
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.server.engine.ApplicationEngine
 import kt225.cache.CacheModule
-import kt225.packet225.Packet225Module
+import kt225.network.NetworkModule
+import kt225.packet.Packet225Module
 
 /**
  * @author Jordan Abraham
  */
 fun main(args: Array<String>) {
     val injector = Guice.createInjector(
-        CacheModule(),
-        Packet225Module(),
+        CacheModule,
+        NetworkModule,
+        Packet225Module,
         GameModule(args)
     )
 

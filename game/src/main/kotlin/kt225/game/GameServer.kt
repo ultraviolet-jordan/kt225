@@ -13,9 +13,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kt225.cache.Cache
 import kt225.common.game.Server
-import kt225.common.game.world.World
 import kt225.common.packet.Packet
 import kt225.common.packet.PacketReader
+import kt225.network.NetworkSession
+import kt225.network.NetworkSessionCodecs
 import java.util.concurrent.TimeUnit
 
 /**
@@ -27,27 +28,25 @@ class GameServer @Inject constructor(
     private val applicationEngine: ApplicationEngine,
     private val applicationEnvironment: ApplicationEnvironment,
     private val cache: Cache,
-    private val world: World,
-    private val gamePacketConfiguration: GamePacketConfiguration
+    private val gamePacketConfiguration: GamePacketConfiguration,
+    private val networkSessionCodecHandlers: NetworkSessionCodecs
 ) : Server {
     override fun bind() = runBlocking {
         val logger = applicationEnvironment.log
         logger.info("Game server is responding at ${applicationEnvironment.config.host}:${applicationEnvironment.config.port}...")
         while (true) {
             val socket = serverSocket.accept()
-            val client = GameClient(
-                logger = logger,
+            val session = NetworkSession(
                 socket = socket,
-                crcs = cache.crcs(),
-                environment = applicationEnvironment,
-                world = world,
-                packetBuilders = gamePacketConfiguration.builders,
-                packetReaders = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id),
-                packetHandlers = gamePacketConfiguration.handlers
+                builders = gamePacketConfiguration.builders,
+                readers = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id),
+                handlers = gamePacketConfiguration.handlers,
+                codecs = networkSessionCodecHandlers,
+                crcs = cache.crcs()
             )
             launch(Dispatchers.IO) {
                 logger.info("Connection from ${socket.remoteAddress}")
-                client.acceptHandshake()
+                session.accept()
             }
         }
     }

@@ -6,6 +6,7 @@ import io.ktor.network.sockets.ServerSocket
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.server.engine.ApplicationEngine
 import kt225.common.game.world.World
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
 
 /**
@@ -21,6 +22,7 @@ class GameModule(
         bind<SelectorManager>().toProvider<ServerSocketSelectorProvider>().asEagerSingleton()
         bind<World>().toProvider<GameWorldProvider>().asEagerSingleton()
         bind<ScheduledExecutorService>().toProvider<GameThreadExecutorProvider>().asEagerSingleton()
+        bind<ExecutorService>().toProvider<EntityPoolExecutorProvider>().asEagerSingleton()
         bind<ServerSocket>().toProvider<ServerSocketProvider>().asEagerSingleton()
     }
 }

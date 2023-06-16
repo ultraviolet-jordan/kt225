@@ -19,12 +19,12 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
     animatorRenders = arrayOfNulls(2048)
 ) {
     override fun renderEntity(entity: Player) {
-        val renderer = entity.renderer()
+        val renderer = entity.renderer
         if (renderer.needsRendering()) {
             highDefinitionRenders[entity.index] = buildHighDefinitionUpdates(entity, renderer.highDefinitionRenderBlocks)
         }
         lowDefinitionRenders[entity.index] = buildLowDefinitionUpdates(renderer.lowDefinitionRenderBlocks)
-        animatorRenders[entity.index] = entity.animator().block()
+        animatorRenders[entity.index] = entity.animator.block()
     }
 
     override fun clear() {
@@ -48,7 +48,7 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
                 val start = it.position()
                 block.builder.buildRenderBlock(it, block.renderType)
                 val end = it.position()
-                player.renderer().capture(block, it.array().sliceArray(start until end))
+                player.renderer.capture(block, it.array().sliceArray(start until end))
             }
         }.array()
     }

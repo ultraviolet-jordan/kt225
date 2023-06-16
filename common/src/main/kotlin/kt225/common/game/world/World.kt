@@ -1,20 +1,20 @@
 package kt225.common.game.world
 
+import kt225.common.game.entity.Entity
 import kt225.common.game.entity.player.Player
-import java.util.concurrent.ConcurrentHashMap
+import kt225.common.network.LoginRequest
 
 /**
  * @author Jordan Abraham
  */
-abstract class World {
-    protected val loginRequests: ConcurrentHashMap.KeySetView<Player, Boolean> = ConcurrentHashMap.newKeySet()
-    protected val logoutRequest: ConcurrentHashMap.KeySetView<Player, Boolean> = ConcurrentHashMap.newKeySet()
-
+abstract class World(
+    val players: Array<Player?>,
+    val loginRequests: MutableSet<Entity>,
+    val logoutRequests: MutableSet<Entity>
+) {
     abstract fun start()
-    abstract fun requestLogin(player: Player)
-    abstract fun requestLogout(player: Player)
+    abstract suspend fun requestLogin(request: LoginRequest)
     abstract fun processLoginRequests()
-    abstract fun processLogoutRequests()
     abstract fun online(): Boolean
     abstract fun players(): Array<Player?>
     abstract fun stop()

@@ -25,7 +25,7 @@ import kt225.cache.song.SongsProvider
 /**
  * @author Jordan Abraham
  */
-class CacheModule : KotlinModule() {
+object CacheModule : KotlinModule() {
     override fun configure() {
         bind<Cache>().toProvider<CacheProvider>().asEagerSingleton()
         bind<ConfigArchive>().toProvider<ConfigArchiveProvider>().asEagerSingleton()

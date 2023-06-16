@@ -1,5 +1,3 @@
-@Suppress("DSL_SCOPE_VIOLATION")
-// https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     application
     alias(deps.plugins.jvm)
@@ -12,8 +10,10 @@ dependencies {
     implementation(deps.cryptography)
 
     implementation(project(":cache"))
+    implementation(project(":cache-225"))
     implementation(project(":common"))
-    implementation(project(":packet-225"))
+    implementation(project(":network"))
+    implementation(project(":packet"))
 }
 
 application {

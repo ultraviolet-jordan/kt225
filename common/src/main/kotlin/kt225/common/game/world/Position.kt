@@ -5,13 +5,13 @@ package kt225.common.game.world
  */
 @JvmInline
 value class Position(
-    private val packedPosition: Int
+    private val packed: Int
 ) {
     constructor(x: Int, z: Int, plane: Int = 0) : this((z and 0x3FFF) or ((x and 0x3FFF) shl 14) or ((plane and 0x3) shl 28))
 
-    val plane get() = packedPosition shr 28 and 0x3
-    val x get() = packedPosition shr 14 and 0x3FFF
-    val z get() = packedPosition and 0x3FFF
+    val plane get() = packed shr 28 and 0x3
+    val x get() = packed shr 14 and 0x3FFF
+    val z get() = packed and 0x3FFF
 
     val mapSquareX get() = (x shr 6)
     val mapSquareZ get() = (z shr 6)

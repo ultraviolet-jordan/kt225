@@ -12,7 +12,7 @@ class TestCRC32 {
 
     @Test
     fun `test crc32`() {
-        val injector = Guice.createInjector(CacheModule())
+        val injector = Guice.createInjector(CacheModule)
 
         val cache = injector.getInstance<Cache>()
 

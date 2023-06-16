@@ -14,7 +14,7 @@ import kt225.http.routing.ApplicationRouting
 fun main(args: Array<String>) {
     try {
         val injector = Guice.createInjector(
-            CacheModule(),
+            CacheModule,
             HttpModule(args)
         )
 

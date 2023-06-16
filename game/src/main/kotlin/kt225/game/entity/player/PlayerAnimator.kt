@@ -5,8 +5,8 @@ import kt225.common.game.entity.animator.Animator
 import kt225.common.game.entity.animator.AnimatorType
 import kt225.common.game.entity.animator.type.Render
 import kt225.common.game.entity.animator.type.Teleport
-import kt225.packet225.builder.animator.PlayerRenderAnimatorBlockBuilder
-import kt225.packet225.builder.animator.PlayerTeleportAnimatorBlockBuilder
+import kt225.packet.builder.animator.PlayerRenderAnimatorBlockBuilder
+import kt225.packet.builder.animator.PlayerTeleportAnimatorBlockBuilder
 
 /**
  * @author Jordan Abraham

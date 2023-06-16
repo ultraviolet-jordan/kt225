@@ -6,8 +6,8 @@ import kt225.common.game.entity.render.RenderType
 import kt225.common.game.entity.render.Renderer
 import kt225.common.game.entity.render.type.Appearance
 import kt225.common.game.entity.render.type.Sequence
-import kt225.packet225.builder.render.PlayerAppearanceRenderBlockBuilder
-import kt225.packet225.builder.render.PlayerSequenceRenderBlockBuilder
+import kt225.packet.builder.render.PlayerAppearanceRenderBlockBuilder
+import kt225.packet.builder.render.PlayerSequenceRenderBlockBuilder
 
 /**
  * @author Jordan Abraham
