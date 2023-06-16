@@ -4,8 +4,8 @@ package kt225.cache225.map
  * @author Jordan Abraham
  */
 @JvmInline
-value class MapSquareLocTile(
-    private val packed: Long
+value class MapSquareLoc(
+    val packed: Long
 ) {
     constructor(
         id: Int,

@@ -4,8 +4,8 @@ package kt225.cache225.map
  * @author Jordan Abraham
  */
 @JvmInline
-value class MapSquareLandTile(
-    private val packed: Long
+value class MapSquareLand(
+    val packed: Long
 ) {
     constructor(
         height: Int,

@@ -12,6 +12,7 @@ import kt225.common.buffer.g1s
 import kt225.common.buffer.g4
 import kt225.common.buffer.gSmart1or2
 import java.nio.ByteBuffer
+import kt225.common.buffer.discard
 
 /**
  * @author Jordan Abraham
@@ -64,7 +65,8 @@ class MapSquaresProvider @Inject constructor(
         for (plane in 0 until 4) {
             for (x in 0 until 64) {
                 for (z in 0 until 64) {
-                    entry.lands[(x and 0x3f shl 6) or (z and 0x3f) or (plane shl 12)] = decodeLand()
+                    val localPosition = MapSquareLocalPosition(plane, x, z)
+                    entry.lands[localPosition.packed] = decodeLand().packed
                 }
             }
         }
@@ -77,11 +79,11 @@ class MapSquaresProvider @Inject constructor(
         overlayRotation: Int = 0,
         collision: Int = 0,
         underlayId: Int = 0
-    ): MapSquareLandTile {
+    ): MapSquareLand {
         val opcode = g1()
         if (opcode == 0 || opcode == 1) {
             val adjustedHeight = if (opcode == 1) g1().let { if (it == 1) 0 else it } else height
-            val land = MapSquareLandTile(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
+            val land = MapSquareLand(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
 
             // Checks the bitpacking.
             require(land.height == adjustedHeight)
@@ -111,46 +113,49 @@ class MapSquaresProvider @Inject constructor(
         return decodeMapSquareLocs(entry, locId + offset)
     }
 
-    private tailrec fun ByteBuffer.decodeLoc(entry: MapSquareEntryType, locId: Int, packedLocation: Int) {
+    private tailrec fun ByteBuffer.decodeLoc(entry: MapSquareEntryType, locId: Int, packedPosition: Int) {
         val offset = gSmart1or2()
         if (offset == 0) {
             return
         }
+        val localPosition = MapSquareLocalPosition(packedPosition + offset - 1)
+        val x = localPosition.x
+        val z = localPosition.z
+        val plane = localPosition.plane.let {
+            // Check for bridges.
+            val positionAtPlaneOne = MapSquareLocalPosition(1, x, z)
+            val land = MapSquareLand(entry.lands[positionAtPlaneOne.packed])
+            if (land.collision and 0x2 == 2) it - 1 else it
+        }
+
+        if (plane < 0) {
+            discard(1) // Discard attributes and continue.
+            return decodeLoc(entry, locId, localPosition.packed)
+        }
+
         val attributes = g1()
         val shape = attributes shr 2
         val rotation = attributes and 0x3
+        val loc = MapSquareLoc(locId, x, z, plane, shape, rotation)
 
-        val packed = packedLocation + offset - 1
-        val x = packed shr 6 and 0x3f
-        val z = packed and 0x3f
-        val plane = (packed shr 12).let {
-            // Check for bridges.
-            if (entry.lands[(x and 0x3f shl 6) or (z and 0x3f) or (1 shl 12)]!!.collision and 0x2 == 2) it - 1 else it
-        }
         // New adjusted packed location after adjusting for bridge.
-        val adjusted = (x and 0x3f shl 6) or (z and 0x3f) or (plane shl 12)
+        val adjustedLocalPosition = MapSquareLocalPosition(plane, x, z).packed
+        // Dynamically increase the slot on this tile depending on the incoming data.
+        // There is a limit of 5 slots per tile.
+        val slots = entry.locs[adjustedLocalPosition]?.size ?: 0
+        require(slots < 5)
+        entry.locs[adjustedLocalPosition] = entry.locs[adjustedLocalPosition]?.copyOf(slots + 1)?.also {
+            it[slots] = loc.packed
+        } ?: LongArray(1) { loc.packed }
 
-        if (plane >= 0) {
-            entry.locs[adjusted] = when (val size = entry.locs[adjusted]?.size ?: 0) {
-                0 -> Array(1) { MapSquareLocTile(locId, x, z, plane, shape, rotation) }
-                in 1 until 5 -> {
-                    entry.locs[adjusted]!!.copyOf(size + 1).also {
-                        it[size] = MapSquareLocTile(locId, x, z, plane, shape, rotation)
-                    }
-                }
-                else -> throw AssertionError("Size is too many. 5 capacity.")
-            }
-
-            // Checks the bitpacking.
-            val loc = entry.locs[adjusted]?.last()
-            require(loc?.id == locId)
-            require(loc?.x == x)
-            require(loc?.z == z)
-            require(loc?.plane == plane)
-            require(loc?.rotation == rotation)
-            require(loc?.shape == shape)
-        }
-        return decodeLoc(entry, locId, packed)
+        // Checks the bitpacking.
+        require(loc.id == locId)
+        require(loc.x == x)
+        require(loc.z == z)
+        require(loc.plane == plane)
+        require(loc.rotation == rotation)
+        require(loc.shape == shape)
+        return decodeLoc(entry, locId, localPosition.packed)
     }
 
     private fun ByteBuffer.decompress(): ByteBuffer {
