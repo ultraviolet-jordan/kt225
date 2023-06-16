@@ -31,6 +31,10 @@ class RequestMapPacketHandler @Inject constructor(
             val length = bytes.size
             val type = request.type
 
+            // We must limit the raw length of bytes to send at a time.
+            // The 225 client has a 5000 byte buffer array limit.
+            // Any packet sent with > 5000 bytes (excluding the packet header etc), will crash the client.
+            // We slice the maps up as many as we want and send each slice of bytes to the client individually.
             val slices = (length / bytesLengthLimit) + 1
             repeat(slices) { slice ->
                 val offset = slice * (bytesLengthLimit - 1)
