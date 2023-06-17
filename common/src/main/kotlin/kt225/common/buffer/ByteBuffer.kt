@@ -23,9 +23,9 @@ fun ByteBuffer.gstr(): String = String(readUChars(untilStringTerminator())).also
 }
 
 fun ByteBuffer.gArrayBuffer(size: Int, offset: Int = position(), length: Int = size): ByteArray {
-    val array = ByteArray(size)
-    get(offset, array, 0, length)
-    return array
+    return ByteArray(size).also {
+        get(offset, it, 0, length)
+    }
 }
 
 fun ByteBuffer.p1(value: Int) {
@@ -50,9 +50,7 @@ fun ByteBuffer.p8(value: Long) {
 }
 
 fun ByteBuffer.pjstr(value: String) {
-    for (char in value) {
-        put(char.code.toByte())
-    }
+    put(value.toByteArray())
     put(10)
 }
 
