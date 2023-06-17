@@ -1,9 +1,7 @@
 package kt225.common.buffer
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
-import org.apache.commons.compress.utils.IOUtils
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import kotlin.math.min
@@ -24,7 +22,13 @@ fun ByteBuffer.gstr(): String = String(readUChars(untilStringTerminator())).also
     discard(1)
 }
 
-fun ByteBuffer.gArrayBuffer(size: Int): ByteArray = ByteArray(size) { get() }
+fun ByteBuffer.gArrayBuffer(size: Int, offset: Int = position()): ByteArray {
+    val position = position()
+    position(offset)
+    val bytes = ByteArray(size) { get() }
+    position(position)
+    return bytes
+}
 
 fun ByteBuffer.p1(value: Int) {
     put(value.toByte())
@@ -54,10 +58,11 @@ fun ByteBuffer.pjstr(value: String) {
     put(10)
 }
 
-fun ByteBuffer.pArrayBuffer(bytes: ByteArray) {
-    for (byte in bytes) {
-        put(byte)
-    }
+fun ByteBuffer.pArrayBuffer(bytes: ByteArray, offset: Int = position()) {
+    val position = position()
+    position(offset)
+    put(bytes)
+    position(position)
 }
 
 fun ByteBuffer.discard(amount: Int) {
@@ -65,29 +70,19 @@ fun ByteBuffer.discard(amount: Int) {
 }
 
 fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int): ByteBuffer {
-    val header = byteArrayOf(
-        'B'.code.toByte(),
-        'Z'.code.toByte(),
-        'h'.code.toByte(),
-        '1'.code.toByte()
-    )
-
-    val dest = ByteArray(length + 4).also {
-        header.copyInto(it)
-        array().copyInto(it, header.size, startIndex, length + startIndex)
+    val startPosition = position()
+    val dest = gArrayBuffer(length + 4, startIndex - 4).also {
+        it[0] = 'B'.code.toByte()
+        it[1] = 'Z'.code.toByte()
+        it[2] = 'h'.code.toByte()
+        it[3] = '1'.code.toByte()
     }
-
-    val input = ByteArrayInputStream(dest)
-    val compressor = BZip2CompressorInputStream(input)
-    val output = ByteArrayOutputStream().apply {
-        IOUtils.copy(compressor, this)
+    position(startPosition)
+    return BZip2CompressorInputStream(ByteArrayInputStream(dest)).let {
+        val buffer = ByteBuffer.wrap(it.readAllBytes())
+        it.close()
+        return@let buffer
     }
-    val bytes = output.toByteArray()
-    output.close()
-    compressor.close()
-    input.close()
-
-    return ByteBuffer.wrap(bytes)
 }
 
 fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteArray {
