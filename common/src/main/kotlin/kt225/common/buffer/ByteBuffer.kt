@@ -90,7 +90,7 @@ fun ByteBuffer.skip(amount: Int) {
 }
 
 fun ByteBuffer.bzip2Decompress(length: Int, startIndex: Int = position()): ByteArray {
-    require(startIndex - 4 > 0)
+    require(startIndex - 4 >= 0)
     val startPosition = position()
     position(0)
     val dest = gArrayBuffer(length + 4, startIndex - 4).also {
