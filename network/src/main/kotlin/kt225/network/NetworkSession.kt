@@ -34,11 +34,17 @@ class NetworkSession(
     crcs = crcs
 ) {
     override suspend fun accept() {
-        codec(
-            type = ServerSeedEncoder::class,
-            message = ServerSeedResponse(
-                seed = ((Math.random() * 99999999.0).toLong() shl 32) + (Math.random() * 99999999.0).toLong()
+        try {
+            codec(
+                type = ServerSeedEncoder::class,
+                message = ServerSeedResponse(
+                    seed = ((Math.random() * 99999999.0).toLong() shl 32) + (Math.random() * 99999999.0).toLong()
+                )
             )
-        )
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        } finally {
+            socket.close()
+        }
     }
 }

@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
  * @author Jordan Abraham
  */
 abstract class Session(
-    private val socket: Socket,
+    val socket: Socket,
     val readChannel: ByteReadChannel,
     val writeChannel: ByteWriteChannel,
     val builders: Map<KClass<*>, PacketBuilder<Packet>>,
