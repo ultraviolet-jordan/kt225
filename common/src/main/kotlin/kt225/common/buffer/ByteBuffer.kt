@@ -89,7 +89,7 @@ fun ByteBuffer.skip(amount: Int) {
     position(position() + amount)
 }
 
-fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int = position()): ByteArray {
+fun ByteBuffer.bzip2Decompress(length: Int, startIndex: Int = position()): ByteArray {
     require(startIndex - 4 > 0)
     val startPosition = position()
     position(0)
@@ -110,10 +110,10 @@ fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int = position()): ByteA
     return bytes
 }
 
-fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteBuffer {
+fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteArray {
     val length = g1()
     val rsa = gArrayBuffer(length)
-    return ByteBuffer.wrap(BigInteger(rsa).modPow(exponent, modulus).toByteArray())
+    return BigInteger(rsa).modPow(exponent, modulus).toByteArray()
 }
 
 private tailrec fun ByteBuffer.toByte(terminator: Int, length: Int = 0): Int {

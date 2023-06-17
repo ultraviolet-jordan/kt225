@@ -1,6 +1,6 @@
 package kt225.cache
 
-import kt225.common.buffer.decompressBzip2
+import kt225.common.buffer.bzip2Decompress
 import kt225.common.buffer.g2
 import kt225.common.buffer.g3
 import kt225.common.buffer.g4
@@ -31,7 +31,7 @@ class JagArchiveUnzipped(
             val isDecompress = decompressed != compressed
 
             val buffer = when {
-                isDecompress -> ByteBuffer.wrap(input.decompressBzip2(compressed))
+                isDecompress -> ByteBuffer.wrap(input.bzip2Decompress(compressed))
                 else -> input
             }
             if (isDecompress) {
@@ -67,7 +67,7 @@ class JagArchiveUnzipped(
             val position = position()
             val data = when {
                 isDecompress -> gArrayBuffer(decompressedLength)
-                else -> decompressBzip2(compressedLength, offset)
+                else -> bzip2Decompress(compressedLength, offset)
             }
             position(position)
             require(decompressedLength == data.size)

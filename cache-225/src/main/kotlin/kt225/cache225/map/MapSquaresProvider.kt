@@ -6,7 +6,7 @@ import kt225.cache.EntryProvider
 import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquares
 import kt225.cache.map.Maps
-import kt225.common.buffer.decompressBzip2
+import kt225.common.buffer.bzip2Decompress
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1s
 import kt225.common.buffer.g4
@@ -160,7 +160,7 @@ class MapSquaresProvider @Inject constructor(
 
     private fun ByteBuffer.decompress(): ByteBuffer {
         val decompressed = g4()
-        val buffer = ByteBuffer.wrap(decompressBzip2(capacity() - 4))
+        val buffer = ByteBuffer.wrap(bzip2Decompress(capacity() - 4))
         require(decompressed == buffer.capacity())
         return buffer
     }
