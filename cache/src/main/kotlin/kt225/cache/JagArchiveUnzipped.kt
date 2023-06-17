@@ -44,6 +44,7 @@ class JagArchiveUnzipped(
                 .decodeFiles(length, isDecompress)
                 .filterNotNull()
                 .associateBy(JagArchiveFile::id)
+            require(length == files.size)
 
             return JagArchiveUnzipped(bytes, name, crc.value.toInt(), files)
         }
