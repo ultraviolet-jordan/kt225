@@ -89,23 +89,25 @@ fun ByteBuffer.skip(amount: Int) {
     position(position() + amount)
 }
 
-fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int): ByteBuffer {
+fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int = position()): ByteArray {
+    require(startIndex - 4 > 0)
     val startPosition = position()
     position(0)
     val dest = gArrayBuffer(length + 4, startIndex - 4).also {
         // Copy 4 + length bytes offset by -4 starting position.
         // The bzip header is copied to the beginning 4 bytes thanks to the -4 start.
+        // Files are in bzip2 format however they do not contain the required header needed to decompress.
+        // The client implementation does not require this header.
         it[0] = 'B'.code.toByte()
         it[1] = 'Z'.code.toByte()
         it[2] = 'h'.code.toByte()
         it[3] = '1'.code.toByte()
     }
     position(startPosition)
-    return BZip2CompressorInputStream(ByteArrayInputStream(dest)).let {
-        val buffer = ByteBuffer.wrap(it.readAllBytes())
-        it.close()
-        return@let buffer
-    }
+    val compressor = BZip2CompressorInputStream(ByteArrayInputStream(dest))
+    val bytes = compressor.readAllBytes()
+    compressor.close()
+    return bytes
 }
 
 fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteBuffer {

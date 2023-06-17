@@ -4,6 +4,7 @@ import kt225.common.buffer.decompressBzip2
 import kt225.common.buffer.g2
 import kt225.common.buffer.g3
 import kt225.common.buffer.g4
+import kt225.common.buffer.gArrayBuffer
 import java.nio.ByteBuffer
 import java.util.TreeMap
 import java.util.zip.CRC32
@@ -21,30 +22,35 @@ class JagArchiveUnzipped(
         fun decode(bytes: ByteArray, name: String): JagArchiveUnzipped {
             val crc = CRC32()
             crc.update(bytes)
+
             val input = ByteBuffer.wrap(bytes)
             require(input.remaining() >= 6)
-            val decompressedLength = input.g3()
-            val compressedLength = input.g3()
-            val needsDecompressing = decompressedLength != compressedLength
+
+            val decompressed = input.g3()
+            val compressed = input.g3()
+            val isDecompress = decompressed != compressed
 
             val buffer = when {
-                needsDecompressing -> input.decompressBzip2(compressedLength, 6)
+                isDecompress -> ByteBuffer.wrap(input.decompressBzip2(compressed))
                 else -> input
             }
-
-            if (needsDecompressing) {
-                require(decompressedLength == buffer.capacity())
+            if (isDecompress) {
+                require(decompressed == buffer.capacity())
             }
 
             require(buffer.remaining() >= 2)
-            val fileLength = buffer.g2()
-            val files = buffer.decodeFiles(fileLength, needsDecompressing).filterNotNull().associateBy(JagArchiveFile::id)
+            val length = buffer.g2()
+            val files = buffer
+                .decodeFiles(length, isDecompress)
+                .filterNotNull()
+                .associateBy(JagArchiveFile::id)
+
             return JagArchiveUnzipped(bytes, name, crc.value.toInt(), files)
         }
 
         private tailrec fun ByteBuffer.decodeFiles(
             length: Int,
-            needsDecompressing: Boolean,
+            isDecompress: Boolean,
             fileId: Int = 0,
             offset: Int = 8 + length * 10,
             files: Array<JagArchiveFile?> = arrayOfNulls(length)
@@ -52,17 +58,22 @@ class JagArchiveUnzipped(
             if (fileId == length) {
                 return files
             }
+
             require(remaining() >= 10)
             val nameHash = g4()
             val decompressedLength = g3()
             val compressedLength = g3()
+
+            val position = position()
             val data = when {
-                needsDecompressing -> ByteArray(decompressedLength).also { array().copyInto(it, 0, offset, decompressedLength) }
-                else -> decompressBzip2(compressedLength, offset).array()
+                isDecompress -> gArrayBuffer(decompressedLength)
+                else -> decompressBzip2(compressedLength, offset)
             }
+            position(position)
             require(decompressedLength == data.size)
+
             files[fileId] = JagArchiveFile(fileId, nameHash, data)
-            return decodeFiles(length, needsDecompressing, fileId + 1, offset + compressedLength)
+            return decodeFiles(length, isDecompress, fileId + 1, offset + compressedLength, files)
         }
     }
 }
