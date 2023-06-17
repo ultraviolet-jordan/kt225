@@ -13,7 +13,7 @@ import java.util.zip.CRC32
  * @author Jordan Abraham
  */
 @Singleton
-class MapProvider : Provider<Maps> {
+class MapsProvider : Provider<Maps> {
     override fun get(): Maps = Maps().also {
         val uri = javaClass.getResource("/maps/")!!.toURI()
         val start = try {
