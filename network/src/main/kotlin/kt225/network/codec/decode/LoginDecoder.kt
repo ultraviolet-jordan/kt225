@@ -45,16 +45,8 @@ class LoginDecoder @Inject constructor(
         val clientSeed = IntArray(4) { rsa.g4() }
         val serverSeed = IntArray(clientSeed.size) { clientSeed[it] + 50 }
         val uid = rsa.g4()
-        println(uid)
-        val username = try {
-            rsa.gString()
-        } catch (exception: Exception) {
-            exception.printStackTrace()
-            ""
-        }
-        println(username)
+        val username = rsa.gString()
         val password = rsa.gString()
-        println(password)
 
         session.codec(
             type = LoginEncoder::class,
