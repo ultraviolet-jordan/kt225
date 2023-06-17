@@ -14,6 +14,6 @@ class TitleResourceProvider @Inject constructor(
 ) : Provider<TitleResource> {
     override fun get(): TitleResource {
         val bytes = cache.getArchiveResource("title")!!
-        return TitleResource(cache.crcs()[1], bytes)
+        return TitleResource(cache.crcs[1], bytes)
     }
 }

@@ -23,7 +23,7 @@ class VarpsProvider @Inject constructor(
     private val configArchive: ConfigArchive
 ) : EntryProvider<VarpEntryType, Varps<VarpEntryType>> {
     override fun get(): Varps<VarpEntryType> = Varps<VarpEntryType>().also {
-        val buffer = configArchive.file("varp.dat")?.buffer() ?: error("varp.dat file not found.")
+        val buffer = configArchive.read("varp.dat") ?: error("varp.dat file not found.")
         repeat(buffer.g2()) { varpId ->
             it[varpId] = decode(buffer, VarpEntryType(varpId))
         }

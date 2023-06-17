@@ -42,7 +42,7 @@ class GameServer @Inject constructor(
                 readers = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id),
                 handlers = gamePacketConfiguration.handlers,
                 codecs = networkSessionCodecHandlers,
-                crcs = cache.crcs()
+                crcs = cache.crcs
             )
             launch(Dispatchers.IO) {
                 logger.info("Connection from ${socket.remoteAddress}")

@@ -14,6 +14,6 @@ class ModelsResourceProvider @Inject constructor(
 ) : Provider<ModelsResource> {
     override fun get(): ModelsResource {
         val bytes = cache.getArchiveResource("models")!!
-        return ModelsResource(cache.crcs()[5], bytes)
+        return ModelsResource(cache.crcs[5], bytes)
     }
 }

@@ -14,6 +14,6 @@ class InterfaceResourceProvider @Inject constructor(
 ) : Provider<InterfaceResource> {
     override fun get(): InterfaceResource {
         val bytes = cache.getArchiveResource("interface")!!
-        return InterfaceResource(cache.crcs()[3], bytes)
+        return InterfaceResource(cache.crcs[3], bytes)
     }
 }

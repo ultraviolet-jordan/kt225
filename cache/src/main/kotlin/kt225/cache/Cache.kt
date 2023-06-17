@@ -4,23 +4,11 @@ package kt225.cache
  * @author Jordan Abraham
  */
 class Cache(
-    private val archives: Map<Int, CacheArchive?>
+    private val archives: Map<Int, JagArchive?>
 ) {
-    fun openArchives() {
-        archives.values.forEach {
-            if (it == null) return@forEach
-            val bytes = getArchiveResource(it.name()) ?: return@forEach
-            it.decode(bytes)
-        }
-    }
+    val crcs = IntArray(archives.size) { if (it == 0) 0 else archives[it]?.crc() ?: -1 }
 
     fun getArchiveResource(name: String): ByteArray? {
-        val archive = archives.values.firstOrNull { it?.name() == name } ?: return null
-        val resource = javaClass.getResourceAsStream("/archives/${archive.name()}")!!
-        val bytes = resource.readAllBytes()
-        resource.close()
-        return bytes
+        return archives.values.firstOrNull { it?.name() == name }?.zipped()
     }
-
-    fun crcs(): IntArray = IntArray(archives.size) { if (it == 0) 0 else archives[it]?.crc() ?: -1 }
 }

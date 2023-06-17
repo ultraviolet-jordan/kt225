@@ -16,7 +16,7 @@ class TestCRC32 {
 
         val cache = injector.getInstance<Cache>()
 
-        val crcs = cache.crcs()
+        val crcs = cache.crcs
 
         val expected = intArrayOf(
             0,

@@ -20,6 +20,6 @@ class TestMapSquares {
 
         val map = maps[12850] ?: return
         val land = map.lands
-        println(land[2]?.height)
+        println(maps.size)
     }
 }

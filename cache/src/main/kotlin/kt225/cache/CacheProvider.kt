@@ -38,6 +38,6 @@ class CacheProvider @Inject constructor(
             7 to wordEncArchive,
             8 to soundsArchive
         )
-        return Cache(archives).also(Cache::openArchives)
+        return Cache(archives)
     }
 }

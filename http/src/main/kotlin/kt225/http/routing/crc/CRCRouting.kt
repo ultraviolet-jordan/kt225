@@ -21,7 +21,7 @@ class CRCRouting @Inject constructor(
     override fun route(application: Application) {
         application.routing {
             get("/crc{id}") {
-                val crcs = cache.crcs()
+                val crcs = cache.crcs
                 val buffer = ByteBuffer.allocate(crcs.size * 4)
                 crcs.forEach(buffer::putInt)
                 call.respondBytes(buffer.array())
