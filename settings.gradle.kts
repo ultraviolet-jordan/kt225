@@ -23,6 +23,7 @@ dependencyResolutionManagement {
             // Ktor Dependencies
             library("ktor-server-core", "io.ktor", "ktor-server-core").versionRef("ktor")
             library("ktor-server-netty", "io.ktor", "ktor-server-netty").versionRef("ktor")
+            library("ktor-server-call-logging", "io.ktor", "ktor-server-call-logging").versionRef("ktor")
 
             // Guice
             library("guice", "dev.misfitlabs.kotlinguice4", "kotlin-guice").versionRef("guice")
@@ -35,7 +36,8 @@ dependencyResolutionManagement {
             // Dependency bundles
             listOf(
                 "ktor-server-core",
-                "ktor-server-netty"
+                "ktor-server-netty",
+                "ktor-server-call-logging"
             ).also { bundle("ktor", it) }
         }
     }
