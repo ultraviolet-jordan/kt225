@@ -17,10 +17,11 @@ class DataLocPacketBuilder : PacketBuilder<DataLocPacket>(
     length = -2
 ) {
     override fun buildPacket(packet: DataLocPacket, buffer: ByteBuffer) {
-        buffer.p1(packet.x)
-        buffer.p1(packet.z)
-        buffer.p2(packet.offset)
-        buffer.p2(packet.length)
-        buffer.pArrayBuffer(packet.bytes)
+        val (x, z, offset, length, bytes) = packet
+        buffer.p1(x)
+        buffer.p1(z)
+        buffer.p2(offset)
+        buffer.p2(length)
+        buffer.pArrayBuffer(bytes)
     }
 }

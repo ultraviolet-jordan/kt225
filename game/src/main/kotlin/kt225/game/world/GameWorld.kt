@@ -31,17 +31,9 @@ class GameWorld(
     }
 
     override suspend fun requestLogin(request: LoginRequest) {
-        val session = request.session
-        val client = GameClient(
-            serverSeed = request.serverSeed,
-            clientSeed = request.clientSeed,
-            session = session
-        )
-        val player = EntityPlayer(
-            username = request.username,
-            client = client,
-            world = this
-        )
+        val (_, _, username, _, clientSeed, serverSeed, session) = request
+        val client = GameClient(serverSeed, clientSeed, session)
+        val player = EntityPlayer(username, client, this)
         if (loginRequests.add(player)) {
             session.attach(client)
             client.attach(player)

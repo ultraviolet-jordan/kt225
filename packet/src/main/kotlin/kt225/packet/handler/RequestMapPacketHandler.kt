@@ -24,12 +24,10 @@ class RequestMapPacketHandler @Inject constructor(
 
     override fun handlePacket(packet: RequestMapPacket, client: Client) {
         packet.mapRequests.forEach { request ->
-            val map = maps.firstOrNull { it.name == request.name } ?: return@forEach
-            val x = request.x
-            val z = request.z
+            val (type, x, z, name) = request
+            val map = maps.firstOrNull { it.name == name } ?: return@forEach
             val bytes = map.bytes
             val length = bytes.size
-            val type = request.type
 
             // We must limit the raw length of bytes to send at a time.
             // The 225 client has a 5000 byte buffer array limit.
