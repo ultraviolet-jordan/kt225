@@ -7,7 +7,7 @@ import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquares
 import kt225.cache.map.Maps
 import kt225.common.buffer.decompressBzip2
-import kt225.common.buffer.discard
+import kt225.common.buffer.skip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1s
 import kt225.common.buffer.g4
@@ -129,7 +129,7 @@ class MapSquaresProvider @Inject constructor(
         }
 
         if (plane < 0) {
-            discard(1) // Discard attributes and continue.
+            skip(1) // Discard attributes and continue.
             return decodeLoc(entry, locId, localPosition.packed)
         }
 

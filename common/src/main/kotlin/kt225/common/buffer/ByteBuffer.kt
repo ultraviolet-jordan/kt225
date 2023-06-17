@@ -9,23 +9,50 @@ import kotlin.math.min
 /**
  * @author Jordan Abraham
  */
-fun ByteBuffer.g1(): Int = get().toInt() and 0xff
-fun ByteBuffer.g1s(): Int = get().toInt()
-fun ByteBuffer.g2(): Int = short.toInt() and 0xffff
-fun ByteBuffer.g3(): Int = (get().toInt() and 0xff shl 16) or (short.toInt() and 0xffff)
-fun ByteBuffer.g4(): Int = int
-
-fun ByteBuffer.gSmart1or2(): Int = if ((this[position()].toInt() and 0xff) < 128) g1() else g2() - 32768
-fun ByteBuffer.gSmart1or2s(): Int = if ((this[position()].toInt() and 0xff) < 128) g1() - 64 else g2() - 49152
-
-fun ByteBuffer.gstr(): String = String(readUChars(untilStringTerminator())).also {
-    discard(1)
+fun ByteBuffer.g1(): Int {
+    return get().toInt() and 0xff
 }
 
-fun ByteBuffer.gArrayBuffer(size: Int, offset: Int = position(), length: Int = size): ByteArray {
-    return ByteArray(size).also {
-        get(offset, it, 0, length)
+fun ByteBuffer.g1s(): Int {
+    return get().toInt()
+}
+
+fun ByteBuffer.g2(): Int {
+    return getShort().toInt() and 0xffff
+}
+
+fun ByteBuffer.g3(): Int {
+    return (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
+}
+
+fun ByteBuffer.g4(): Int {
+    return getInt()
+}
+
+fun ByteBuffer.g8(): Long {
+    return getLong()
+}
+
+fun ByteBuffer.gSmart1or2(): Int {
+    return if ((this[position()].toInt() and 0xff) < 128) g1() else g2() - 32768
+}
+
+fun ByteBuffer.gSmart1or2s(): Int {
+    return if ((this[position()].toInt() and 0xff) < 128) g1() - 64 else g2() - 49152
+}
+
+fun ByteBuffer.gString(): String {
+    return String(gArrayBuffer(toByte(10))).also {
+        skip(1)
     }
+}
+
+fun ByteBuffer.gArrayBuffer(size: Int, position: Int = position()): ByteArray {
+    val array = ByteArray(size).also {
+        get(position, it, 0, size) // Doesn't move position.
+    }
+    skip(size)
+    return array
 }
 
 fun ByteBuffer.p1(value: Int) {
@@ -49,7 +76,7 @@ fun ByteBuffer.p8(value: Long) {
     putLong(value)
 }
 
-fun ByteBuffer.pjstr(value: String) {
+fun ByteBuffer.pString(value: String) {
     put(value.toByteArray())
     put(10)
 }
@@ -58,13 +85,16 @@ fun ByteBuffer.pArrayBuffer(bytes: ByteArray) {
     put(bytes)
 }
 
-fun ByteBuffer.discard(amount: Int) {
+fun ByteBuffer.skip(amount: Int) {
     position(position() + amount)
 }
 
 fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int): ByteBuffer {
     val startPosition = position()
+    position(0)
     val dest = gArrayBuffer(length + 4, startIndex - 4).also {
+        // Copy 4 + length bytes offset by -4 starting position.
+        // The bzip header is copied to the beginning 4 bytes thanks to the -4 start.
         it[0] = 'B'.code.toByte()
         it[1] = 'Z'.code.toByte()
         it[2] = 'h'.code.toByte()
@@ -78,18 +108,16 @@ fun ByteBuffer.decompressBzip2(length: Int, startIndex: Int): ByteBuffer {
     }
 }
 
-fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteArray {
+fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteBuffer {
     val length = g1()
     val rsa = gArrayBuffer(length)
-    return BigInteger(rsa).modPow(exponent, modulus).toByteArray()
+    return ByteBuffer.wrap(BigInteger(rsa).modPow(exponent, modulus).toByteArray())
 }
 
-private tailrec fun ByteBuffer.untilStringTerminator(length: Int = 0): Int {
-    if (this[position() + length].toInt() == 10) return length
-    return untilStringTerminator(length + 1)
+private tailrec fun ByteBuffer.toByte(terminator: Int, length: Int = 0): Int {
+    if (this[position() + length].toInt() == terminator) return length
+    return toByte(terminator, length + 1)
 }
-
-private fun ByteBuffer.readUChars(n: Int): CharArray = CharArray(n) { (get().toInt() and 0xff).toChar() }
 
 inline fun ByteBuffer.withBitAccess(block: BitAccess.() -> Unit) {
     val bitAccess = BitAccess(this)

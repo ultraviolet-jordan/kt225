@@ -8,11 +8,11 @@ import kt225.cache.archive.config.varp.Varps
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.g4
-import kt225.common.buffer.gstr
+import kt225.common.buffer.gString
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.p4
-import kt225.common.buffer.pjstr
+import kt225.common.buffer.pString
 import java.nio.ByteBuffer
 
 /**
@@ -40,7 +40,7 @@ class VarpsProvider @Inject constructor(
             6 -> entry.opcode6 = true
             7 -> entry.opcode7 = buffer.g4()
             8 -> entry.opcode8 = true
-            10 -> entry.opcode10 = buffer.gstr()
+            10 -> entry.opcode10 = buffer.gString()
             else -> error("Missing opcode $opcode.")
         }
         return decode(buffer, entry)
@@ -107,7 +107,7 @@ class VarpsProvider @Inject constructor(
         }
         if (opcode10 != null) {
             buffer.p1(10)
-            buffer.pjstr(opcode10)
+            buffer.pString(opcode10)
         }
         buffer.p1(0)
         return buffer
