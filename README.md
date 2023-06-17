@@ -1,13 +1,19 @@
 # 225 Emulator Written in Kotlin.
 
 ## Requirements
-- Kotlin 1.6.10
+- Kotlin 1.8.20
 
 ## Getting Started
-- Place cache archive files in " /cache/src/main/resources/archives/ " directory.
-- Place cache song files in " /cache/src/main/resources/songs/ " directory.
-- Place cache map files in " /cache/src/main/resources/maps/ " directory.
+- To start the web server using Gradle, you can run the run task:
+```shell
+./gradlew :http:run
+```
+
+- To start the game server using Gradle, you can run the run task:
+```shell
+./gradlew :game:run
+```
 
 <p align="center">
-  <img src="https://github.com/ultraviolet-jordan/kt225/blob/main/github/225_lumbridge.jpg?raw=true" alt="Habbo Hotel Registration"/>
+  <img src="https://github.com/ultraviolet-jordan/kt225/blob/main/github/225_lumbridge.jpg?raw=true" alt="Lumbridge in 2004"/>
 </p>
