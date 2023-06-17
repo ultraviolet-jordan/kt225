@@ -29,11 +29,11 @@ abstract class JagArchive(
     }
 
     fun read(fileId: Int): ByteBuffer? {
-        return file(fileId)?.let { ByteBuffer.wrap(it.data) }
+        return file(fileId)?.let { ByteBuffer.wrap(it.bytes) }
     }
 
     fun read(fileName: String): ByteBuffer? {
-        return file(fileName)?.let { ByteBuffer.wrap(it.data) }
+        return file(fileName)?.let { ByteBuffer.wrap(it.bytes) }
     }
 
     private fun String.nameHash(): Int {

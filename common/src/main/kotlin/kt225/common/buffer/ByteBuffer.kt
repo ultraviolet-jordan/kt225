@@ -47,11 +47,11 @@ fun ByteBuffer.gString(): String {
     }
 }
 
-fun ByteBuffer.gArrayBuffer(size: Int, position: Int = position()): ByteArray {
+fun ByteBuffer.gArrayBuffer(size: Int, position: Int = position(), length: Int = size): ByteArray {
     val array = ByteArray(size).also {
-        get(position, it, 0, size) // Doesn't move position.
+        get(position, it, 0, length) // Doesn't move position.
     }
-    skip(size)
+    skip(length)
     return array
 }
 
@@ -81,8 +81,9 @@ fun ByteBuffer.pString(value: String) {
     put(10)
 }
 
-fun ByteBuffer.pArrayBuffer(bytes: ByteArray) {
-    put(bytes)
+fun ByteBuffer.pArrayBuffer(bytes: ByteArray, position: Int = position(), length: Int = bytes.size) {
+    put(position, bytes, 0, length) // Doesn't move position.
+    skip(length)
 }
 
 fun ByteBuffer.skip(amount: Int) {

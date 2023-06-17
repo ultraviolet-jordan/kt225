@@ -16,7 +16,7 @@ class JagArchiveUnzipped(
     val bytes: ByteArray,
     val name: String,
     val crc: Int,
-    val files: Map<Int, JagArchiveFile> = TreeMap()
+    val files: MutableMap<Int, JagArchiveFile> = TreeMap()
 ) {
     companion object {
         fun decode(bytes: ByteArray, name: String): JagArchiveUnzipped {
@@ -40,12 +40,8 @@ class JagArchiveUnzipped(
 
             require(buffer.remaining() >= 2)
             val length = buffer.g2()
-            val files = buffer
-                .decodeFiles(length, isDecompress)
-                .filterNotNull()
-                .associateBy(JagArchiveFile::id)
+            val files = buffer.decodeFiles(length, isDecompress).filterNotNull().associateBy(JagArchiveFile::id).toMutableMap()
             require(length == files.size)
-
             return JagArchiveUnzipped(bytes, name, crc.value.toInt(), files)
         }
 
@@ -62,19 +58,18 @@ class JagArchiveUnzipped(
 
             require(remaining() >= 10)
             val nameHash = g4()
-            val decompressedLength = g3()
-            val compressedLength = g3()
+            val decompressed = g3()
+            val compressed = g3()
 
             val position = position()
             val data = when {
-                isDecompress -> gArrayBuffer(decompressedLength)
-                else -> bzip2Decompress(compressedLength, offset)
+                isDecompress -> gArrayBuffer(decompressed)
+                else -> bzip2Decompress(compressed, offset)
             }
             position(position)
-            require(decompressedLength == data.size)
-
-            files[fileId] = JagArchiveFile(fileId, nameHash, data)
-            return decodeFiles(length, isDecompress, fileId + 1, offset + compressedLength, files)
+            require(decompressed == data.size)
+            val file = JagArchiveFile(fileId, nameHash, data)
+            return decodeFiles(length, isDecompress, fileId + 1, offset + compressed, files.plus(file))
         }
     }
 }

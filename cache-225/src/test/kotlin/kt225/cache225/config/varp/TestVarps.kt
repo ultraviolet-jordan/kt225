@@ -1,7 +1,6 @@
 package kt225.cache225.config.varp
 
 import com.google.inject.Guice
-import com.google.inject.Injector
 import dev.misfitlabs.kotlinguice4.getInstance
 import kt225.cache.CacheModule
 import kt225.cache.archive.config.varp.Varps
@@ -17,7 +16,7 @@ class TestVarps {
 
     @Test
     fun `test varps`() {
-        val injector: Injector = Guice.createInjector(CacheModule, Cache225Module)
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
         val varps = injector.getInstance<Varps<VarpEntryType>>()
         varps.values.forEach(::println)
         assert(varps.values.last().id == 294)
@@ -25,7 +24,7 @@ class TestVarps {
 
     @Test
     fun `test encode decode`() {
-        val injector: Injector = Guice.createInjector(CacheModule, Cache225Module)
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
         val provider = injector.getInstance<VarpsProvider>()
         val varps = injector.getInstance<Varps<VarpEntryType>>()
 

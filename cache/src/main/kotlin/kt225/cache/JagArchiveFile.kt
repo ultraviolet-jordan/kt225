@@ -6,7 +6,7 @@ package kt225.cache
 data class JagArchiveFile(
     val id: Int,
     val nameHash: Int,
-    val data: ByteArray
+    val bytes: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
