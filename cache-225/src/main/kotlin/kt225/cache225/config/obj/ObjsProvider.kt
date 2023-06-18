@@ -39,6 +39,8 @@ class ObjsProvider @Inject constructor(
             encode(datBuffer, it)
             idxBuffer.p2(datBuffer.position() - position) // The length of the encoded bytes.
         }
+        datBuffer.flip()
+        idxBuffer.flip()
         configArchive.write("obj.dat", datBuffer)
         configArchive.write("obj.idx", idxBuffer)
     }

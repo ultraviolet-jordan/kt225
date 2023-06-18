@@ -34,8 +34,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
-
         assertEquals(configArchive.crc(), newConfigArchive.crc())
+        assertTrue(configArchive.zippedBytes().contentEquals(newConfigArchive.zippedBytes()))
     }
 
     @Test
@@ -54,6 +54,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(interfaceArchive.crc(), newInterfaceArchive.crc())
+        assertTrue(interfaceArchive.zippedBytes().contentEquals(newInterfaceArchive.zippedBytes()))
     }
 
     @Test
@@ -72,6 +74,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(mediaArchive.crc(), newMediaArchive.crc())
+        assertTrue(mediaArchive.zippedBytes().contentEquals(newMediaArchive.zippedBytes()))
     }
 
     @Test
@@ -90,6 +94,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(modelsArchive.crc(), newModelsArchive.crc())
+        assertTrue(modelsArchive.zippedBytes().contentEquals(newModelsArchive.zippedBytes()))
     }
 
     @Test
@@ -108,6 +114,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(soundsArchive.crc(), newSoundsArchive.crc())
+        assertTrue(soundsArchive.zippedBytes().contentEquals(newSoundsArchive.zippedBytes()))
     }
 
     @Test
@@ -126,6 +134,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(texturesArchive.crc(), newTexturesArchive.crc())
+        assertTrue(texturesArchive.zippedBytes().contentEquals(newTexturesArchive.zippedBytes()))
     }
 
     @Test
@@ -144,6 +154,8 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(titleArchive.crc(), newTitleArchive.crc())
+        assertTrue(titleArchive.zippedBytes().contentEquals(newTitleArchive.zippedBytes()))
     }
 
     @Test
@@ -162,5 +174,7 @@ class TestJagArchive {
             assertEquals(file?.nameHash, it.nameHash)
             assertEquals(file?.crc, it.crc)
         }
+        assertEquals(wordEncArchive.crc(), newWordEncArchive.crc())
+        assertTrue(wordEncArchive.zippedBytes().contentEquals(newWordEncArchive.zippedBytes()))
     }
 }

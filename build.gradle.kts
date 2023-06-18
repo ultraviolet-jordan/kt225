@@ -16,13 +16,19 @@ allprojects {
     plugins.withType<KotlinPluginWrapper> {
         dependencies {
             implementation(kotlin("stdlib"))
+            implementation(deps.slf4j.simple)
         }
     }
 
     tasks.withType<Test> {
         dependencies {
             testImplementation(kotlin("test"))
+            testImplementation(deps.slf4j.simple)
         }
+        systemProperty(
+            "java.library.path",
+            "$rootDir/common/src/main/resources/"
+        )
     }
 
     tasks.withType<KotlinCompile> {

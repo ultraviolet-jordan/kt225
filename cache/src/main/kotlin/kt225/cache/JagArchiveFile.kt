@@ -16,14 +16,10 @@ data class JagArchiveFile(
         other as JagArchiveFile
 
         if (id != other.id) return false
-        if (nameHash != other.nameHash) return false
-        return bytes.contentEquals(other.bytes)
+        return nameHash == other.nameHash
     }
 
     override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + nameHash
-        result = 31 * result + bytes.contentHashCode()
-        return result
+        return nameHash
     }
 }

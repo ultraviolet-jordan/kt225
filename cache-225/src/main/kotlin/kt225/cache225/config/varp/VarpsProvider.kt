@@ -38,6 +38,7 @@ class VarpsProvider @Inject constructor(
         entries.values.forEach {
             encode(buffer, it)
         }
+        buffer.flip()
         configArchive.write("varp.dat", buffer)
     }
 

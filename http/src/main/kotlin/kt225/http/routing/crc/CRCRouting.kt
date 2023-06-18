@@ -24,7 +24,11 @@ class CRCRouting @Inject constructor(
                 val crcs = cache.crcs
                 val buffer = ByteBuffer.allocate(crcs.size * 4)
                 crcs.forEach(buffer::putInt)
-                call.respondBytes(buffer.array())
+                if (buffer.hasArray()) {
+                    call.respondBytes(buffer.array())
+                } else {
+                    call.respondBytes(ByteArray(buffer.position()) { buffer.get() })
+                }
             }
         }
     }

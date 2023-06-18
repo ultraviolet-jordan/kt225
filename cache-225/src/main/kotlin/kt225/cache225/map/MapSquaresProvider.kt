@@ -3,14 +3,14 @@ package kt225.cache225.map
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.cache.EntryProvider
+import kt225.cache.bzip2.bzip2Decompress
 import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquares
 import kt225.cache.map.Maps
-import kt225.common.buffer.bzip2Decompress
-import kt225.common.buffer.copy
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.g4
+import kt225.common.buffer.gdata
 import kt225.common.buffer.gsmarts
 import kt225.common.buffer.skip
 import java.nio.ByteBuffer
@@ -165,8 +165,8 @@ class MapSquaresProvider @Inject constructor(
 
     private fun ByteBuffer.decompress(): ByteBuffer {
         val decompressed = g4()
-        val buffer = ByteBuffer.wrap(copy().bzip2Decompress())
-        require(decompressed == buffer.capacity())
+        val buffer = ByteBuffer.wrap(bzip2Decompress(gdata(limit() - 4)))
+        require(decompressed == buffer.limit())
         return buffer
     }
 }

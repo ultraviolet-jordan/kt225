@@ -1,6 +1,7 @@
 package kt225.game
 
 import com.google.inject.Singleton
+import kt225.common.buffer.gdata
 import kt225.common.buffer.p1
 import kt225.common.buffer.pdata
 import kt225.common.game.SynchronizerEntityRenderer
@@ -36,7 +37,7 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
     private fun buildHighDefinitionUpdates(player: Player, blocks: Array<HighDefinitionRenderBlock<*>?>): ByteArray {
         val mask = blocks.calculateMask(0x80)
         val size = blocks.calculateSize(mask)
-        return ByteBuffer.allocate(size).also {
+        val buffer = ByteBuffer.allocate(size).also {
             it.p1(mask and 0xff)
             if (mask >= 256) {
                 it.p1(mask shr 8)
@@ -48,15 +49,25 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
                 val start = it.position()
                 block.builder.buildRenderBlock(it, block.renderType)
                 val end = it.position()
-                player.renderer.capture(block, it.array().sliceArray(start until end))
+                if (it.hasArray()) {
+                    player.renderer.capture(block, it.array().sliceArray(start until end))
+                } else {
+                    it.mark()
+                    player.renderer.capture(block, it.slice(start, end).gdata())
+                    it.reset()
+                }
             }
-        }.array()
+        }
+        if (buffer.hasArray()) {
+            return buffer.array()
+        }
+        return buffer.gdata()
     }
 
     private fun buildLowDefinitionUpdates(blocks: Array<LowDefinitionRenderBlock<*>?>): ByteArray {
         val mask = blocks.calculateMask(0x80)
         val size = blocks.calculateSize(mask)
-        return ByteBuffer.allocate(size).also {
+        val buffer = ByteBuffer.allocate(size).also {
             it.p1(mask and 0xff)
             if (mask >= 256) {
                 it.p1(mask shr 8)
@@ -67,6 +78,10 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
                 }
                 it.pdata(block.persistedBytes)
             }
-        }.array()
+        }
+        if (buffer.hasArray()) {
+            return buffer.array()
+        }
+        return buffer.gdata()
     }
 }

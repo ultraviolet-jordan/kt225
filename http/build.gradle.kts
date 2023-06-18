@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
     implementation(deps.bundles.ktor)
-    implementation(deps.slf4j.simple)
     implementation(deps.guice)
 
     implementation(project(":cache"))
@@ -13,4 +12,7 @@ dependencies {
 
 application {
     mainClass.set("kt225.http.ApplicationKt")
+    applicationDefaultJvmArgs += listOf(
+        "-Djava.library.path=$rootDir/common/src/main/resources/"
+    )
 }

@@ -1,11 +1,6 @@
 package kt225.common.buffer
 
 import io.ktor.util.moveTo
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.SequenceInputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import kotlin.math.min
@@ -51,7 +46,7 @@ fun ByteBuffer.gstr(): String {
     }
 }
 
-fun ByteBuffer.gdata(size: Int, position: Int = position(), length: Int = size): ByteArray {
+fun ByteBuffer.gdata(size: Int = limit(), position: Int = position(), length: Int = size): ByteArray {
     val array = ByteArray(size).also {
         get(position, it, 0, length) // Doesn't move position.
     }
@@ -99,24 +94,6 @@ fun ByteBuffer.copy(index: Int = position(), size: Int = remaining()): ByteBuffe
         this@copy.slice(index, size).moveTo(this@apply)
         clear()
     }
-}
-
-fun ByteBuffer.bzip2Decompress(): ByteArray {
-    val header = ByteArrayInputStream("BZh1".toByteArray()) // Add the "BZh1" header.
-    val stream = SequenceInputStream(header, ByteArrayInputStream(array()))
-    val compressor = BZip2CompressorInputStream(stream)
-    val decompressed = compressor.readAllBytes()
-    compressor.close()
-    return decompressed
-}
-
-fun bzip2Compress(bytes: ByteArray): ByteArray {
-    val stream = ByteArrayOutputStream()
-    val compressor = BZip2CompressorOutputStream(stream, 1)
-    compressor.write(bytes)
-    compressor.close()
-    val compressed = stream.toByteArray()
-    return compressed.copyOfRange(4, compressed.size) // Slice the "BZh1" header off.
 }
 
 fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger): ByteArray {

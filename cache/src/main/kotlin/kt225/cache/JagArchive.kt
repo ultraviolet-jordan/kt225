@@ -1,8 +1,7 @@
 package kt225.cache
 
-import kt225.common.buffer.bzip2Compress
-import kt225.common.buffer.bzip2Decompress
-import kt225.common.buffer.copy
+import kt225.cache.bzip2.bzip2Compress
+import kt225.cache.bzip2.bzip2Decompress
 import kt225.common.buffer.g2
 import kt225.common.buffer.g3
 import kt225.common.buffer.g4
@@ -53,10 +52,9 @@ abstract class JagArchive(
     }
 
     fun write(fileId: Int, buffer: ByteBuffer, nameHash: Int): Boolean {
-        val bytes = buffer.copy(0, buffer.position()).array()
-        val crc = CRC32()
-        crc.update(bytes)
-        return archive.files.put(fileId, JagArchiveFile(fileId, nameHash, crc.value.toInt(), bytes)) != null
+        val bytes = buffer.gdata()
+        val crc = CRC32().also { it.update(bytes) }.value.toInt()
+        return archive.files.put(fileId, JagArchiveFile(fileId, nameHash, crc, bytes)) != null
     }
 
     fun write(fileName: String, buffer: ByteBuffer): Boolean {
@@ -85,15 +83,13 @@ abstract class JagArchive(
 
     companion object {
         fun decode(bytes: ByteArray): JagArchiveUnzipped {
-            val crc = CRC32()
-            crc.update(bytes)
             val input = ByteBuffer.wrap(bytes)
             require(input.remaining() >= 6)
             val decompressed = input.g3()
             val compressed = input.g3()
             val isCompressed = decompressed != compressed
             val buffer = when {
-                isCompressed -> ByteBuffer.wrap(input.copy(size = compressed).bzip2Decompress())
+                isCompressed -> ByteBuffer.wrap(bzip2Decompress(input.gdata(compressed)))
                 else -> input
             }
             if (isCompressed) {
@@ -103,25 +99,35 @@ abstract class JagArchive(
             val length = buffer.g2()
             val files = buffer.decodeFiles(length, isCompressed).filterNotNull().associateBy(JagArchiveFile::id).toMutableMap()
             require(length == files.size)
-            return JagArchiveUnzipped(bytes, isCompressed, crc.value.toInt(), files)
+
+            val crc = CRC32().also { it.update(bytes) }.value.toInt()
+            return JagArchiveUnzipped(bytes, isCompressed, crc, files)
         }
 
         fun encode(archive: JagArchiveUnzipped): ByteArray {
             val isCompressed = archive.isCompressed
-            val files = ByteBuffer.allocate(1_500_000)
-            files.p2(archive.files.size)
-            val offset = files.encodeFiles(archive.files, isCompressed)
-            val filesBytes = files.copy(0, offset).array()
+            val files = archive.files
 
-            val buffer = ByteBuffer.allocate(1_500_000)
-            buffer.p3(filesBytes.size)
+            // Good enough as long as there is enough alloc.
+            val lengths = files.values.sumOf { it.bytes.size + 10 + 2 }
+
+            val filesBuffer = ByteBuffer.allocate(lengths)
+            filesBuffer.p2(files.size)
+            val offset = filesBuffer.encodeFiles(files, isCompressed)
+            filesBuffer.position(offset)
+            filesBuffer.flip()
+            val filesBytes = filesBuffer.gdata(offset)
+
+            val archiveBuffer = ByteBuffer.allocate(filesBytes.size + 6)
+            archiveBuffer.p3(filesBytes.size)
             val bytes = when {
                 isCompressed -> bzip2Compress(filesBytes)
                 else -> filesBytes
             }
-            buffer.p3(bytes.size)
-            buffer.pdata(bytes)
-            return buffer.copy(0, buffer.position()).array()
+            archiveBuffer.p3(bytes.size)
+            archiveBuffer.pdata(bytes)
+            archiveBuffer.flip()
+            return archiveBuffer.gdata()
         }
 
         private tailrec fun ByteBuffer.decodeFiles(
@@ -138,14 +144,16 @@ abstract class JagArchive(
             val nameHash = g4()
             val decompressed = g3()
             val compressed = g3()
-            val data = when {
+            mark()
+            val bytes = when {
                 isCompressed -> gdata(decompressed)
-                else -> copy(offset, compressed).bzip2Decompress()
+                else -> bzip2Decompress(gdata(compressed, offset))
             }
-            val crc = CRC32()
-            crc.update(data)
-            require(decompressed == data.size)
-            val file = JagArchiveFile(fileId, nameHash, crc.value.toInt(), data)
+            reset()
+            require(decompressed == bytes.size)
+
+            val crc = CRC32().also { it.update(bytes) }.value.toInt()
+            val file = JagArchiveFile(fileId, nameHash, crc, bytes)
             return decodeFiles(length, isCompressed, fileId + 1, offset + compressed, files.plus(file))
         }
 
@@ -167,9 +175,9 @@ abstract class JagArchive(
                 else -> bzip2Compress(file.bytes)
             }
             p3(bytes.size)
-            val position = position()
+            mark()
             pdata(bytes, offset) // This moves the position.
-            position(position)
+            reset()
             return encodeFiles(files, isCompressed, fileId + 1, offset + bytes.size)
         }
     }

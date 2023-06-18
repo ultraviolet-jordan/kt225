@@ -1,6 +1,7 @@
-package kt225.common.buffer
+package kt225.cache
 
-import java.nio.ByteBuffer
+import kt225.cache.bzip2.bzip2Compress
+import kt225.cache.bzip2.bzip2Decompress
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -8,12 +9,12 @@ import kotlin.test.assertContentEquals
 /**
  * @author Jordan Abraham
  */
-class BufferTest {
+class TestBzip2 {
     @Test
     fun `test bzip2`() {
         val random = Random.nextBytes(500)
         val x = bzip2Compress(random)
-        val z = ByteBuffer.wrap(x).bzip2Decompress()
+        val z = bzip2Decompress(x)
         assertContentEquals(random, z)
     }
 }
