@@ -46,6 +46,7 @@ class TestVarps {
             assertEquals(it.opcode7, decoded.opcode7)
             assertEquals(it.opcode8, decoded.opcode8)
             assertEquals(it.opcode10, decoded.opcode10)
+            assertEquals(it.hashCode(), decoded.hashCode())
         }
     }
 
@@ -64,6 +65,38 @@ class TestVarps {
         val varps = varpsProvider.read()
 
         assert(varps.values.last().id == 294)
+    }
+
+    @Test
+    fun `test obj rewrite`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val configArchive = injector.getInstance<ConfigArchive>()
+        val varps = injector.getInstance<Varps<VarpEntryType>>()
+        val varpsProvider = injector.getInstance<VarpsProvider>()
+
+        varpsProvider.write(varps)
+
+        val editedConfigArchiveEncoded = JagArchive.encode(configArchive.unzipped())
+        val editedConfigArchiveUnzipped = JagArchive.decode(editedConfigArchiveEncoded)
+        val editedConfigArchive = ConfigArchive(editedConfigArchiveUnzipped)
+        val editedVarpsProviders = VarpsProvider(editedConfigArchive)
+
+        val editedVarps = editedVarpsProviders.read()
+
+        editedVarps.values.forEach {
+            val original = varps[it.id]
+            assertEquals(original?.id, it.id)
+            assertEquals(original?.opcode1, it.opcode1)
+            assertEquals(original?.opcode2, it.opcode2)
+            assertEquals(original?.opcode3, it.opcode3)
+            assertEquals(original?.opcode4, it.opcode4)
+            assertEquals(original?.clientcode, it.clientcode)
+            assertEquals(original?.opcode6, it.opcode6)
+            assertEquals(original?.opcode7, it.opcode7)
+            assertEquals(original?.opcode8, it.opcode8)
+            assertEquals(original?.opcode10, it.opcode10)
+            assertEquals(original?.hashCode(), it.hashCode())
+        }
     }
 
     @Test
