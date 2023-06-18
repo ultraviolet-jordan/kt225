@@ -27,7 +27,7 @@ import kotlin.reflect.KClass
 /**
  * @author Jordan Abraham
  */
-object Packet225Module : KotlinModule() {
+object PacketModule : KotlinModule() {
     override fun configure() {
         bindPacketBuilders()
         bindPacketReaders()

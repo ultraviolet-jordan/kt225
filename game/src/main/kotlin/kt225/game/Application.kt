@@ -7,7 +7,7 @@ import io.ktor.server.engine.ApplicationEngine
 import kt225.cache.CacheModule
 import kt225.cache225.Cache225Module
 import kt225.network.NetworkModule
-import kt225.packet.Packet225Module
+import kt225.packet.PacketModule
 
 /**
  * @author Jordan Abraham
@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
         CacheModule,
         Cache225Module,
         NetworkModule,
-        Packet225Module,
+        PacketModule,
         GameModule(args)
     )
 
