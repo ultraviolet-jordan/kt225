@@ -28,15 +28,15 @@ class CacheProvider @Inject constructor(
 ) : Provider<Cache> {
     override fun get(): Cache {
         val archives = mapOf(
-            0 to null,
-            1 to titleArchive,
-            2 to configArchive,
-            3 to interfaceArchive,
-            4 to mediaArchive,
-            5 to modelsArchive,
-            6 to texturesArchive,
-            7 to wordEncArchive,
-            8 to soundsArchive
+            "none" to null,
+            "title" to titleArchive,
+            "config" to configArchive,
+            "interface" to interfaceArchive,
+            "media" to mediaArchive,
+            "models" to modelsArchive,
+            "textures" to texturesArchive,
+            "wordenc" to wordEncArchive,
+            "sounds" to soundsArchive
         )
         return Cache(archives)
     }

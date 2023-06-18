@@ -2,7 +2,7 @@ package kt225.cache.archive.textures
 
 import com.google.inject.Provider
 import com.google.inject.Singleton
-import kt225.cache.JagArchiveUnzipped
+import kt225.cache.JagArchive
 
 /**
  * @author Jordan Abraham
@@ -13,6 +13,6 @@ class TexturesArchiveProvider : Provider<TexturesArchive> {
         val resource = javaClass.getResourceAsStream("/archives/textures")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return TexturesArchive(JagArchiveUnzipped.decode(bytes, "textures"))
+        return TexturesArchive(JagArchive.decode(bytes))
     }
 }

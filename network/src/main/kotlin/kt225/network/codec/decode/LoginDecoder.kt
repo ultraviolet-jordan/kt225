@@ -6,8 +6,8 @@ import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.utils.io.ByteReadChannel
 import kt225.common.buffer.g1
 import kt225.common.buffer.g4
-import kt225.common.buffer.gString
-import kt225.common.buffer.rsaDecrypt
+import kt225.common.buffer.gstr
+import kt225.common.buffer.rsadec
 import kt225.common.network.CodecDecoder
 import kt225.common.network.Session
 import kt225.network.codec.encode.LoginEncoder
@@ -40,13 +40,13 @@ class LoginDecoder @Inject constructor(
         val version = buffer.g1()
         val properties = buffer.g1()
         val crcs = IntArray(9) { buffer.g4() }
-        val rsa = ByteBuffer.wrap(buffer.rsaDecrypt(BigInteger(exponent), BigInteger(modulus)))
+        val rsa = ByteBuffer.wrap(buffer.rsadec(BigInteger(exponent), BigInteger(modulus)))
         val rsaTen = rsa.g1()
         val clientSeed = IntArray(4) { rsa.g4() }
         val serverSeed = IntArray(clientSeed.size) { clientSeed[it] + 50 }
         val uid = rsa.g4()
-        val username = rsa.gString()
-        val password = rsa.gString()
+        val username = rsa.gstr()
+        val password = rsa.gstr()
 
         session.codec(
             type = LoginEncoder::class,

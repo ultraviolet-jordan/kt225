@@ -1,7 +1,11 @@
 package kt225.common.buffer
 
+import io.ktor.util.moveTo
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.SequenceInputStream
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import kotlin.math.min
@@ -13,7 +17,7 @@ fun ByteBuffer.g1(): Int {
     return get().toInt() and 0xff
 }
 
-fun ByteBuffer.g1s(): Int {
+fun ByteBuffer.g1b(): Int {
     return get().toInt()
 }
 
@@ -33,21 +37,21 @@ fun ByteBuffer.g8(): Long {
     return getLong()
 }
 
-fun ByteBuffer.gSmart1or2(): Int {
+fun ByteBuffer.gsmarts(): Int {
     return if ((this[position()].toInt() and 0xff) < 128) g1() else g2() - 32768
 }
 
-fun ByteBuffer.gSmart1or2s(): Int {
+fun ByteBuffer.gsmart(): Int {
     return if ((this[position()].toInt() and 0xff) < 128) g1() - 64 else g2() - 49152
 }
 
-fun ByteBuffer.gString(): String {
-    return String(gArrayBuffer(toByte(10))).also {
+fun ByteBuffer.gstr(): String {
+    return String(gdata(toByte(10))).also {
         skip(1)
     }
 }
 
-fun ByteBuffer.gArrayBuffer(size: Int, position: Int = position(), length: Int = size): ByteArray {
+fun ByteBuffer.gdata(size: Int, position: Int = position(), length: Int = size): ByteArray {
     val array = ByteArray(size).also {
         get(position, it, 0, length) // Doesn't move position.
     }
@@ -76,12 +80,12 @@ fun ByteBuffer.p8(value: Long) {
     putLong(value)
 }
 
-fun ByteBuffer.pString(value: String) {
+fun ByteBuffer.pjstr(value: String) {
     put(value.toByteArray())
     put(10)
 }
 
-fun ByteBuffer.pArrayBuffer(bytes: ByteArray, position: Int = position(), length: Int = bytes.size) {
+fun ByteBuffer.pdata(bytes: ByteArray, position: Int = position(), length: Int = bytes.size) {
     put(position, bytes, 0, length) // Doesn't move position.
     skip(length)
 }
@@ -90,30 +94,34 @@ fun ByteBuffer.skip(amount: Int) {
     position(position() + amount)
 }
 
-fun ByteBuffer.bzip2Decompress(length: Int, startIndex: Int = position()): ByteArray {
-    require(startIndex - 4 >= 0)
-    val startPosition = position()
-    position(0)
-    val dest = gArrayBuffer(length + 4, startIndex - 4).also {
-        // Copy 4 + length bytes offset by -4 starting position.
-        // The bzip header is copied to the beginning 4 bytes thanks to the -4 start.
-        // Files are in bzip2 format however they do not contain the required header needed to decompress.
-        // The client implementation does not require this header.
-        it[0] = 'B'.code.toByte()
-        it[1] = 'Z'.code.toByte()
-        it[2] = 'h'.code.toByte()
-        it[3] = '1'.code.toByte()
+fun ByteBuffer.copy(index: Int = position(), size: Int = remaining()): ByteBuffer {
+    return ByteBuffer.allocate(size).apply {
+        this@copy.slice(index, size).moveTo(this@apply)
+        clear()
     }
-    position(startPosition)
-    val compressor = BZip2CompressorInputStream(ByteArrayInputStream(dest))
-    val bytes = compressor.readAllBytes()
-    compressor.close()
-    return bytes
 }
 
-fun ByteBuffer.rsaDecrypt(exponent: BigInteger, modulus: BigInteger): ByteArray {
+fun ByteBuffer.bzip2Decompress(): ByteArray {
+    val header = ByteArrayInputStream("BZh1".toByteArray()) // Add the "BZh1" header.
+    val stream = SequenceInputStream(header, ByteArrayInputStream(array()))
+    val compressor = BZip2CompressorInputStream(stream)
+    val decompressed = compressor.readAllBytes()
+    compressor.close()
+    return decompressed
+}
+
+fun bzip2Compress(bytes: ByteArray): ByteArray {
+    val stream = ByteArrayOutputStream()
+    val compressor = BZip2CompressorOutputStream(stream, 1)
+    compressor.write(bytes)
+    compressor.close()
+    val compressed = stream.toByteArray()
+    return compressed.copyOfRange(4, compressed.size) // Slice the "BZh1" header off.
+}
+
+fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger): ByteArray {
     val length = g1()
-    val rsa = gArrayBuffer(length)
+    val rsa = gdata(length)
     return BigInteger(rsa).modPow(exponent, modulus).toByteArray()
 }
 

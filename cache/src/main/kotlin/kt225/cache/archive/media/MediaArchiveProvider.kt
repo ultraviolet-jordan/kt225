@@ -2,7 +2,7 @@ package kt225.cache.archive.media
 
 import com.google.inject.Provider
 import com.google.inject.Singleton
-import kt225.cache.JagArchiveUnzipped
+import kt225.cache.JagArchive
 
 /**
  * @author Jordan Abraham
@@ -13,6 +13,6 @@ class MediaArchiveProvider : Provider<MediaArchive> {
         val resource = javaClass.getResourceAsStream("/archives/media")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return MediaArchive(JagArchiveUnzipped.decode(bytes, "media"))
+        return MediaArchive(JagArchive.decode(bytes))
     }
 }

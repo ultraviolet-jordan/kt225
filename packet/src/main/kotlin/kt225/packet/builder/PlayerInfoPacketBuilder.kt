@@ -2,7 +2,7 @@ package kt225.packet.builder
 
 import com.google.inject.Singleton
 import kt225.common.buffer.BitAccess
-import kt225.common.buffer.pArrayBuffer
+import kt225.common.buffer.pdata
 import kt225.common.buffer.withBitAccess
 import kt225.common.game.entity.animator.Animator
 import kt225.common.game.entity.player.Viewport
@@ -62,7 +62,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
     private fun ByteBuffer.updatePlayerMasks(viewport: Viewport, packet: PlayerInfoPacket) {
         for (index in viewport.localRenderUpdates) {
             val render = packet.highDefinitionRenders[index] ?: continue
-            pArrayBuffer(render)
+            pdata(render)
         }
         viewport.localRenderUpdates.clear()
     }

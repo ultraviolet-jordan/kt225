@@ -2,7 +2,7 @@ package kt225.cache.archive.wordenc
 
 import com.google.inject.Provider
 import com.google.inject.Singleton
-import kt225.cache.JagArchiveUnzipped
+import kt225.cache.JagArchive
 
 /**
  * @author Jordan Abraham
@@ -13,6 +13,6 @@ class WordEncArchiveProvider : Provider<WordEncArchive> {
         val resource = javaClass.getResourceAsStream("/archives/wordenc")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return WordEncArchive(JagArchiveUnzipped.decode(bytes, "wordenc"))
+        return WordEncArchive(JagArchive.decode(bytes))
     }
 }

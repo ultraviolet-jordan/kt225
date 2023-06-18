@@ -2,7 +2,7 @@ package kt225.game
 
 import com.google.inject.Singleton
 import kt225.common.buffer.p1
-import kt225.common.buffer.pArrayBuffer
+import kt225.common.buffer.pdata
 import kt225.common.game.SynchronizerEntityRenderer
 import kt225.common.game.entity.player.Player
 import kt225.common.game.entity.render.HighDefinitionRenderBlock
@@ -65,7 +65,7 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
                 if (block == null) {
                     continue
                 }
-                it.pArrayBuffer(block.persistedBytes)
+                it.pdata(block.persistedBytes)
             }
         }.array()
     }

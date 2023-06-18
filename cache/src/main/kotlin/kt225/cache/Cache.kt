@@ -4,11 +4,11 @@ package kt225.cache
  * @author Jordan Abraham
  */
 class Cache(
-    private val archives: Map<Int, JagArchive?>
+    private val archives: Map<String, JagArchive?>
 ) {
-    val crcs = IntArray(archives.size) { if (it == 0) 0 else archives[it]?.crc() ?: -1 }
+    val crcs = archives.map { it.value?.crc() ?: 0 }.toIntArray()
 
     fun getArchiveResource(name: String): ByteArray? {
-        return archives.values.firstOrNull { it?.name() == name }?.zipped()
+        return archives[name]?.zippedBytes()
     }
 }

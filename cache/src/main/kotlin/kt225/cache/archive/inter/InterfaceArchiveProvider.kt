@@ -2,7 +2,7 @@ package kt225.cache.archive.inter
 
 import com.google.inject.Provider
 import com.google.inject.Singleton
-import kt225.cache.JagArchiveUnzipped
+import kt225.cache.JagArchive
 
 /**
  * @author Jordan Abraham
@@ -13,6 +13,6 @@ class InterfaceArchiveProvider : Provider<InterfaceArchive> {
         val resource = javaClass.getResourceAsStream("/archives/interface")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return InterfaceArchive(JagArchiveUnzipped.decode(bytes, "interface"))
+        return InterfaceArchive(JagArchive.decode(bytes))
     }
 }

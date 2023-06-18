@@ -3,7 +3,7 @@ package kt225.packet.builder
 import com.google.inject.Singleton
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
-import kt225.common.buffer.pArrayBuffer
+import kt225.common.buffer.pdata
 import kt225.common.packet.PacketBuilder
 import kt225.packet.type.server.DataLandPacket
 import java.nio.ByteBuffer
@@ -22,6 +22,6 @@ class DataLandPacketBuilder : PacketBuilder<DataLandPacket>(
         buffer.p1(z)
         buffer.p2(offset)
         buffer.p2(length)
-        buffer.pArrayBuffer(bytes)
+        buffer.pdata(bytes)
     }
 }

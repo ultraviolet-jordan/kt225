@@ -7,10 +7,11 @@ import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquares
 import kt225.cache.map.Maps
 import kt225.common.buffer.bzip2Decompress
+import kt225.common.buffer.copy
 import kt225.common.buffer.g1
-import kt225.common.buffer.g1s
+import kt225.common.buffer.g1b
 import kt225.common.buffer.g4
-import kt225.common.buffer.gSmart1or2
+import kt225.common.buffer.gsmarts
 import kt225.common.buffer.skip
 import java.nio.ByteBuffer
 
@@ -21,7 +22,7 @@ import java.nio.ByteBuffer
 class MapSquaresProvider @Inject constructor(
     private val maps: Maps
 ) : EntryProvider<MapSquareEntryType, MapSquares<MapSquareEntryType>> {
-    override fun get(): MapSquares<MapSquareEntryType> = MapSquares<MapSquareEntryType>().also {
+    override fun read(): MapSquares<MapSquareEntryType> = MapSquares<MapSquareEntryType>().also {
         val lengthX = 0 until maps.maxOf(MapResource::x) + 1
         val lengthZ = 0 until maps.maxOf(MapResource::z) + 1
 
@@ -52,12 +53,16 @@ class MapSquaresProvider @Inject constructor(
         }
     }
 
+    override fun write(entries: MapSquares<MapSquareEntryType>) {
+        TODO("Not yet implemented")
+    }
+
     override fun decode(buffer: ByteBuffer, entry: MapSquareEntryType): MapSquareEntryType {
         if (entry.type == 0) buffer.decodeMapSquareLands(entry) else buffer.decodeMapSquareLocs(entry)
         return entry
     }
 
-    override fun encode(entry: MapSquareEntryType): ByteBuffer {
+    override fun encode(buffer: ByteBuffer, entry: MapSquareEntryType) {
         TODO("Not yet implemented")
     }
 
@@ -96,7 +101,7 @@ class MapSquaresProvider @Inject constructor(
         }
         return decodeLand(
             height = height,
-            overlayId = if (opcode in 2..49) g1s() else overlayId,
+            overlayId = if (opcode in 2..49) g1b() else overlayId,
             overlayPath = if (opcode in 2..49) (opcode - 2) / 4 else overlayPath,
             overlayRotation = if (opcode in 2..49) opcode - 2 and 3 else overlayRotation,
             collision = if (opcode in 50..81) opcode - 49 else collision,
@@ -105,7 +110,7 @@ class MapSquaresProvider @Inject constructor(
     }
 
     private tailrec fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareEntryType, locId: Int = -1) {
-        val offset = gSmart1or2()
+        val offset = gsmarts()
         if (offset == 0) {
             return
         }
@@ -114,7 +119,7 @@ class MapSquaresProvider @Inject constructor(
     }
 
     private tailrec fun ByteBuffer.decodeLoc(entry: MapSquareEntryType, locId: Int, packedPosition: Int) {
-        val offset = gSmart1or2()
+        val offset = gsmarts()
         if (offset == 0) {
             return
         }
@@ -160,7 +165,7 @@ class MapSquaresProvider @Inject constructor(
 
     private fun ByteBuffer.decompress(): ByteBuffer {
         val decompressed = g4()
-        val buffer = ByteBuffer.wrap(bzip2Decompress(capacity() - 4))
+        val buffer = ByteBuffer.wrap(copy().bzip2Decompress())
         require(decompressed == buffer.capacity())
         return buffer
     }

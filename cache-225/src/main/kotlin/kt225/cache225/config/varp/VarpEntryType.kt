@@ -11,7 +11,7 @@ data class VarpEntryType(
     var opcode2: Int = 0,
     var opcode3: Boolean = false,
     var opcode4: Boolean = true,
-    var clientCode: Int = 0,
+    var clientcode: Int = 0,
     var opcode6: Boolean = false,
     var opcode7: Int = 0,
     var opcode8: Boolean = false,

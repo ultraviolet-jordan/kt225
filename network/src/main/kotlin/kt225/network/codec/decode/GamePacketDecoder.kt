@@ -11,7 +11,6 @@ import kt225.common.network.Session
 import kt225.common.packet.Packet
 import java.nio.ByteBuffer
 import java.time.Duration
-import kt225.common.packet.PacketGroup
 
 /**
  * @author Jordan Abraham

@@ -6,6 +6,7 @@ package kt225.cache
 data class JagArchiveFile(
     val id: Int,
     val nameHash: Int,
+    val crc: Int,
     val bytes: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {
@@ -14,8 +15,15 @@ data class JagArchiveFile(
 
         other as JagArchiveFile
 
-        return id == other.id
+        if (id != other.id) return false
+        if (nameHash != other.nameHash) return false
+        return bytes.contentEquals(other.bytes)
     }
 
-    override fun hashCode(): Int = id
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + nameHash
+        result = 31 * result + bytes.contentHashCode()
+        return result
+    }
 }

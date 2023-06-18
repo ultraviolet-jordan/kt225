@@ -6,7 +6,7 @@ package kt225.cache.song
 data class SongResource(
     val name: String,
     val bytes: ByteArray,
-    val crc32: Int
+    val crc: Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -16,13 +16,13 @@ data class SongResource(
 
         if (name != other.name) return false
         if (!bytes.contentEquals(other.bytes)) return false
-        return crc32 == other.crc32
+        return crc == other.crc
     }
 
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + bytes.contentHashCode()
-        result = 31 * result + crc32
+        result = 31 * result + crc
         return result
     }
 }
