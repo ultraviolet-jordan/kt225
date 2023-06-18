@@ -20,15 +20,9 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
         if (size == 0) {
             return null
         }
-        val mapRequests = buildList {
-            repeat(size) {
-                val type = buffer.g1()
-                val x = buffer.g1()
-                val z = buffer.g1()
-                val name = "${if (type == 0) "m" else "l"}${x}_$z"
-                add(MapRequest(type, x, z, name))
-            }
+        val requests = Array(size) {
+            MapRequest(buffer.g1(), buffer.g1(), buffer.g1())
         }
-        return RequestMapPacket(mapRequests)
+        return RequestMapPacket(requests)
     }
 }

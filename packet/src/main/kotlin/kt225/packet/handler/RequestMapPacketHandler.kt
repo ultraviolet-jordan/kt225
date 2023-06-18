@@ -23,8 +23,9 @@ class RequestMapPacketHandler @Inject constructor(
     private val bytesLengthLimit = 250
 
     override fun handlePacket(packet: RequestMapPacket, client: Client) {
-        packet.mapRequests.forEach { request ->
-            val (type, x, z, name) = request
+        packet.requests.forEach { request ->
+            val (type, x, z) = request
+            val name = "${if (type == 0) "m" else "l"}${x}_$z"
             val map = maps.firstOrNull { it.name == name } ?: return@forEach
             val bytes = map.bytes
             val length = bytes.size

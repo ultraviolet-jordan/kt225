@@ -7,5 +7,5 @@ import kt225.common.packet.server.MapRequest
  * @author Jordan Abraham
  */
 data class RequestMapPacket(
-    val mapRequests: List<MapRequest>
+    val requests: Array<MapRequest>
 ) : Packet
