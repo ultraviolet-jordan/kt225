@@ -68,7 +68,7 @@ class GameClient(
         writeChannelQueue.clear()
     }
 
-    override fun flushReadQueue() {
+    override fun consumeReadQueue() {
         for (handler in readChannelQueue) {
             val queue = handler.value
             for (i in 0 until 10) {
