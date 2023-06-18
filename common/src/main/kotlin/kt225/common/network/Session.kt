@@ -22,7 +22,8 @@ abstract class Session(
     val handlers: Map<KClass<*>, PacketHandler<Packet>>,
     val encoders: Set<CodecEncoder<CodecEncoderType>>,
     val decoders: Set<CodecDecoder>,
-    val crcs: IntArray
+    val crcs: IntArray,
+    val clientPacketLengths: IntArray
 ) {
     var client: Client? = null
 

@@ -20,10 +20,7 @@ class GameClient(
     serverSeed: IntArray,
     clientSeed: IntArray,
     private val session: Session
-) : Client(
-    serverIsaac = serverSeed.toISAAC(),
-    clientIsaac = clientSeed.toISAAC()
-) {
+) : Client(serverSeed.toISAAC(), clientSeed.toISAAC()) {
     private val readChannelQueue = ConcurrentHashMap<Int, ArrayBlockingQueue<PacketGroup>>()
     private val writeChannelQueue = ByteBuffer.allocateDirect(100_000)
 
@@ -44,18 +41,26 @@ class GameClient(
         val endPos = writeChannelQueue.position()
         val size = endPos - offset
         writeChannelQueue.position(startPos)
-        if (builder.length == -1) {
-            writeChannelQueue.p1(size)
-        } else {
-            writeChannelQueue.p2(size)
+        when (builder.length) {
+            -1 -> writeChannelQueue.p1(size)
+            -2 -> writeChannelQueue.p2(size)
+            else -> throw IllegalStateException("Builder length can only be -1 or -2 here.")
         }
         writeChannelQueue.position(endPos)
+    }
+
+    override fun readPacket(packet: Packet) {
+        val handler = session.handlers[packet::class] ?: return
+        val group = PacketGroup(packet, handler)
+        readChannelQueue
+            .computeIfAbsent(group.handler.groupId) { ArrayBlockingQueue<PacketGroup>(10) }
+            .offer(group)
     }
 
     override fun flushWriteQueue() {
         val writeChannel = session.writeChannel
         if (writeChannel.isClosedForWrite) return
-        // This way we only have to suspend once per client.
+        // This way we only have to block once per client.
         runBlocking(Dispatchers.IO) {
             writeChannel.writeFully(writeChannelQueue.flip())
         }
@@ -64,6 +69,13 @@ class GameClient(
     }
 
     override fun flushReadQueue() {
-        TODO("Not yet implemented")
+        for (handler in readChannelQueue) {
+            val queue = handler.value
+            for (i in 0 until 10) {
+                val group = queue.poll() ?: break
+                group.handler.handlePacket(group.packet, this)
+            }
+            queue.clear()
+        }
     }
 }

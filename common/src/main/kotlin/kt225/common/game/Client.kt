@@ -13,9 +13,10 @@ abstract class Client(
 ) {
     var player: Player? = null
 
-    abstract fun flushReadQueue()
     abstract fun writePacket(packet: Packet)
+    abstract fun readPacket(packet: Packet)
     abstract fun flushWriteQueue()
+    abstract fun flushReadQueue()
 
     fun attach(player: Player) {
         this.player = player

@@ -31,6 +31,9 @@ class GameServer @Inject constructor(
     private val gamePacketConfiguration: GamePacketConfiguration,
     private val networkSessionCodecHandlers: NetworkSessionCodecs
 ) : Server {
+    private val readers = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id)
+    private val clientPacketLengths = applicationEnvironment.config.property("game.packet.lengths").getList().map(String::toInt).toIntArray()
+
     override fun bind() = runBlocking {
         val logger = applicationEnvironment.log
         logger.info("Game server is responding at ${applicationEnvironment.config.host}:${applicationEnvironment.config.port}...")
@@ -39,10 +42,11 @@ class GameServer @Inject constructor(
             val session = NetworkSession(
                 socket = socket,
                 builders = gamePacketConfiguration.builders,
-                readers = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id),
+                readers = readers,
                 handlers = gamePacketConfiguration.handlers,
                 codecs = networkSessionCodecHandlers,
-                crcs = cache.crcs
+                crcs = cache.crcs,
+                clientPacketLengths = clientPacketLengths
             )
             launch(Dispatchers.IO) {
                 logger.info("Connection from ${socket.remoteAddress}")

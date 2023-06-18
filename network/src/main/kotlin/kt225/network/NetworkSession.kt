@@ -21,18 +21,9 @@ class NetworkSession(
     readers: Map<Int, PacketReader<Packet>>,
     handlers: Map<KClass<*>, PacketHandler<Packet>>,
     codecs: NetworkSessionCodecs,
-    crcs: IntArray
-) : Session(
-    socket = socket,
-    readChannel = socket.openReadChannel(),
-    writeChannel = socket.openWriteChannel(),
-    builders = builders,
-    readers = readers,
-    handlers = handlers,
-    encoders = codecs.encoders,
-    decoders = codecs.decoders,
-    crcs = crcs
-) {
+    crcs: IntArray,
+    clientPacketLengths: IntArray
+) : Session(socket, socket.openReadChannel(), socket.openWriteChannel(), builders, readers, handlers, codecs.encoders, codecs.decoders, crcs, clientPacketLengths) {
     override suspend fun accept() {
         try {
             codec(
@@ -43,6 +34,7 @@ class NetworkSession(
             )
         } catch (exception: Exception) {
             exception.printStackTrace()
+            // TODO Disconnect the client/player.
         } finally {
             socket.close()
         }

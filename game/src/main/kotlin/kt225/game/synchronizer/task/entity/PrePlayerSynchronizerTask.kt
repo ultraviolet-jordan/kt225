@@ -12,6 +12,7 @@ class PrePlayerSynchronizerTask(
     private val renderer: PlayerSynchronizerRenderer
 ) : Runnable {
     override fun run() {
+        player.client.flushReadQueue()
         renderer.renderEntity(player)
     }
 }

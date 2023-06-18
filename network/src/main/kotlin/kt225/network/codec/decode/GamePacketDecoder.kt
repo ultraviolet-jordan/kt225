@@ -11,6 +11,7 @@ import kt225.common.network.Session
 import kt225.common.packet.Packet
 import java.nio.ByteBuffer
 import java.time.Duration
+import kt225.common.packet.PacketGroup
 
 /**
  * @author Jordan Abraham
@@ -27,18 +28,21 @@ class GamePacketDecoder @Inject constructor(
             val packet = withTimeout(Duration.ofSeconds(30)) {
                 channel.awaitPacket(session, client.clientIsaac)
             } ?: continue
-            val handler = session.handlers[packet::class] ?: continue
-            handler.handlePacket(packet, client)
+            client.readPacket(packet)
         }
     }
 
     private suspend fun ByteReadChannel.awaitPacket(session: Session, isaac: ISAAC): Packet? {
         val id = ((readByte().toInt() and 0xff) - isaac.getNext() and 0xff)
-        if (id > PacketLengths.lengths.size) {
+        if (id > session.clientPacketLengths.size) {
             discard(availableForRead.toLong())
             return null
         }
-        val serverLength = PacketLengths.lengths[id]
+        val serverLength = session.clientPacketLengths[id]
+        if (serverLength == -3) {
+            discard(availableForRead.toLong())
+            return null
+        }
         val clientLength = when {
             serverLength != -1 && serverLength != -2 -> serverLength
             serverLength == -1 -> (readByte().toInt() and 0xff)
@@ -75,36 +79,5 @@ class GamePacketDecoder @Inject constructor(
 
         logger.info("Incoming Packet: Id=$id, ServerLength=$serverLength, ClientLength=$clientLength")
         return packet
-    }
-
-    private object PacketLengths {
-        val lengths = intArrayOf(
-            0, 0, 2, 0, -1, 0, 6, 4, 2, 2, // 0
-            0, 8, 0, 0, 0, 0, 0, 1, 0, 0, // 10
-            0, 0, 0, 0, 0, 0, 0, 2, 0, 0, // 20
-            3, 6, 0, 0, 0, 0, 0, 0, 6, 0, // 30
-            6, 0, 0, 0, 0, 0, 0, 0, 8, 0, // 40
-            0, 0, 13, 2, 0, 0, 0, 0, 0, 6, // 50
-            0, 0, 0, 0, 0, 0, 4, 0, 0, 0, // 60
-            0, 6, 0, 0, 0, 6, 0, 0, 0, 8, // 70
-            0, -1, 0, 0, 0, 0, 0, 0, 4, 0, // 80
-            0, 0, 0, -1, 0, 0, 6, 6, 0, 0, // 90
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 100
-            0, 0, 0, 2, 0, 0, 6, 0, 8, 0, // 110
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 120
-            12, 0, 0, 6, 4, 0, 0, 0, 8, 0, // 130
-            6, 0, 0, 0, 0, 0, -1, 0, 9, 0, // 140
-            -1, 0, 0, 0, 0, 2, 0, 6, 3, 6, // 150
-            0, 0, 0, 0, 2, -1, 0, 0, 0, 0, // 160
-            0, 8, 6, 0, 0, 1, 2, 4, 6, 0, // 170
-            0, -1, 0, 0, 0, 2, 0, 0, 0, 6, // 180
-            10, 0, 0, 0, 2, 6, 0, 0, 0, 0, // 190
-            6, 0, 8, 0, 0, 0, 2, 0, 0, 0, // 200
-            0, 6, 6, 0, 0, 3, 0, 0, 0, -1, // 210
-            6, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 220
-            0, 0, 0, 1, 0, 4, 4, 4, 1, 12, // 230
-            0, 0, 0, 0, 3, 6, 0, 6, 8, 0, // 240
-            0, 0, 0, 0, 0, 0 // 250
-        )
     }
 }
