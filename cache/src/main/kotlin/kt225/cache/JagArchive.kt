@@ -84,21 +84,26 @@ abstract class JagArchive(
     companion object {
         fun decode(bytes: ByteArray): JagArchiveUnzipped {
             val input = ByteBuffer.wrap(bytes)
-            require(input.remaining() >= 6)
+            require(input.remaining() >= 6) { "Invalid input byte array." }
+
             val decompressed = input.g3()
             val compressed = input.g3()
             val isCompressed = decompressed != compressed
+
             val buffer = when {
                 isCompressed -> ByteBuffer.wrap(bzip2Decompress(input.gdata(compressed)))
                 else -> input
             }
+
             if (isCompressed) {
-                require(decompressed == buffer.capacity())
+                require(decompressed == buffer.capacity()) { "Invalid compressed data." }
             }
-            require(buffer.remaining() >= 2)
+
+            require(buffer.remaining() >= 2) { "Invalid buffer length." }
+
             val length = buffer.g2()
             val files = buffer.decodeFiles(length, isCompressed).filterNotNull().associateBy(JagArchiveFile::id).toMutableMap()
-            require(length == files.size)
+            require(length == files.size) { "Invalid file count." }
 
             val crc = CRC32().also { it.update(bytes) }.value.toInt()
             return JagArchiveUnzipped(bytes, isCompressed, crc, files)
@@ -140,7 +145,7 @@ abstract class JagArchive(
             if (fileId == length) {
                 return files
             }
-            require(remaining() >= 10)
+            require(remaining() >= 10) { "Invalid buffer length." }
             val nameHash = g4()
             val decompressed = g3()
             val compressed = g3()
@@ -150,7 +155,7 @@ abstract class JagArchive(
                 else -> bzip2Decompress(gdata(compressed, offset))
             }
             reset()
-            require(decompressed == bytes.size)
+            require(decompressed == bytes.size) { "Invalid compressed data" }
 
             val crc = CRC32().also { it.update(bytes) }.value.toInt()
             val file = JagArchiveFile(fileId, nameHash, crc, bytes)
@@ -167,7 +172,7 @@ abstract class JagArchive(
                 return offset
             }
             val file = files[fileId]
-            requireNotNull(file)
+            requireNotNull(file) { "File not found." }
             p4(file.nameHash)
             p3(file.bytes.size)
             val bytes = when {
