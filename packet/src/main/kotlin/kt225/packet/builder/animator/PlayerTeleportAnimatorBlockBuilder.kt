@@ -1,6 +1,6 @@
 package kt225.packet.builder.animator
 
-import kt225.common.buffer.pBit
+import kt225.common.buffer.pbit
 import kt225.common.game.entity.animator.AnimatorBlockBuilder
 import kt225.common.game.entity.animator.type.Teleport
 import java.nio.ByteBuffer
@@ -13,10 +13,10 @@ class PlayerTeleportAnimatorBlockBuilder : AnimatorBlockBuilder<Teleport>(
 ) {
     override fun buildAnimatorBlock(buffer: ByteBuffer, animator: Teleport) {
         val (rendering, x, z, plane) = animator
-        buffer.pBit(2, plane)
-        buffer.pBit(7, x)
-        buffer.pBit(7, z)
-        buffer.pBit(1, 1) // Clear movement queue.
-        buffer.pBit(1, if (rendering) 1 else 0)
+        buffer.pbit(2, plane)
+        buffer.pbit(7, x)
+        buffer.pbit(7, z)
+        buffer.pbit(1, 1) // Clear movement queue.
+        buffer.pbit(1, if (rendering) 1 else 0)
     }
 }

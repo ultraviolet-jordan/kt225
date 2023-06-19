@@ -1,9 +1,9 @@
 package kt225.packet.builder
 
 import com.google.inject.Singleton
-import kt225.common.buffer.pBit
+import kt225.common.buffer.accessBits
+import kt225.common.buffer.pbit
 import kt225.common.buffer.pdata
-import kt225.common.buffer.withBitAccess
 import kt225.common.game.entity.animator.Animator
 import kt225.common.game.entity.player.Viewport
 import kt225.common.game.entity.render.Renderer
@@ -22,7 +22,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
     override fun buildPacket(packet: PlayerInfoPacket, buffer: ByteBuffer) {
         val observing = packet.observing
         val viewport = observing.viewport
-        buffer.withBitAccess {
+        buffer.accessBits {
             updateLocalPlayer(observing.index, viewport, observing.renderer, observing.animator)
             updateOtherPlayers(viewport)
             updateNewPlayers(viewport)
@@ -34,11 +34,11 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
         val rendering = renderer.needsRendering()
         val animatedBlock = animator.block()
         if (animatedBlock == null) {
-            pBit(1, 0)
+            pbit(1, 0)
             return
         }
-        pBit(1, 1)
-        pBit(2, animatedBlock.builder.index)
+        pbit(1, 1)
+        pbit(2, animatedBlock.builder.index)
         animatedBlock.builder.buildAnimatorBlock(this, animatedBlock.animatorType)
         if (rendering) {
             viewport.localRenderUpdates.add(index)
@@ -46,7 +46,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
     }
 
     private fun ByteBuffer.updateOtherPlayers(viewport: Viewport) {
-        pBit(8, 0)
+        pbit(8, 0)
         for (player in viewport.players) {
             continue // TODO
         }
@@ -55,7 +55,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
     private fun ByteBuffer.updateNewPlayers(viewport: Viewport) {
         // TODO
         if (viewport.localRenderUpdates.isNotEmpty()) {
-            pBit(11, 2047)
+            pbit(11, 2047)
         }
     }
 

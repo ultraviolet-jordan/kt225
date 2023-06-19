@@ -123,18 +123,18 @@ class TestBuffer {
     fun `test bits`() {
         val numberOfBits = 9
         val buffer = ByteBuffer.allocate(numberOfBits)
-        buffer.withBitAccess {
-            pBit(1, 0)
-            pBit(1, 3)
-            pBit(7, 13)
+        buffer.accessBits {
+            pbit(1, 0)
+            pbit(1, 3)
+            pbit(7, 13)
         }
         // Only 2 bytes required for 9 bits.
         assertEquals(buffer.position(), 2)
         buffer.position(0)
-        buffer.withBitAccess {
-            val x = gBit(1)
-            val y = gBit(1)
-            val z = gBit(7)
+        buffer.accessBits {
+            val x = gbit(1)
+            val y = gbit(1)
+            val z = gbit(7)
             assertEquals(0, x)
             assertEquals(1, y)
             assertEquals(13, z)
@@ -145,7 +145,15 @@ class TestBuffer {
     fun `test bits without access`() {
         val buffer = ByteBuffer.allocate(1)
         assertFailsWith<InvalidMarkException>(
-            block = { buffer.pBit(1, 0) }
+            block = { buffer.pbit(1, 0) }
+        )
+    }
+
+    @Test
+    fun `test access bytes without access`() {
+        val buffer = ByteBuffer.allocate(0)
+        assertFailsWith<InvalidMarkException>(
+            block = buffer::accessBytes
         )
     }
 
@@ -154,22 +162,22 @@ class TestBuffer {
         val illegalArgumentException = assertFailsWith<IllegalArgumentException>(
             block = {
                 val buffer = ByteBuffer.allocate(1)
-                buffer.withBitAccess {
-                    buffer.pBit(2, 0)
+                buffer.accessBits {
+                    buffer.pbit(2, 0)
                 }
             }
         )
         assertEquals(illegalArgumentException.message, "Buffer does not have enough capacity for byte -> bit positioning.")
 
         val buffer = ByteBuffer.allocate(2)
-        buffer.withBitAccess {
-            buffer.pBit(2, 0)
+        buffer.accessBits {
+            buffer.pbit(2, 0)
         }
         // Only 1 byte required for 2 bits.
         assertEquals(buffer.position(), 1)
         buffer.position(0)
-        buffer.withBitAccess {
-            assertEquals(0, gBit(2))
+        buffer.accessBits {
+            assertEquals(0, gbit(2))
         }
     }
 }

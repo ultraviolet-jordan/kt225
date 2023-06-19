@@ -102,9 +102,9 @@ fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger) {
 
 /**
  * Gets a specified number of bits from this ByteBuffer.
- * This function must only be called from [ByteBuffer.withBitAccess]
+ * This function must only be called from [ByteBuffer.accessBits]
  */
-fun ByteBuffer.gBit(count: Int): Int {
+fun ByteBuffer.gbit(count: Int): Int {
     val position = position()
     // Constantly mark and reset.
     reset()
@@ -112,7 +112,7 @@ fun ByteBuffer.gBit(count: Int): Int {
     // Keeps the mark positioned at the starting byte index.
     mark()
     val index = marked + (position - marked)
-    val value = gBit(count, index shr 3, index % 8, 0)
+    val value = gbit(count, index shr 3, index % 8, 0)
     val nextPosition = position + count
     require(nextPosition <= limit()) { "Buffer does not have enough capacity for byte -> bit positioning." }
     position(nextPosition)
@@ -215,9 +215,9 @@ fun ByteBuffer.rsaenc(exponent: BigInteger, modulus: BigInteger) {
 
 /**
  * Puts a specified number of bits from the given value to this ByteBuffer.
- * This function must only be called from [ByteBuffer.withBitAccess]
+ * This function must only be called from [ByteBuffer.accessBits]
  */
-fun ByteBuffer.pBit(count: Int, value: Int) {
+fun ByteBuffer.pbit(count: Int, value: Int) {
     val position = position()
     // Constantly mark and reset.
     reset()
@@ -225,7 +225,7 @@ fun ByteBuffer.pBit(count: Int, value: Int) {
     // Keeps the mark positioned at the starting byte index.
     mark()
     val index = marked + (position - marked)
-    pBit(value, count, index shr 3, index % 8)
+    pbit(value, count, index shr 3, index % 8)
     val nextPosition = position + count
     require(nextPosition <= limit()) { "Buffer does not have enough capacity for byte -> bit positioning." }
     position(nextPosition)
@@ -250,7 +250,7 @@ fun ByteBuffer.skip(amount: Int) {
  * This function marks the ByteBuffer at the last accessed bit position. This mark does not matter
  * for future invocations of this function.
  */
-inline fun ByteBuffer.withBitAccess(function: ByteBuffer.() -> Unit) {
+inline fun ByteBuffer.accessBits(function: ByteBuffer.() -> Unit) {
     position(position() * 8)
     // The mark. The all powerful. Keeps track of the current byte index.
     // Avoids total object creation annihilation since player/npc update uses this every tick.
@@ -258,6 +258,14 @@ inline fun ByteBuffer.withBitAccess(function: ByteBuffer.() -> Unit) {
     // Some of these solutions also instantiate a ByteArray(4026) for writing bits??
     mark()
     function.invoke(this)
+    accessBytes()
+}
+
+/**
+ * This function will throw if accessed outside of [ByteBuffer.accessBits]
+ * Use [ByteBuffer.accessBits] which will automatically accessBytes after invocation.
+ */
+fun ByteBuffer.accessBytes() {
     val position = position()
     reset()
     // The marked starting byte index to calculate from the ending position.
@@ -266,7 +274,7 @@ inline fun ByteBuffer.withBitAccess(function: ByteBuffer.() -> Unit) {
     position((index + 7) / 8)
 }
 
-private tailrec fun ByteBuffer.pBit(value: Int, remainingBits: Int, byteIndex: Int, bitIndex: Int) {
+private tailrec fun ByteBuffer.pbit(value: Int, remainingBits: Int, byteIndex: Int, bitIndex: Int) {
     if (remainingBits == 0) {
         return
     }
@@ -284,10 +292,10 @@ private tailrec fun ByteBuffer.pBit(value: Int, remainingBits: Int, byteIndex: I
     // The current byte with the new bits.
     val newValue = currentValue and mask.inv() or (byteValue shl (bitOffset - bitsToWrite))
     put(byteIndex, newValue.toByte())
-    return pBit(value, remainingBits - bitsToWrite, byteIndex + 1, 0)
+    return pbit(value, remainingBits - bitsToWrite, byteIndex + 1, 0)
 }
 
-private tailrec fun ByteBuffer.gBit(remainingBits: Int, byteIndex: Int, bitIndex: Int, accumulator: Int): Int {
+private tailrec fun ByteBuffer.gbit(remainingBits: Int, byteIndex: Int, bitIndex: Int, accumulator: Int): Int {
     if (remainingBits == 0) {
         return accumulator
     }
@@ -299,7 +307,7 @@ private tailrec fun ByteBuffer.gBit(remainingBits: Int, byteIndex: Int, bitIndex
     // The relevant bits from the current byte.
     val byteValue = (get(byteIndex).toInt() ushr (bitOffset - bitsToRead)) and mask
     val nextValue = (accumulator shl bitsToRead) or byteValue
-    return gBit(remainingBits - bitsToRead, byteIndex + 1, 0, nextValue)
+    return gbit(remainingBits - bitsToRead, byteIndex + 1, 0, nextValue)
 }
 
 private tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
