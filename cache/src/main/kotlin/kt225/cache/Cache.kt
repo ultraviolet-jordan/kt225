@@ -6,9 +6,9 @@ package kt225.cache
 class Cache(
     private val archives: Map<String, JagArchive?>
 ) {
-    val crcs = archives.map { it.value?.crc() ?: 0 }.toIntArray()
+    val crcs = archives.map { it.value?.crc ?: 0 }.toIntArray()
 
     fun getArchiveResource(name: String): ByteArray? {
-        return archives[name]?.zippedBytes()
+        return archives[name]?.zipped
     }
 }

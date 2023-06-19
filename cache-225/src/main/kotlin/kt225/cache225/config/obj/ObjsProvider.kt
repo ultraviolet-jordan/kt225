@@ -44,8 +44,8 @@ class ObjsProvider @Inject constructor(
         }
         datBuffer.flip()
         idxBuffer.flip()
-        configArchive.write("obj.dat", datBuffer)
-        configArchive.write("obj.idx", idxBuffer)
+        configArchive.add("obj.dat", datBuffer)
+        configArchive.add("obj.idx", idxBuffer)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: ObjEntryType): ObjEntryType {

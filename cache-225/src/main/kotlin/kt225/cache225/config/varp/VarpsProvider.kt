@@ -39,7 +39,7 @@ class VarpsProvider @Inject constructor(
             encode(buffer, it)
         }
         buffer.flip()
-        configArchive.write("varp.dat", buffer)
+        configArchive.add("varp.dat", buffer)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: VarpEntryType): VarpEntryType {

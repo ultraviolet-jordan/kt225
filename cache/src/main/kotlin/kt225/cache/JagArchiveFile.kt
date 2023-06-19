@@ -20,6 +20,6 @@ data class JagArchiveFile(
     }
 
     override fun hashCode(): Int {
-        return nameHash
+        return id
     }
 }

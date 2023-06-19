@@ -85,7 +85,7 @@ class TestObjs {
 
         objsProvider.write(objs)
 
-        val editedConfigArchiveEncoded = JagArchive.encode(configArchive.unzipped())
+        val editedConfigArchiveEncoded = JagArchive.encode(configArchive)
         val editedConfigArchiveDecoded = JagArchive.decode(editedConfigArchiveEncoded)
         val editedConfigArchive = ConfigArchive(editedConfigArchiveDecoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)
@@ -143,7 +143,7 @@ class TestObjs {
         obj.name = "The God Slayer"
         objsProvider.write(objs)
 
-        val editedConfigArchiveEncoded = JagArchive.encode(configArchive.unzipped())
+        val editedConfigArchiveEncoded = JagArchive.encode(configArchive)
         val editedConfigArchiveDecoded = JagArchive.decode(editedConfigArchiveEncoded)
         val editedConfigArchive = ConfigArchive(editedConfigArchiveDecoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)

@@ -55,10 +55,10 @@ class TestVarps {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
 
         val configArchive = injector.getInstance<ConfigArchive>()
-        val configArchiveEncoded = JagArchive.encode(configArchive.unzipped())
+        val configArchiveEncoded = JagArchive.encode(configArchive)
         val newConfigArchiveUnzipped = JagArchive.decode(configArchiveEncoded)
 
-        assertEquals(configArchive.files().size, newConfigArchiveUnzipped.files.size)
+        assertEquals(configArchive.files.size, newConfigArchiveUnzipped.files.size)
 
         val newConfigArchive = ConfigArchive(newConfigArchiveUnzipped)
         val varpsProvider = VarpsProvider(newConfigArchive)
@@ -76,7 +76,7 @@ class TestVarps {
 
         varpsProvider.write(varps)
 
-        val editedConfigArchiveEncoded = JagArchive.encode(configArchive.unzipped())
+        val editedConfigArchiveEncoded = JagArchive.encode(configArchive)
         val editedConfigArchiveUnzipped = JagArchive.decode(editedConfigArchiveEncoded)
         val editedConfigArchive = ConfigArchive(editedConfigArchiveUnzipped)
         val editedVarpsProviders = VarpsProvider(editedConfigArchive)
@@ -112,7 +112,7 @@ class TestVarps {
 
         varpsProvider.write(varps)
 
-        val editedConfigArchiveEncoded = JagArchive.encode(configArchive.unzipped())
+        val editedConfigArchiveEncoded = JagArchive.encode(configArchive)
         val editedConfigArchiveUnzipped = JagArchive.decode(editedConfigArchiveEncoded)
         val editedConfigArchive = ConfigArchive(editedConfigArchiveUnzipped)
         val editedVarpsProviders = VarpsProvider(editedConfigArchive)

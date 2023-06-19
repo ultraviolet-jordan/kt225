@@ -19,30 +19,20 @@ import java.util.zip.CRC32
 abstract class JagArchive(
     private val archive: JagArchiveUnzipped
 ) {
-    fun crc(): Int {
-        return archive.crc
-    }
-
-    fun zippedBytes(): ByteArray {
-        return archive.bytes
-    }
-
-    fun unzipped(): JagArchiveUnzipped {
-        return archive
-    }
+    val crc: Int get() = archive.crc
+    val zipped: ByteArray get() = archive.bytes
+    val lastFileId: Int get() = archive.files.keys.last()
+    val lastFile: JagArchiveFile get() = archive.files.values.last()
+    val files: MutableMap<Int, JagArchiveFile> get() = archive.files
+    val isCompressed: Boolean get() = archive.isCompressed
 
     fun file(fileId: Int): JagArchiveFile? {
-        return archive.files[fileId]
+        return files[fileId]
     }
 
     fun file(fileName: String): JagArchiveFile? {
-        return archive.files.values.firstOrNull { it.nameHash == fileName.nameHash() }
+        return files.values.firstOrNull { it.nameHash == fileName.nameHash() }
     }
-
-    fun files(): MutableMap<Int, JagArchiveFile> {
-        return archive.files
-    }
-
     fun read(fileId: Int): ByteBuffer? {
         return file(fileId)?.let { ByteBuffer.wrap(it.bytes) }
     }
@@ -51,30 +41,31 @@ abstract class JagArchive(
         return file(fileName)?.let { ByteBuffer.wrap(it.bytes) }
     }
 
-    fun write(fileId: Int, buffer: ByteBuffer, nameHash: Int): Boolean {
+    fun add(fileId: Int, buffer: ByteBuffer, nameHash: Int): Boolean {
         val bytes = buffer.gdata()
         val crc = CRC32().also { it.update(bytes) }.value.toInt()
-        return archive.files.put(fileId, JagArchiveFile(fileId, nameHash, crc, bytes)) != null
+        return files.put(fileId, JagArchiveFile(fileId, nameHash, crc, bytes)) == null
     }
 
-    fun write(fileName: String, buffer: ByteBuffer): Boolean {
+    fun add(fileName: String, buffer: ByteBuffer): Boolean {
         val existing = file(fileName)
         if (existing != null) {
-            return write(existing.id, buffer, existing.nameHash)
+            require(existing.nameHash == fileName.nameHash())
+            return add(existing.id, buffer, existing.nameHash)
         }
-        return write(lastFileId() + 1, buffer, -1)
+        return add(lastFileId + 1, buffer, fileName.nameHash())
     }
 
-    fun lastFileId(): Int {
-        return archive.files.keys.last()
+    fun remove(fileId: Int): Boolean {
+        val existing = file(fileId) ?: return false
+        val removed = files.remove(existing.id)
+        return removed != null
     }
 
-    fun lastFile(): JagArchiveFile {
-        return archive.files.values.last()
-    }
-
-    fun isCompressed(): Boolean {
-        return archive.isCompressed
+    fun remove(fileName: String): Boolean {
+        val existing = file(fileName) ?: return false
+        val removed = files.remove(existing.id)
+        return removed != null
     }
 
     private fun String.nameHash(): Int {
@@ -102,14 +93,18 @@ abstract class JagArchive(
             require(buffer.remaining() >= 2) { "Invalid buffer length." }
 
             val length = buffer.g2()
-            val files = buffer.decodeFiles(length, isCompressed).filterNotNull().associateBy(JagArchiveFile::id).toMutableMap()
+            val files = buffer
+                .decodeFiles(length, isCompressed)
+                .filterNotNull()
+                .associateBy(JagArchiveFile::id)
+                .toMutableMap()
             require(length == files.size) { "Invalid file count." }
 
             val crc = CRC32().also { it.update(bytes) }.value.toInt()
             return JagArchiveUnzipped(bytes, isCompressed, crc, files)
         }
 
-        fun encode(archive: JagArchiveUnzipped): ByteArray {
+        fun encode(archive: JagArchive): ByteArray {
             val isCompressed = archive.isCompressed
             val files = archive.files
 
@@ -159,20 +154,21 @@ abstract class JagArchive(
 
             val crc = CRC32().also { it.update(bytes) }.value.toInt()
             val file = JagArchiveFile(fileId, nameHash, crc, bytes)
-            return decodeFiles(length, isCompressed, fileId + 1, offset + compressed, files.plus(file))
+            files[fileId] = file
+            return decodeFiles(length, isCompressed, fileId + 1, offset + compressed, files)
         }
 
         private tailrec fun ByteBuffer.encodeFiles(
             files: MutableMap<Int, JagArchiveFile>,
             isCompressed: Boolean,
             fileId: Int = 0,
-            offset: Int = 2 + files.size * 10
+            offset: Int = 2 + files.size * 10,
+            accumulator: Int = 0
         ): Int {
-            if (fileId == files.size) {
+            if (accumulator == files.size) {
                 return offset
             }
-            val file = files[fileId]
-            requireNotNull(file) { "File not found." }
+            val file = files[fileId] ?: return encodeFiles(files, isCompressed, fileId + 1, offset, accumulator)
             p4(file.nameHash)
             p3(file.bytes.size)
             val bytes = when {
@@ -183,7 +179,7 @@ abstract class JagArchive(
             mark()
             pdata(bytes, offset) // This moves the position.
             reset()
-            return encodeFiles(files, isCompressed, fileId + 1, offset + bytes.size)
+            return encodeFiles(files, isCompressed, fileId + 1, offset + bytes.size, accumulator + 1)
         }
     }
 }
