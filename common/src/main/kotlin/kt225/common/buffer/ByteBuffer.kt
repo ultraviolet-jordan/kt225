@@ -160,7 +160,7 @@ fun ByteBuffer.p8(value: Long) {
  * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
  */
 fun ByteBuffer.psmarts(value: Int) {
-    require(value in 0..65535)
+    require(value in -255..65535)
     if (value < 128) {
         put(value.toByte())
     } else {
@@ -173,7 +173,7 @@ fun ByteBuffer.psmarts(value: Int) {
  * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
  */
 fun ByteBuffer.psmart(value: Int) {
-    require(value in 0..65535)
+    require(value in -255..65535)
     if (value < 128) {
         put((value + 64).toByte())
     } else {
