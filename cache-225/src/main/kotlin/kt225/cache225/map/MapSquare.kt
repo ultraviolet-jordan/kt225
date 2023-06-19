@@ -5,7 +5,7 @@ package kt225.cache225.map
  */
 @JvmInline
 value class MapSquare(
-    private val packed: Int
+    val packed: Int
 ) {
     constructor(id: Int, x: Int, z: Int) : this((id and 0xffff shl 16) or (x and 0xff shl 8) or (z and 0xff))
 

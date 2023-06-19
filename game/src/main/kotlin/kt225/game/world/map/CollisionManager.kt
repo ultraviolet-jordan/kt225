@@ -1,6 +1,7 @@
 package kt225.game.world.map
 
 import kt225.cache.map.MapSquares
+import kt225.cache225.map.MapSquare
 import kt225.cache225.map.MapSquareEntryType
 import kt225.cache225.map.MapSquareLand
 import kt225.cache225.map.MapSquareLoc
@@ -34,14 +35,14 @@ class CollisionManager {
         if (adjustedPlane < 0) {
             return
         }
-        val mapSquare = entry.value.mapSquare
+        val mapSquare = MapSquare(entry.value.mapSquare)
         val baseX = mapSquare.x shl 6
         val baseZ = mapSquare.z shl 6
         // TODO Add land collision.
     }
 
     private fun addLocCollision(entry: MutableMap.MutableEntry<Int, MapSquareEntryType>) {
-        val mapSquare = entry.value.mapSquare
+        val mapSquare = MapSquare(entry.value.mapSquare)
         val baseX = mapSquare.x shl 6
         val baseZ = mapSquare.z shl 6
         val locs = entry.value.locs[entry.key] ?: return

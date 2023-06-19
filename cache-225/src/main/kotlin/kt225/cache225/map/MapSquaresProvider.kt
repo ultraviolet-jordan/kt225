@@ -44,7 +44,7 @@ class MapSquaresProvider @Inject constructor(
                 require(mapSquare.x == landX)
                 require(mapSquare.z == landZ)
 
-                val entry = MapSquareEntryType(mapSquare, type = 0)
+                val entry = MapSquareEntryType(mapSquare.packed, type = 0)
                 decode(ByteBuffer.wrap(land.bytes).decompress(), entry)
                 entry.type = 1
                 decode(ByteBuffer.wrap(loc.bytes).decompress(), entry)
