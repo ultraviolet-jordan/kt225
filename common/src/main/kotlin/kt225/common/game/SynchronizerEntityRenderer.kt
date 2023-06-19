@@ -17,16 +17,29 @@ abstract class SynchronizerEntityRenderer<E : Entity>(
     abstract fun renderEntity(entity: E)
     abstract fun clear()
 
-    fun Array<out RenderBlock<*>?>.calculateMask(comparator: Int): Int = fold(0) { mask, block ->
-        if (block == null) mask else mask or block.builder.mask
-    }.let { if (it >= 256) it or comparator else it }
-
-    fun Array<out RenderBlock<*>?>.calculateSize(mask: Int): Int = fold(0) { size, block ->
-        if (block == null) return@fold size
-        when (block) {
-            is LowDefinitionRenderBlock -> size + block.persistedBytes.size
-            is HighDefinitionRenderBlock -> size + block.builder.bytesLength(block.renderType)
-            else -> throw AssertionError("Block is not in correct instance.")
+    fun Array<out RenderBlock<*>?>.calculateMask(comparator: Int): Int {
+        var mask = 0
+        for (block in this) {
+            if (block == null) {
+                continue
+            }
+            mask = mask or block.builder.mask
         }
-    }.let { if (mask >= 256) it + 2 else it + 1 }
+        return if (mask >= 256) mask or comparator else mask
+    }
+
+    fun Array<out RenderBlock<*>?>.calculateSize(mask: Int): Int {
+        var size = 0
+        for (block in this) {
+            if (block == null) {
+                continue
+            }
+            size += when (block) {
+                is LowDefinitionRenderBlock -> block.persistedBytes.size
+                is HighDefinitionRenderBlock -> block.builder.bytesLength(block.renderType)
+                else -> throw AssertionError("Block is not in correct instance.")
+            }
+        }
+        return if (mask >= 256) size + 2 else size + 1
+    }
 }
