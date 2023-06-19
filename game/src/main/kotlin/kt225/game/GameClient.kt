@@ -22,31 +22,10 @@ class GameClient(
     private val session: Session
 ) : Client(serverSeed.toISAAC(), clientSeed.toISAAC()) {
     private val readChannelQueue = ConcurrentHashMap<Int, ArrayBlockingQueue<PacketGroup>>()
-    private val writeChannelQueue = ByteBuffer.allocateDirect(100_000)
+    private val writeChannelQueue = ByteBuffer.allocateDirect(5_000)
 
     override fun writePacket(packet: Packet) {
-        val builder = session.builders[packet::class] ?: return
-
-        writeChannelQueue.p1(builder.id + serverIsaac.getNext() and 0xff)
-
-        if (builder.length != -1 && builder.length != -2) {
-            builder.buildPacket(packet, writeChannelQueue)
-            return
-        }
-
-        val startPos = writeChannelQueue.position()
-        val offset = startPos + if (builder.length == -1) 1 else 2
-        writeChannelQueue.position(offset)
-        builder.buildPacket(packet, writeChannelQueue)
-        val endPos = writeChannelQueue.position()
-        val size = endPos - offset
-        writeChannelQueue.position(startPos)
-        when (builder.length) {
-            -1 -> writeChannelQueue.p1(size)
-            -2 -> writeChannelQueue.p2(size)
-            else -> throw IllegalStateException("Builder length can only be -1 or -2 here.")
-        }
-        writeChannelQueue.position(endPos)
+        write(writeChannelQueue, packet)
     }
 
     override fun readPacket(packet: Packet) {
@@ -58,13 +37,7 @@ class GameClient(
     }
 
     override fun flushWriteQueue() {
-        val writeChannel = session.writeChannel
-        if (writeChannel.isClosedForWrite) return
-        // This way we only have to block once per client.
-        runBlocking(Dispatchers.IO) {
-            writeChannel.writeFully(writeChannelQueue.flip())
-        }
-        writeChannel.flush()
+        flush(writeChannelQueue)
         writeChannelQueue.clear()
     }
 
@@ -77,5 +50,42 @@ class GameClient(
             }
             queue.clear()
         }
+    }
+
+    override fun writePacketDirect(packet: Packet, length: Int) {
+        val buffer = ByteBuffer.allocate(length + 3)
+        write(buffer, packet)
+        flush(buffer)
+    }
+
+    private fun write(buffer: ByteBuffer, packet: Packet) {
+        val builder = session.builders[packet::class] ?: return
+        buffer.p1(builder.id + serverIsaac.getNext() and 0xff)
+        if (builder.length != -1 && builder.length != -2) {
+            builder.buildPacket(packet, buffer)
+            return
+        }
+        val startPos = buffer.position()
+        val offset = startPos + if (builder.length == -1) 1 else 2
+        buffer.position(offset)
+        builder.buildPacket(packet, buffer)
+        val endPos = buffer.position()
+        val size = endPos - offset
+        buffer.position(startPos)
+        when (builder.length) {
+            -1 -> buffer.p1(size)
+            -2 -> buffer.p2(size)
+            else -> throw IllegalStateException("Builder length can only be -1 or -2 here.")
+        }
+        buffer.position(endPos)
+    }
+
+    private fun flush(buffer: ByteBuffer) {
+        val writeChannel = session.writeChannel
+        if (writeChannel.isClosedForWrite) return
+        runBlocking(Dispatchers.IO) {
+            writeChannel.writeFully(buffer.flip())
+        }
+        writeChannel.flush()
     }
 }

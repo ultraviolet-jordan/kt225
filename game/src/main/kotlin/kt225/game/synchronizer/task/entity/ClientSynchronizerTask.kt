@@ -9,9 +9,7 @@ import kt225.packet.type.server.PlayerInfoPacket
  * @author Jordan Abraham
  */
 class ClientSynchronizerTask(
-    private val player: Player,
-    private val highDefinitionRenders: Array<ByteArray?>,
-    private val lowDefinitionRenders: Array<ByteArray?>
+    private val player: Player
 ) : Runnable {
     override fun run() {
         val position = player.position
@@ -29,6 +27,6 @@ class ClientSynchronizerTask(
             )
         }
 
-        player.client.writePacket(PlayerInfoPacket(player, highDefinitionRenders, lowDefinitionRenders))
+        player.client.writePacket(PlayerInfoPacket(player))
     }
 }

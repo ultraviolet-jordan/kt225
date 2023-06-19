@@ -17,6 +17,7 @@ abstract class Client(
     abstract fun readPacket(packet: Packet)
     abstract fun flushWriteQueue()
     abstract fun consumeReadQueue()
+    abstract fun writePacketDirect(packet: Packet, length: Int)
 
     fun attach(player: Player) {
         this.player = player

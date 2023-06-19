@@ -5,6 +5,8 @@ import io.ktor.network.selector.SelectorManager
 import io.ktor.network.sockets.ServerSocket
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.server.engine.ApplicationEngine
+import kt225.common.game.SynchronizerEntityRenderer
+import kt225.common.game.entity.player.Player
 import kt225.common.game.world.World
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
@@ -24,5 +26,6 @@ class GameModule(
         bind<ScheduledExecutorService>().toProvider<GameThreadExecutorProvider>().asEagerSingleton()
         bind<ExecutorService>().toProvider<EntityPoolExecutorProvider>().asEagerSingleton()
         bind<ServerSocket>().toProvider<ServerSocketProvider>().asEagerSingleton()
+        bind<SynchronizerEntityRenderer<Player>>().to<PlayerSynchronizerRenderer>().asEagerSingleton()
     }
 }

@@ -1,10 +1,13 @@
 package kt225.packet.builder
 
+import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.common.buffer.accessBits
 import kt225.common.buffer.pbit
 import kt225.common.buffer.pdata
+import kt225.common.game.SynchronizerEntityRenderer
 import kt225.common.game.entity.animator.Animator
+import kt225.common.game.entity.player.Player
 import kt225.common.game.entity.player.Viewport
 import kt225.common.game.entity.render.Renderer
 import kt225.common.packet.PacketBuilder
@@ -15,7 +18,9 @@ import java.nio.ByteBuffer
  * @author Jordan Abraham
  */
 @Singleton
-class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
+class PlayerInfoPacketBuilder @Inject constructor(
+    private val synchronizerEntityRenderer: SynchronizerEntityRenderer<Player>
+) : PacketBuilder<PlayerInfoPacket>(
     id = 184,
     length = -2
 ) {
@@ -61,7 +66,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
 
     private fun ByteBuffer.updatePlayerMasks(viewport: Viewport, packet: PlayerInfoPacket) {
         for (index in viewport.localRenderUpdates) {
-            val render = packet.highDefinitionRenders[index] ?: continue
+            val render = synchronizerEntityRenderer.highDefinitionRenders[index] ?: continue
             pdata(render)
         }
         viewport.localRenderUpdates.clear()

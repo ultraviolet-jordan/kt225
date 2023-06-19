@@ -20,14 +20,11 @@ class EntitySynchronizer(
     private val executor: ExecutorService
 ) : SynchronizerTask {
     private val phaser = Phaser(1)
-    private val players = world.players
+    private val players get() = world.players.toList().filterNotNull().filter(Player::online)
 
     override fun cycle(tick: Int) {
         val players = players
-            .toList()
-            .filterNotNull()
-            .filter(Player::online)
-
+        
         phaser.bulkRegister(players.size)
         for (player in players) {
             val task = PrePlayerSynchronizerTask(player, renderer)
@@ -37,7 +34,7 @@ class EntitySynchronizer(
 
         phaser.bulkRegister(players.size)
         for (player in players) {
-            val task = ClientSynchronizerTask(player, renderer.highDefinitionRenders, renderer.lowDefinitionRenders)
+            val task = ClientSynchronizerTask(player)
             executor.submit(EntitySynchronizerTask(phaser, task))
         }
         phaser.arriveAndAwaitAdvance()
