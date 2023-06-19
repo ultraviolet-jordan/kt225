@@ -1,8 +1,9 @@
 package kt225.packet.builder.animator
 
-import kt225.common.buffer.BitAccess
+import kt225.common.buffer.pBit
 import kt225.common.game.entity.animator.AnimatorBlockBuilder
 import kt225.common.game.entity.animator.type.Teleport
+import java.nio.ByteBuffer
 
 /**
  * @author Jordan Abraham
@@ -10,7 +11,7 @@ import kt225.common.game.entity.animator.type.Teleport
 class PlayerTeleportAnimatorBlockBuilder : AnimatorBlockBuilder<Teleport>(
     index = 3
 ) {
-    override fun buildAnimatorBlock(buffer: BitAccess, animator: Teleport) {
+    override fun buildAnimatorBlock(buffer: ByteBuffer, animator: Teleport) {
         val (rendering, x, z, plane) = animator
         buffer.pBit(2, plane)
         buffer.pBit(7, x)

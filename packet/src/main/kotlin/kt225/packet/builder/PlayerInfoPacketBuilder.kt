@@ -1,7 +1,7 @@
 package kt225.packet.builder
 
 import com.google.inject.Singleton
-import kt225.common.buffer.BitAccess
+import kt225.common.buffer.pBit
 import kt225.common.buffer.pdata
 import kt225.common.buffer.withBitAccess
 import kt225.common.game.entity.animator.Animator
@@ -30,7 +30,7 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
         buffer.updatePlayerMasks(viewport, packet)
     }
 
-    private fun BitAccess.updateLocalPlayer(index: Int, viewport: Viewport, renderer: Renderer, animator: Animator) {
+    private fun ByteBuffer.updateLocalPlayer(index: Int, viewport: Viewport, renderer: Renderer, animator: Animator) {
         val rendering = renderer.needsRendering()
         val animatedBlock = animator.block()
         if (animatedBlock == null) {
@@ -45,14 +45,14 @@ class PlayerInfoPacketBuilder : PacketBuilder<PlayerInfoPacket>(
         }
     }
 
-    private fun BitAccess.updateOtherPlayers(viewport: Viewport) {
+    private fun ByteBuffer.updateOtherPlayers(viewport: Viewport) {
         pBit(8, 0)
         for (player in viewport.players) {
             continue // TODO
         }
     }
 
-    private fun BitAccess.updateNewPlayers(viewport: Viewport) {
+    private fun ByteBuffer.updateNewPlayers(viewport: Viewport) {
         // TODO
         if (viewport.localRenderUpdates.isNotEmpty()) {
             pBit(11, 2047)
