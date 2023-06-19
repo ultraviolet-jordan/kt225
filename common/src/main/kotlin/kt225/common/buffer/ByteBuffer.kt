@@ -7,44 +7,79 @@ import kotlin.math.min
 /**
  * @author Jordan Abraham
  */
+
+/**
+ * Get 1 byte from this ByteBuffer.
+ */
 fun ByteBuffer.g1(): Int {
     return get().toInt() and 0xff
 }
 
+/**
+ * Get 1 signed byte from this ByteBuffer.
+ */
 fun ByteBuffer.g1b(): Int {
     return get().toInt()
 }
 
+/**
+ * Get 2 bytes from this ByteBuffer.
+ */
 fun ByteBuffer.g2(): Int {
     return getShort().toInt() and 0xffff
 }
 
+/**
+ * Get 3 bytes from this ByteBuffer.
+ */
 fun ByteBuffer.g3(): Int {
     return (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
 }
 
+/**
+ * Get 4 bytes from this ByteBuffer.
+ */
 fun ByteBuffer.g4(): Int {
     return getInt()
 }
 
+/**
+ * Get 8 bytes from this ByteBuffer.
+ */
 fun ByteBuffer.g8(): Long {
     return getLong()
 }
 
+/**
+ * Get 1 byte from this ByteBuffer if the next byte is < 128.
+ * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
+ */
 fun ByteBuffer.gsmarts(): Int {
     return if ((this[position()].toInt() and 0xff) < 128) g1() else g2() - 32768
 }
 
+/**
+ * Get 1 byte from this ByteBuffer if the next byte is < 128.
+ * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
+ */
 fun ByteBuffer.gsmart(): Int {
     return if ((this[position()].toInt() and 0xff) < 128) g1() - 64 else g2() - 49152
 }
 
+/**
+ * Get a string from this ByteBuffer.
+ * Moves the buffer position from the current position + string.length + 1
+ */
 fun ByteBuffer.gstr(): String {
-    return String(gdata(toByte(10))).also {
+    return String(gdata(lengthToByte(10))).also {
         skip(1)
     }
 }
 
+/**
+ * Get bytes from this ByteBuffer.
+ * The position of this buffer is moved to the current position + the length.
+ */
 fun ByteBuffer.gdata(size: Int = limit(), position: Int = position(), length: Int = size): ByteArray {
     val array = ByteArray(size).also {
         get(position, it, 0, length) // Doesn't move position.
@@ -53,43 +88,168 @@ fun ByteBuffer.gdata(size: Int = limit(), position: Int = position(), length: In
     return array
 }
 
+/**
+ * Directly decrypt this ByteBuffer with RSA.
+ * The position is set to 0 after this function is called.
+ */
+fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger) {
+    val length = g1()
+    val dec = BigInteger(gdata(length)).modPow(exponent, modulus).toByteArray()
+    position(0)
+    pdata(dec)
+    position(0)
+}
+
+/**
+ * Gets a specified number of bits from this ByteBuffer.
+ * This function must only be called from [ByteBuffer.withBitAccess]
+ */
+fun ByteBuffer.gBit(count: Int): Int {
+    val position = position()
+    // Constantly mark and reset.
+    reset()
+    val marked = position()
+    // Keeps the mark positioned at the starting byte index.
+    mark()
+    val index = marked + (position - marked)
+    val value = gBit(count, index shr 3, index % 8, 0)
+    val nextPosition = position + count
+    require(nextPosition <= limit()) { "Buffer does not have enough capacity for byte -> bit positioning." }
+    position(nextPosition)
+    return value
+}
+
+/**
+ * Puts 1 byte into this ByteBuffer.
+ */
 fun ByteBuffer.p1(value: Int) {
     put(value.toByte())
 }
 
+/**
+ * Puts 2 bytes into this ByteBuffer.
+ */
 fun ByteBuffer.p2(value: Int) {
     putShort(value.toShort())
 }
 
+/**
+ * Puts 3 bytes into this ByteBuffer.
+ */
 fun ByteBuffer.p3(value: Int) {
     put((value shr 16).toByte())
     putShort(value.toShort())
 }
 
+/**
+ * Puts 4 bytes into this ByteBuffer.
+ */
 fun ByteBuffer.p4(value: Int) {
     putInt(value)
 }
 
+/**
+ * Puts 8 bytes into this ByteBuffer.
+ */
 fun ByteBuffer.p8(value: Long) {
     putLong(value)
 }
 
+/**
+ * Puts 1 byte into this ByteBuffer if the value is < 128.
+ * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
+ */
+fun ByteBuffer.psmarts(value: Int) {
+    require(value in 0..65535)
+    if (value < 128) {
+        put(value.toByte())
+    } else {
+        putShort((value + 32768).toShort())
+    }
+}
+
+/**
+ * Puts 1 byte into this ByteBuffer if the value is < 128.
+ * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
+ */
+fun ByteBuffer.psmart(value: Int) {
+    require(value in 0..65535)
+    if (value < 128) {
+        put((value + 64).toByte())
+    } else {
+        putShort((value + 49152).toShort())
+    }
+}
+
+/**
+ * Put a string into this ByteBuffer.
+ * Moves the buffer position from the current position + string.length + 1
+ */
 fun ByteBuffer.pjstr(value: String) {
     put(value.toByteArray())
     put(10)
 }
 
+/**
+ * Put bytes into this ByteBuffer.
+ * The position of this buffer is moved to the current position + the length.
+ */
 fun ByteBuffer.pdata(bytes: ByteArray, position: Int = position(), length: Int = bytes.size) {
     put(position, bytes, 0, length) // Doesn't move position.
     skip(length)
 }
 
-fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger): ByteArray {
-    val length = g1()
-    val rsa = gdata(length)
-    return BigInteger(rsa).modPow(exponent, modulus).toByteArray()
+/**
+ * Directly encrypt this ByteBuffer with RSA.
+ * The position is set to the length of the encrypted bytes.
+ * It is up to the caller of this function to flip the buffer for reading.
+ */
+fun ByteBuffer.rsaenc(exponent: BigInteger, modulus: BigInteger) {
+    val length = position()
+    position(0)
+    val enc = BigInteger(gdata(length)).modPow(exponent, modulus).toByteArray()
+    position(0)
+    p1(enc.size)
+    pdata(enc)
 }
 
+/**
+ * Puts a specified number of bits from the given value to this ByteBuffer.
+ * This function must only be called from [ByteBuffer.withBitAccess]
+ */
+fun ByteBuffer.pBit(count: Int, value: Int) {
+    val position = position()
+    // Constantly mark and reset.
+    reset()
+    val marked = position()
+    // Keeps the mark positioned at the starting byte index.
+    mark()
+    val index = marked + (position - marked)
+    pBit(value, count, index shr 3, index % 8)
+    val nextPosition = position + count
+    require(nextPosition <= limit()) { "Buffer does not have enough capacity for byte -> bit positioning." }
+    position(nextPosition)
+}
+
+fun ByteBuffer.skip(amount: Int) {
+    position(position() + amount)
+}
+
+/**
+ * Gives access to bits of this ByteBuffer.
+ * The ByteBuffer is properly repositioned for byte access after function invocation.
+ * Note that accessing bits assumes that this ByteBuffer will have enough capacity.
+ * Because of the magic position, there is a chance that this function will throw
+ * if the ByteBuffer tries to newPosition > limit.
+ *
+ * The ByteBuffer utilizes byte position to keep track of the bits positioning.
+ * If the requested number of bits is 13, then the ByteBuffer requires at least 13 bytes of limit
+ * to be able to properly calculate the bits positioning.
+ *
+ * This function can only be used once at a time per ByteBuffer object.
+ * This function marks the ByteBuffer at the last accessed bit position. This mark does not matter
+ * for future invocations of this function.
+ */
 inline fun ByteBuffer.withBitAccess(function: ByteBuffer.() -> Unit) {
     position(position() * 8)
     // The mark. The all powerful. Keeps track of the current byte index.
@@ -106,20 +266,10 @@ inline fun ByteBuffer.withBitAccess(function: ByteBuffer.() -> Unit) {
     position((index + 7) / 8)
 }
 
-fun ByteBuffer.pBit(count: Int, value: Int) {
-    val position = position()
-    // Constantly mark and reset.
-    reset()
-    val marked = position()
-    // Keeps the mark positioned at the starting byte index.
-    mark()
-    val index = marked + (position - marked)
-    pBit(value, count, index shr 3, index % 8)
-    position(position + count)
-}
-
 private tailrec fun ByteBuffer.pBit(value: Int, remainingBits: Int, byteIndex: Int, bitIndex: Int) {
-    if (remainingBits == 0) return
+    if (remainingBits == 0) {
+        return
+    }
     val bitOffset = 8 - bitIndex
     // The maximum number of bits that can be written to the current byte.
     val bitsToWrite = min(remainingBits, bitOffset)
@@ -137,11 +287,22 @@ private tailrec fun ByteBuffer.pBit(value: Int, remainingBits: Int, byteIndex: I
     return pBit(value, remainingBits - bitsToWrite, byteIndex + 1, 0)
 }
 
-fun ByteBuffer.skip(amount: Int) {
-    position(position() + amount)
+private tailrec fun ByteBuffer.gBit(remainingBits: Int, byteIndex: Int, bitIndex: Int, accumulator: Int): Int {
+    if (remainingBits == 0) {
+        return accumulator
+    }
+    val bitOffset = 8 - bitIndex
+    // The maximum number of bits that can be read from the current byte.
+    val bitsToRead = min(remainingBits, bitOffset)
+    // The mask for extracting the relevant bits from the current byte.
+    val mask = (1 shl bitsToRead) - 1
+    // The relevant bits from the current byte.
+    val byteValue = (get(byteIndex).toInt() ushr (bitOffset - bitsToRead)) and mask
+    val nextValue = (accumulator shl bitsToRead) or byteValue
+    return gBit(remainingBits - bitsToRead, byteIndex + 1, 0, nextValue)
 }
 
-private tailrec fun ByteBuffer.toByte(terminator: Int, length: Int = 0): Int {
+private tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
     if (this[position() + length].toInt() == terminator) return length
-    return toByte(terminator, length + 1)
+    return lengthToByte(terminator, length + 1)
 }
