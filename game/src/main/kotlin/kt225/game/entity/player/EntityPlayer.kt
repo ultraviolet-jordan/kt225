@@ -1,6 +1,7 @@
 package kt225.game.entity.player
 
 import kt225.common.game.Client
+import kt225.common.game.entity.animator.type.Teleport
 import kt225.common.game.entity.player.Player
 import kt225.common.game.entity.render.type.Appearance
 import kt225.common.game.world.Position
@@ -33,6 +34,14 @@ class EntityPlayer(
                 headIcon = 0,
                 name = username,
                 combatLevel = 44
+            )
+        )
+        animator.animate(
+            Teleport(
+                rendering = true,
+                x = position.x - position.zoneOriginX,
+                z = position.z - position.zoneOriginZ,
+                plane = position.plane
             )
         )
         online = true

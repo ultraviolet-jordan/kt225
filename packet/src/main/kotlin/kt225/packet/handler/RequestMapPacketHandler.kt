@@ -8,6 +8,7 @@ import kt225.common.packet.PacketHandler
 import kt225.packet.type.client.RequestMapPacket
 import kt225.packet.type.server.DataLandDonePacket
 import kt225.packet.type.server.DataLandPacket
+import kt225.packet.type.server.DataLocDonePacket
 import kt225.packet.type.server.DataLocPacket
 
 /**
@@ -27,6 +28,12 @@ class RequestMapPacketHandler @Inject constructor(
             val bytes = map.bytes
             val zipped = bytes.size
 
+            val donePacket = when (type) {
+                0 -> DataLandDonePacket(x, z)
+                1 -> DataLocDonePacket(x, z)
+                else -> null
+            }
+
             // We must limit the raw length of bytes to send at a time.
             // The 225 client has a 5000 byte buffer array limit.
             // Any packet sent with > 5000 bytes (excluding the packet header etc), will crash the client.
@@ -36,15 +43,19 @@ class RequestMapPacketHandler @Inject constructor(
             repeat(slices) { slice ->
                 val offset = slice * (sliceLimit - 1)
                 val length = minOf((slice + 1) * sliceLimit, zipped)
-                val sliced = bytes.sliceArray(offset until length)
-                when (type) {
-                    0 -> client.writePacketDirect(DataLandPacket(x, z, offset, zipped, sliced), sliced.size + 6)
-                    1 -> client.writePacketDirect(DataLocPacket(x, z, offset, zipped, sliced), sliced.size + 6)
+                val sliced = bytes.copyOfRange(offset, length)
+                val packetToSend = when (type) {
+                    0 -> DataLandPacket(x, z, offset, zipped, sliced)
+                    1 -> DataLocPacket(x, z, offset, zipped, sliced)
+                    else -> null
+                }
+                packetToSend?.let {
+                    client.writePacketDirect(it, sliced.size + 6)
                 }
             }
-            when (type) {
-                0 -> client.writePacketDirect(DataLandDonePacket(x, z), 2)
-                1 -> client.writePacketDirect(DataLandDonePacket(x, z), 2)
+
+            donePacket?.let {
+                client.writePacketDirect(it, 2)
             }
         }
     }

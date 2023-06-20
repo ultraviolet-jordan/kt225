@@ -15,7 +15,12 @@ abstract class SynchronizerEntityRenderer<E : Entity>(
     val animatorRenders: Array<AnimatedBlock<*>?>
 ) {
     abstract fun renderEntity(entity: E)
-    abstract fun clear()
+
+    fun clear() {
+        highDefinitionRenders.fill(null)
+        lowDefinitionRenders.fill(null)
+        animatorRenders.fill(null)
+    }
 
     fun Array<out RenderBlock<*>?>.calculateMask(comparator: Int): Int {
         var mask = 0
@@ -35,7 +40,7 @@ abstract class SynchronizerEntityRenderer<E : Entity>(
                 continue
             }
             size += when (block) {
-                is LowDefinitionRenderBlock -> block.persistedBytes.size
+                is LowDefinitionRenderBlock -> block.persisted.limit()
                 is HighDefinitionRenderBlock -> block.builder.bytesLength(block.renderType)
                 else -> throw AssertionError("Block is not in correct instance.")
             }

@@ -16,7 +16,7 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
     length = -1
 ) {
     override suspend fun readPacket(buffer: ByteBuffer, length: Int): RequestMapPacket? {
-        val size = buffer.capacity() / 3
+        val size = buffer.remaining() / 3
         if (size == 0) {
             return null
         }

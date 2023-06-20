@@ -41,7 +41,7 @@ class EntitySynchronizer(
 
         phaser.bulkRegister(players.size)
         for (player in players) {
-            val task = PostPlayerSynchronizerTask(player)
+            val task = PostPlayerSynchronizerTask(player, renderer)
             executor.submit(EntitySynchronizerTask(phaser, task))
         }
         phaser.arriveAndAwaitAdvance()

@@ -30,6 +30,13 @@ fun ByteBuffer.g2(): Int {
 }
 
 /**
+ * Get 2 bytes from this ByteBuffer LE.
+ */
+fun ByteBuffer.ig2(): Int {
+    return (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8)
+}
+
+/**
  * Get 3 bytes from this ByteBuffer.
  */
 fun ByteBuffer.g3(): Int {
@@ -134,6 +141,14 @@ fun ByteBuffer.p2(value: Int) {
 }
 
 /**
+ * Puts 2 bytes into this ByteBuffer LE.
+ */
+fun ByteBuffer.ip2(value: Int) {
+    put(value.toByte())
+    put((value shr 8).toByte())
+}
+
+/**
  * Puts 3 bytes into this ByteBuffer.
  */
 fun ByteBuffer.p3(value: Int) {
@@ -160,11 +175,11 @@ fun ByteBuffer.p8(value: Long) {
  * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
  */
 fun ByteBuffer.psmarts(value: Int) {
-    require(value in -255..65535)
-    if (value < 128) {
-        put(value.toByte())
-    } else {
+//    require(value in -65535..65535)
+    if (value >= 128) {
         putShort((value + 32768).toShort())
+    } else {
+        put(value.toByte())
     }
 }
 
@@ -173,11 +188,11 @@ fun ByteBuffer.psmarts(value: Int) {
  * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
  */
 fun ByteBuffer.psmart(value: Int) {
-    require(value in -255..65535)
-    if (value < 128) {
-        put((value + 64).toByte())
-    } else {
+    require(value in -65535..65535)
+    if (value >= 128) {
         putShort((value + 49152).toShort())
+    } else {
+        put((value + 64).toByte())
     }
 }
 
