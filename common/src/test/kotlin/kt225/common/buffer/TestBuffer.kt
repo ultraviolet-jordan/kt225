@@ -41,6 +41,15 @@ class TestBuffer {
     }
 
     @Test
+    fun `test 2 LE`() {
+        val buffer = ByteBuffer.allocate(2)
+        buffer.ip2(65535)
+        buffer.flip()
+        val result = buffer.ig2()
+        assertEquals(65535, result)
+    }
+
+    @Test
     fun `test 3`() {
         val buffer = ByteBuffer.allocate(3)
         buffer.p3(696969)

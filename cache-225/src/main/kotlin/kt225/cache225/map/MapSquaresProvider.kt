@@ -12,7 +12,8 @@ import kt225.common.buffer.g1b
 import kt225.common.buffer.g4
 import kt225.common.buffer.gdata
 import kt225.common.buffer.gsmarts
-import kt225.common.buffer.skip
+import kt225.common.buffer.p1
+import kt225.common.buffer.psmarts
 import java.nio.ByteBuffer
 
 /**
@@ -58,12 +59,29 @@ class MapSquaresProvider @Inject constructor(
     }
 
     override fun decode(buffer: ByteBuffer, entry: MapSquareEntryType): MapSquareEntryType {
-        if (entry.type == 0) buffer.decodeMapSquareLands(entry) else buffer.decodeMapSquareLocs(entry)
+        if (entry.type == 0) {
+            buffer.decodeMapSquareLands(entry)
+        } else {
+            buffer.decodeMapSquareLocs(entry)
+        }
         return entry
     }
 
     override fun encode(buffer: ByteBuffer, entry: MapSquareEntryType) {
-        TODO("Not yet implemented")
+        if (entry.type == 1) {
+            // We have to group the locs together in a specific way for it to encode properly.
+            // Locs have to be grouped together by their packed position.
+            // Then sorted in order of the packed position.
+            // Then sorted in order by their locId.
+            val sortedLocs = entry
+                .locs
+                .flatMap { e -> e.value.map { e.key to MapSquareLoc(it) } }
+                .groupBy { it.second.id }
+                .toSortedMap()
+            buffer.encodeMapSquareLocs(sortedLocs)
+        } else {
+            buffer.encodeMapSquareLands(entry.lands)
+        }
     }
 
     private fun ByteBuffer.decodeMapSquareLands(entry: MapSquareEntryType) {
@@ -72,6 +90,17 @@ class MapSquaresProvider @Inject constructor(
                 for (z in 0 until 64) {
                     val localPosition = MapSquareLocalPosition(plane, x, z)
                     entry.lands[localPosition.packed] = decodeLand().packed
+                }
+            }
+        }
+    }
+    
+    private fun ByteBuffer.encodeMapSquareLands(lands: LongArray) {
+        for (plane in 0 until 4) {
+            for (x in 0 until 64) {
+                for (z in 0 until 64) {
+                    val localPosition = MapSquareLocalPosition(plane, x, z)
+                    encodeLand(MapSquareLand(lands[localPosition.packed]))
                 }
             }
         }
@@ -87,7 +116,7 @@ class MapSquaresProvider @Inject constructor(
     ): MapSquareLand {
         val opcode = g1()
         if (opcode == 0 || opcode == 1) {
-            val adjustedHeight = if (opcode == 1) g1().let { if (it == 1) 0 else it } else height
+            val adjustedHeight = if (opcode == 1) g1()/*.let { if (it == 1) 0 else it }*/ else height
             val land = MapSquareLand(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
 
             // Checks the bitpacking.
@@ -108,17 +137,52 @@ class MapSquaresProvider @Inject constructor(
             underlayId = if (opcode > 81) opcode - 81 else underlayId
         )
     }
+    
+    private fun ByteBuffer.encodeLand(land: MapSquareLand) {
+        if (land.overlayId != 0) {
+            val path = land.overlayPath * 4 + 2
+            val rotation = land.overlayRotation and 0x3
+            val opcode = path + rotation
+            p1(opcode)
+            p1(land.overlayId)
+        }
+        if (land.collision != 0) {
+            p1(land.collision + 49)
+        }
+        if (land.underlayId != 0) {
+            p1(land.underlayId + 81)
+        }
+        if (land.height != 0) {
+            p1(1)
+            p1(land.height)
+        } else {
+            p1(0)
+        }
+    }
 
     private tailrec fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareEntryType, locId: Int = -1) {
         val offset = gsmarts()
         if (offset == 0) {
             return
         }
-        decodeLoc(entry, locId + offset, 0)
+        decodeLocs(entry, locId + offset, 0)
         return decodeMapSquareLocs(entry, locId + offset)
     }
 
-    private tailrec fun ByteBuffer.decodeLoc(entry: MapSquareEntryType, locId: Int, packedPosition: Int) {
+    private fun ByteBuffer.encodeMapSquareLocs(locs: Map<Int, List<Pair<Int, MapSquareLoc>>>, offset: Int = -1, accumulator: Int = 0) {
+        val keys = locs.keys
+        if (accumulator == keys.size) {
+            psmarts(0)
+            return
+        }
+        val key = keys.elementAt(accumulator)
+        val group = locs[key]!! // This should never be null ever.
+        psmarts(key - offset)
+        encodeLocs(group.sortedBy(Pair<Int, MapSquareLoc>::first))
+        return encodeMapSquareLocs(locs, key, accumulator + 1)
+    }
+
+    private tailrec fun ByteBuffer.decodeLocs(entry: MapSquareEntryType, locId: Int, packedPosition: Int) {
         val offset = gsmarts()
         if (offset == 0) {
             return
@@ -126,17 +190,23 @@ class MapSquaresProvider @Inject constructor(
         val localPosition = MapSquareLocalPosition(packedPosition + offset - 1)
         val x = localPosition.x
         val z = localPosition.z
-        val plane = localPosition.plane.let {
+        val plane = localPosition.plane
+        
+        // TODO 
+        // The client does the commented out logic.
+        // We do not do this check here. We need to add this logic
+        // when we go to clip the world.
+        
+        /*.let {
             // Check for bridges.
             val positionAtPlaneOne = MapSquareLocalPosition(1, x, z)
             val land = MapSquareLand(entry.lands[positionAtPlaneOne.packed])
             if (land.collision and 0x2 == 2) it - 1 else it
-        }
-
-        if (plane < 0) {
+        }*/
+        /*if (plane < 0) {
             skip(1) // Discard attributes and continue.
-            return decodeLoc(entry, locId, localPosition.packed)
-        }
+            return decodeLocs(entry, locId, localPosition.packed)
+        }*/
 
         val attributes = g1()
         val shape = attributes shr 2
@@ -160,7 +230,28 @@ class MapSquaresProvider @Inject constructor(
         require(loc.plane == plane)
         require(loc.rotation == rotation)
         require(loc.shape == shape)
-        return decodeLoc(entry, locId, localPosition.packed)
+        return decodeLocs(entry, locId, localPosition.packed)
+    }
+
+    private tailrec fun ByteBuffer.encodeLocs(locs: List<Pair<Int, MapSquareLoc>>, offset: Int = 0, accumulator: Int = 0) {
+        if (accumulator == locs.size) {
+            psmarts(0)
+            return
+        }
+        val pair = locs[accumulator]
+        val locId = pair.first
+        val loc = pair.second
+        val packedOffset = MapSquareLocalPosition(loc.plane, loc.x, loc.z).packed - offset + 1
+        if (offset != packedOffset) {
+            psmarts(packedOffset)
+        } else {
+            psmarts(1)
+        }
+        val rotation = loc.rotation
+        val shape = loc.shape
+        val attributes = (shape shl 2) or (rotation and 0x3)
+        p1(attributes)
+        return encodeLocs(locs, locId, accumulator + 1)
     }
 
     private fun ByteBuffer.decompress(): ByteBuffer {
