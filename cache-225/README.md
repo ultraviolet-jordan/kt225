@@ -58,7 +58,7 @@ the compression and decompression. However, for the algorithm to match the origi
 RuneScape implementation bit by bit, the fix was done 
 by [OpenRS2](https://github.com/openrs2/openrs2) instead of using the pure Java implementation.
 
-### Usage
+### Examples
 _All of the following examples use the "config" archive as an example archive.
 Please keep in mind there are multiple archives used by the game._
 
