@@ -21,7 +21,7 @@ class IsaacRandom(
     }
     
     init {
-        val mixer = IntArray(8) { 0x9E3779B9.toInt() }
+        val mixer = IntArray(8) { -1640531527 }
         repeat(4) {
             mixer.mix(it, firstPass = true)
         }
