@@ -6,4 +6,4 @@ import java.util.TreeMap
 /**
  * @author Jordan Abraham
  */
-class MapSquares<T : EntryType> : MutableMap<Int, T> by TreeMap()
+class MapSquareLocs<T : EntryType> : MutableMap<Int, T> by TreeMap()

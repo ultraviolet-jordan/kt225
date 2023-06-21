@@ -2,7 +2,8 @@ package kt225.packet.handler
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import kt225.cache.map.Maps
+import kt225.cache.map.MapLands
+import kt225.cache.map.MapLocs
 import kt225.common.game.Client
 import kt225.common.packet.PacketHandler
 import kt225.packet.type.client.RequestMapPacket
@@ -16,15 +17,19 @@ import kt225.packet.type.server.DataLocPacket
  */
 @Singleton
 class RequestMapPacketHandler @Inject constructor(
-    private val maps: Maps
+    private val mapLands: MapLands,
+    private val mapLocs: MapLocs
 ) : PacketHandler<RequestMapPacket>(
     groupId = 0
 ) {
     override fun handlePacket(packet: RequestMapPacket, client: Client) {
         packet.requests.forEach { request ->
             val (type, x, z) = request
-            val name = "${if (type == 0) "m" else "l"}${x}_$z"
-            val map = maps.firstOrNull { it.name == name } ?: return@forEach
+            val map = when (type) {
+                0 -> mapLands.firstOrNull { it.name == "m${x}_$z" }
+                1 -> mapLocs.firstOrNull { it.name == "l${x}_$z" }
+                else -> null
+            } ?: return@forEach
             val bytes = map.bytes
             val zipped = bytes.size
 

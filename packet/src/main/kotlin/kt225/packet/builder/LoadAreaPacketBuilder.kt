@@ -2,7 +2,8 @@ package kt225.packet.builder
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import kt225.cache.map.Maps
+import kt225.cache.map.MapLands
+import kt225.cache.map.MapLocs
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.p4
@@ -15,7 +16,8 @@ import java.nio.ByteBuffer
  */
 @Singleton
 class LoadAreaPacketBuilder @Inject constructor(
-    private val maps: Maps
+    private val mapLands: MapLands,
+    private val mapLocs: MapLocs
 ) : PacketBuilder<LoadAreaPacket>(
     id = 237,
     length = -2
@@ -34,8 +36,8 @@ class LoadAreaPacketBuilder @Inject constructor(
             zonesZ.forEach { z ->
                 buffer.p1(x)
                 buffer.p1(z)
-                buffer.p4(maps.firstOrNull { it.name == "m${x}_$z" }?.crc ?: 0)
-                buffer.p4(maps.firstOrNull { it.name == "l${x}_$z" }?.crc ?: 0)
+                buffer.p4(mapLands.firstOrNull { it.name == "m${x}_$z" }?.crc ?: 0)
+                buffer.p4(mapLocs.firstOrNull { it.name == "l${x}_$z" }?.crc ?: 0)
             }
         }
     }
