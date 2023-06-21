@@ -10,6 +10,7 @@ import kt225.cache.map.MapLocsProvider
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.Cache225Module
+import kt225.common.game.world.Position
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -22,15 +23,15 @@ class TestMapSquares {
     @Test
     fun `test map land encoder decoder`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val mapSquares = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
-        val mapSquaresProvider = injector.getInstance<MapSquareLandsProvider>()
+        val mapSquareLands = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
+        val mapSquareLandsProvider = injector.getInstance<MapSquareLandsProvider>()
         
-        val lumbridge = mapSquares[12850]!!
+        val lumbridge = mapSquareLands[12850]!!
         val buffer = ByteBuffer.allocate(50_000)
-        mapSquaresProvider.encode(buffer, lumbridge)
+        mapSquareLandsProvider.encode(buffer, lumbridge)
         buffer.flip()
         
-        val decoded = mapSquaresProvider.decode(buffer, MapSquareLandEntryType(lumbridge.mapSquare))
+        val decoded = mapSquareLandsProvider.decode(buffer, MapSquareLandEntryType(lumbridge.mapSquare))
         assertEquals(lumbridge.mapSquare, decoded.mapSquare)
         assertEquals(lumbridge.lands.size, decoded.lands.size)
         assertContentEquals(lumbridge.lands, decoded.lands)
@@ -39,16 +40,16 @@ class TestMapSquares {
     @Test
     fun `test all map land encoder decoder`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val mapSquares = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
-        val mapSquaresProvider = injector.getInstance<MapSquareLandsProvider>()
+        val mapSquareLands = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
+        val mapSquareLandsProvider = injector.getInstance<MapSquareLandsProvider>()
 
-        for (mapSquareEntry in mapSquares) {
+        for (mapSquareEntry in mapSquareLands) {
             val entry = mapSquareEntry.value
             val buffer = ByteBuffer.allocate(100_000)
-            mapSquaresProvider.encode(buffer, entry)
+            mapSquareLandsProvider.encode(buffer, entry)
             buffer.flip()
 
-            val decoded = mapSquaresProvider.decode(buffer, MapSquareLandEntryType(entry.mapSquare))
+            val decoded = mapSquareLandsProvider.decode(buffer, MapSquareLandEntryType(entry.mapSquare))
             assertEquals(entry.mapSquare, decoded.mapSquare)
             assertEquals(entry.lands.size, decoded.lands.size)
             assertContentEquals(entry.lands, decoded.lands)
@@ -58,16 +59,16 @@ class TestMapSquares {
     @Test
     fun `test map loc encoder decoder`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val mapSquares = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
-        val mapSquaresProvider = injector.getInstance<MapSquareLocsProvider>()
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+        val mapSquareLocsProvider = injector.getInstance<MapSquareLocsProvider>()
 
-        val lumbridge = mapSquares[12850]!!
+        val lumbridge = mapSquareLocs[12850]!!
         
         val buffer = ByteBuffer.allocate(50_000)
-        mapSquaresProvider.encode(buffer, lumbridge)
+        mapSquareLocsProvider.encode(buffer, lumbridge)
         buffer.flip()
 
-        val decoded = mapSquaresProvider.decode(buffer, MapSquareLocEntryType(lumbridge.mapSquare))
+        val decoded = mapSquareLocsProvider.decode(buffer, MapSquareLocEntryType(lumbridge.mapSquare))
         assertEquals(lumbridge.mapSquare, decoded.mapSquare)
         assertEquals(lumbridge.locs.size, decoded.locs.size)
         assertContentEquals(lumbridge.locs.keys.toIntArray(), decoded.locs.keys.toIntArray())
@@ -79,16 +80,16 @@ class TestMapSquares {
     @Test
     fun `test all map loc encoder decoder`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val mapSquares = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
-        val mapSquaresProvider = injector.getInstance<MapSquareLocsProvider>()
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+        val mapSquareLocsProvider = injector.getInstance<MapSquareLocsProvider>()
         
-        for (mapSquareEntry in mapSquares) {
+        for (mapSquareEntry in mapSquareLocs) {
             val entry = mapSquareEntry.value
             val buffer = ByteBuffer.allocate(50_000)
-            mapSquaresProvider.encode(buffer, entry)
+            mapSquareLocsProvider.encode(buffer, entry)
             buffer.flip()
 
-            val decoded = mapSquaresProvider.decode(buffer, MapSquareLocEntryType(entry.mapSquare))
+            val decoded = mapSquareLocsProvider.decode(buffer, MapSquareLocEntryType(entry.mapSquare))
             assertEquals(entry.mapSquare, decoded.mapSquare)
             assertEquals(entry.locs.size, decoded.locs.size)
             assertContentEquals(entry.locs.keys.toIntArray(), decoded.locs.keys.toIntArray())
@@ -101,18 +102,18 @@ class TestMapSquares {
     @Test
     fun `test maps rewrite lands`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val maps = injector.getInstance<MapLands>()
-        val mapSquares = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
-        val mapSquaresProvider = injector.getInstance<MapSquareLandsProvider>()
+        val mapLands = injector.getInstance<MapLands>()
+        val mapSquareLands = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
+        val mapSquareLandsProvider = injector.getInstance<MapSquareLandsProvider>()
         
-        mapSquaresProvider.write(mapSquares)
+        mapSquareLandsProvider.write(mapSquareLands)
         
-        val newMapsProvider = MapLandsProvider().get()
-        val newMapSquaresProvider = MapSquareLandsProvider(newMapsProvider)
-        val newMapSquares = newMapSquaresProvider.read()
+        val newMapLands = MapLandsProvider().get()
+        val newMapSquareLandsProvider = MapSquareLandsProvider(newMapLands)
+        val newMapSquareLands = newMapSquareLandsProvider.read()
         
-        newMapsProvider.forEachIndexed { index, resource ->
-            val original = maps[index]
+        newMapLands.forEachIndexed { index, resource ->
+            val original = mapLands[index]
             assertEquals(original.id, resource.id)
             assertEquals(original.name, resource.name)
             assertEquals(original.x, resource.x)
@@ -120,8 +121,8 @@ class TestMapSquares {
             assertEquals(original.crc, resource.crc)
         }
         
-        newMapSquares.forEach { 
-            val original = mapSquares[it.key]
+        newMapSquareLands.forEach { 
+            val original = mapSquareLands[it.key]
             assertEquals(original?.mapSquare, it.value.mapSquare)
             assertContentEquals(original?.lands, it.value.lands)
         }
@@ -130,18 +131,18 @@ class TestMapSquares {
     @Test
     fun `test maps rewrite locs`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val maps = injector.getInstance<MapLocs>()
-        val mapSquares = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
-        val mapSquaresProvider = injector.getInstance<MapSquareLocsProvider>()
+        val mapLocs = injector.getInstance<MapLocs>()
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+        val mapSquareLocsProvider = injector.getInstance<MapSquareLocsProvider>()
 
-        mapSquaresProvider.write(mapSquares)
+        mapSquareLocsProvider.write(mapSquareLocs)
 
-        val newMapsProvider = MapLocsProvider().get()
-        val newMapSquaresProvider = MapSquareLocsProvider(newMapsProvider)
-        val newMapSquares = newMapSquaresProvider.read()
+        val newMapLocs = MapLocsProvider().get()
+        val newMapSquareLocsProvider = MapSquareLocsProvider(newMapLocs)
+        val newMapSquareLocs = newMapSquareLocsProvider.read()
 
-        newMapsProvider.forEachIndexed { index, resource ->
-            val original = maps[index]
+        newMapLocs.forEachIndexed { index, resource ->
+            val original = mapLocs[index]
             assertEquals(original.id, resource.id)
             assertEquals(original.name, resource.name)
             assertEquals(original.x, resource.x)
@@ -149,11 +150,85 @@ class TestMapSquares {
             assertEquals(original.crc, resource.crc)
         }
 
-        newMapSquares.forEach {
-            val original = mapSquares[it.key]
+        newMapSquareLocs.forEach {
+            val original = mapSquareLocs[it.key]
             assertEquals(original?.mapSquare, it.value.mapSquare)
             assertEquals(original?.locs?.size, it.value.locs.size)
             assertContentEquals(original?.locs?.keys?.toIntArray(), it.value.locs.keys.toIntArray())
         }
+    }
+
+    @Test
+    fun `test edit add chest`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+        val mapSquareLocsProvider = injector.getInstance<MapSquareLocsProvider>()
+
+        val position = Position(3223, 3222, 0)
+        val entryType = mapSquareLocs[position.mapSquareId]!!
+        val mapSquare = MapSquare(entryType.mapSquare)
+        
+        val baseX = mapSquare.x shl 6
+        val baseZ = mapSquare.z shl 6
+        
+        for (locs in entryType.locs.values) {
+            val packed = locs.indices
+                .map { MapSquareLoc(locs[it]) }
+                .associateWith { Position(it.x + baseX, it.z + baseZ, it.plane) }
+                .filter { it.value == position }
+                .keys
+                .firstOrNull()
+
+            packed?.let {
+                println("Here")
+                val index = locs.indexOf(it.packed)
+                locs[index] = MapSquareLoc(2191, it.x, it.z, it.plane, 10, it.rotation).packed
+            }
+        }
+
+        mapSquareLocsProvider.write(mapSquareLocs)
+        
+        // Uncomment this if you want to write the file out to use in the game.
+        // val mapResource = maps.first { it.id == mapSquare.id }
+        // val bytes = mapResource.bytes
+        // val file = File("./${mapResource.name}")
+        // file.writeBytes(bytes)
+    }
+
+    @Test
+    fun `test edit remove bush`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+        val mapSquareLocsProvider = injector.getInstance<MapSquareLocsProvider>()
+
+        val position = Position(3223, 3220, 0)
+        val entryType = mapSquareLocs[position.mapSquareId]!!
+        val mapSquare = MapSquare(entryType.mapSquare)
+
+        val baseX = mapSquare.x shl 6
+        val baseZ = mapSquare.z shl 6
+
+        for (locs in entryType.locs.values) {
+            val packed = locs.indices
+                .map { MapSquareLoc(locs[it]) }
+                .associateWith { Position(it.x + baseX, it.z + baseZ, it.plane) }
+                .filter { it.value == position }
+                .keys
+                .firstOrNull { it.id == 1124 }
+                ?.packed
+
+            packed?.let { 
+                val index = locs.indexOf(it)
+                locs[index] = -1
+            }
+        }
+
+        mapSquareLocsProvider.write(mapSquareLocs)
+
+        // Uncomment this if you want to write the file out to use in the game.
+        // val mapResource = maps.first { it.id == mapSquare.id }
+        // val bytes = mapResource.bytes
+        // val file = File("./${mapResource.name}")
+        // file.writeBytes(bytes)
     }
 }

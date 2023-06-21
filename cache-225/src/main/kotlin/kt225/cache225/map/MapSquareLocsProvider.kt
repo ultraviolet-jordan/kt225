@@ -78,6 +78,7 @@ class MapSquareLocsProvider @Inject constructor(
         val sortedLocs = entry
             .locs
             .flatMap { e -> e.value.map { e.key to MapSquareLoc(it) } }
+            .filter { it.second.packed.toInt() != -1 } // -1 is removed from array.
             .groupBy { it.second.id }
             .toSortedMap()
         buffer.encodeMapSquareLocs(sortedLocs)
