@@ -169,14 +169,15 @@ class MapSquaresProvider @Inject constructor(
         return decodeMapSquareLocs(entry, locId + offset)
     }
 
-    private fun ByteBuffer.encodeMapSquareLocs(locs: Map<Int, List<Pair<Int, MapSquareLoc>>>, offset: Int = -1, accumulator: Int = 0) {
+    private tailrec fun ByteBuffer.encodeMapSquareLocs(locs: Map<Int, List<Pair<Int, MapSquareLoc>>>, offset: Int = -1, accumulator: Int = 0) {
         val keys = locs.keys
         if (accumulator == keys.size) {
             psmarts(0)
             return
         }
         val key = keys.elementAt(accumulator)
-        val group = locs[key]!! // This should never be null ever.
+        val group = locs[key]
+        requireNotNull(group)
         psmarts(key - offset)
         encodeLocs(group.sortedBy(Pair<Int, MapSquareLoc>::first))
         return encodeMapSquareLocs(locs, key, accumulator + 1)
@@ -239,19 +240,12 @@ class MapSquaresProvider @Inject constructor(
             return
         }
         val pair = locs[accumulator]
-        val locId = pair.first
         val loc = pair.second
-        val packedOffset = MapSquareLocalPosition(loc.plane, loc.x, loc.z).packed - offset + 1
-        if (offset != packedOffset) {
-            psmarts(packedOffset)
-        } else {
-            psmarts(1)
-        }
-        val rotation = loc.rotation
-        val shape = loc.shape
-        val attributes = (shape shl 2) or (rotation and 0x3)
+        val localPosition = MapSquareLocalPosition(loc.plane, loc.x, loc.z).packed - offset + 1
+        psmarts(localPosition)
+        val attributes = (loc.shape shl 2) or (loc.rotation and 0x3)
         p1(attributes)
-        return encodeLocs(locs, locId, accumulator + 1)
+        return encodeLocs(locs, pair.first, accumulator + 1)
     }
 
     private fun ByteBuffer.decompress(): ByteBuffer {

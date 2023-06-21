@@ -31,15 +31,35 @@ class TestMapSquares {
         val mapSquaresProvider = injector.getInstance<MapSquaresProvider>()
         
         val lumbridge = mapSquares[12850]!!
-        val buffer = ByteBuffer.allocate(100_000)
+        val buffer = ByteBuffer.allocate(50_000)
         lumbridge.type = 0
         mapSquaresProvider.encode(buffer, lumbridge)
         buffer.flip()
         
-        val landDecoded = mapSquaresProvider.decode(buffer, MapSquareEntryType(lumbridge.mapSquare, type = 0))
-        assertEquals(lumbridge.mapSquare, landDecoded.mapSquare)
-        assertEquals(lumbridge.lands.size, landDecoded.lands.size)
-        assertContentEquals(lumbridge.lands, landDecoded.lands)
+        val decoded = mapSquaresProvider.decode(buffer, MapSquareEntryType(lumbridge.mapSquare, type = 0))
+        assertEquals(lumbridge.mapSquare, decoded.mapSquare)
+        assertEquals(lumbridge.lands.size, decoded.lands.size)
+        assertContentEquals(lumbridge.lands, decoded.lands)
+    }
+
+    @Test
+    fun `test all map land encoder decoder`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val mapSquares = injector.getInstance<MapSquares<MapSquareEntryType>>()
+        val mapSquaresProvider = injector.getInstance<MapSquaresProvider>()
+
+        for (mapSquareEntry in mapSquares) {
+            val entry = mapSquareEntry.value
+            val buffer = ByteBuffer.allocate(100_000)
+            entry.type = 0
+            mapSquaresProvider.encode(buffer, entry)
+            buffer.flip()
+
+            val decoded = mapSquaresProvider.decode(buffer, MapSquareEntryType(entry.mapSquare, type = 0))
+            assertEquals(entry.mapSquare, decoded.mapSquare)
+            assertEquals(entry.lands.size, decoded.lands.size)
+            assertContentEquals(entry.lands, decoded.lands)
+        }
     }
 
     @Test
@@ -50,15 +70,40 @@ class TestMapSquares {
 
         val lumbridge = mapSquares[12850]!!
         
-        val buffer = ByteBuffer.allocate(500_000)
+        val buffer = ByteBuffer.allocate(50_000)
         lumbridge.type = 1
         mapSquaresProvider.encode(buffer, lumbridge)
         buffer.flip()
 
-        val landDecoded = mapSquaresProvider.decode(buffer, MapSquareEntryType(lumbridge.mapSquare, type = 1))
-        assertEquals(lumbridge.mapSquare, landDecoded.mapSquare)
-        assertEquals(lumbridge.locs.size, landDecoded.locs.size)
-        assertContentEquals(lumbridge.locs.keys.toIntArray(), landDecoded.locs.keys.toIntArray())
-        assertContentEquals(lumbridge.locs.values, lumbridge.locs.values)
+        val decoded = mapSquaresProvider.decode(buffer, MapSquareEntryType(lumbridge.mapSquare, type = 1))
+        assertEquals(lumbridge.mapSquare, decoded.mapSquare)
+        assertEquals(lumbridge.locs.size, decoded.locs.size)
+        assertContentEquals(lumbridge.locs.keys.toIntArray(), decoded.locs.keys.toIntArray())
+        for (loc in lumbridge.locs) {
+            assertContentEquals(loc.value, decoded.locs[loc.key])
+        }
+    }
+
+    @Test
+    fun `test all map loc encoder decoder`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val mapSquares = injector.getInstance<MapSquares<MapSquareEntryType>>()
+        val mapSquaresProvider = injector.getInstance<MapSquaresProvider>()
+        
+        for (mapSquareEntry in mapSquares) {
+            val entry = mapSquareEntry.value
+            val buffer = ByteBuffer.allocate(50_000)
+            entry.type = 1
+            mapSquaresProvider.encode(buffer, entry)
+            buffer.flip()
+
+            val decoded = mapSquaresProvider.decode(buffer, MapSquareEntryType(entry.mapSquare, type = 1))
+            assertEquals(entry.mapSquare, decoded.mapSquare)
+            assertEquals(entry.locs.size, decoded.locs.size)
+            assertContentEquals(entry.locs.keys.toIntArray(), decoded.locs.keys.toIntArray())
+            for (loc in entry.locs) {
+                assertContentEquals(loc.value, decoded.locs[loc.key])
+            }
+        }
     }
 }
