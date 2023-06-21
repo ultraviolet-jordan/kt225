@@ -88,9 +88,9 @@ class IsaacRandom(
             }
             val position = mem[index]
             randa += mem[(index + 128) and 0xff]
-            (mem[position shr 2 and 0xFF] + randa + randb)
+            (mem[position shr 2 and 0xff] + randa + randb)
                 .also { mem[index] = it }
-                .also { randb = (mem[it shr 8 shr 2 and 0xFF] + position).also { next -> rsl[index] = next } }
+                .also { randb = (mem[it shr 8 shr 2 and 0xff] + position).also { next -> rsl[index] = next } }
         }
     }
 
