@@ -7,5 +7,5 @@ import kt225.cache.EntryType
  */
 data class MapSquareLocEntryType(
     val mapSquare: Int,
-    val locs: MutableMap<Int, LongArray> = LinkedHashMap()
+    val locs: MutableMap<Int, LongArray> = HashMap()
 ) : EntryType
