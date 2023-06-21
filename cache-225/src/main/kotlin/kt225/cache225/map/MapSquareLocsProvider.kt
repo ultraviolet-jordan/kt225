@@ -19,7 +19,6 @@ import java.util.zip.CRC32
 class MapSquareLocsProvider @Inject constructor(
     private val maps: MapLocs
 ) : MapSquaresProvider<MapSquareLocEntryType, MapSquareLocs<MapSquareLocEntryType>> {
-
     override fun read(): MapSquareLocs<MapSquareLocEntryType> {
         val locs = MapSquareLocs<MapSquareLocEntryType>()
         val lengthX = 0 until maps.maxOf(MapResource::x) + 1
@@ -68,8 +67,7 @@ class MapSquareLocsProvider @Inject constructor(
     }
 
     override fun decode(buffer: ByteBuffer, entry: MapSquareLocEntryType): MapSquareLocEntryType {
-        buffer.decodeMapSquareLocs(entry)
-        return entry
+        return buffer.decodeMapSquareLocs(entry)
     }
 
     override fun encode(buffer: ByteBuffer, entry: MapSquareLocEntryType) {
@@ -85,10 +83,10 @@ class MapSquareLocsProvider @Inject constructor(
         buffer.encodeMapSquareLocs(sortedLocs)
     }
 
-    private tailrec fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareLocEntryType, locId: Int = -1) {
+    private tailrec fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareLocEntryType, locId: Int = -1): MapSquareLocEntryType {
         val offset = gsmarts()
         if (offset == 0) {
-            return
+            return entry
         }
         decodeLocs(entry, locId + offset, 0)
         return decodeMapSquareLocs(entry, locId + offset)
@@ -126,12 +124,14 @@ class MapSquareLocsProvider @Inject constructor(
         val loc = MapSquareLoc(locId, x, z, plane, shape, rotation)
 
         // New adjusted packed location after adjusting for bridge.
-        val adjustedLocalPosition = MapSquareLocalPosition(plane, x, z).packed
+        // val adjustedLocalPosition = MapSquareLocalPosition(plane, x, z).packed
+        
+        val localPositionPacked = localPosition.packed
         // Dynamically increase the slot on this tile depending on the incoming data.
         // There is a limit of 5 slots per tile.
-        val slots = entry.locs[adjustedLocalPosition]?.size ?: 0
+        val slots = entry.locs[localPositionPacked]?.size ?: 0
         require(slots < 5)
-        entry.locs[adjustedLocalPosition] = entry.locs[adjustedLocalPosition]?.copyOf(slots + 1)?.also {
+        entry.locs[localPositionPacked] = entry.locs[localPositionPacked]?.copyOf(slots + 1)?.also {
             it[slots] = loc.packed
         } ?: LongArray(1) { loc.packed }
 
