@@ -4,6 +4,8 @@ import com.google.inject.Guice
 import dev.misfitlabs.kotlinguice4.getInstance
 import kt225.cache.CacheModule
 import kt225.cache.map.MapSquares
+import kt225.cache.map.Maps
+import kt225.cache.map.MapsProvider
 import kt225.cache225.Cache225Module
 import java.nio.ByteBuffer
 import kotlin.test.Test
@@ -104,6 +106,38 @@ class TestMapSquares {
             for (loc in entry.locs) {
                 assertContentEquals(loc.value, decoded.locs[loc.key])
             }
+        }
+    }
+
+    @Test
+    fun `test maps rewrite`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val maps = injector.getInstance<Maps>()
+        val mapSquares = injector.getInstance<MapSquares<MapSquareEntryType>>()
+        val mapSquaresProvider = injector.getInstance<MapSquaresProvider>()
+        
+        mapSquaresProvider.write(mapSquares)
+        
+        val newMapsProvider = MapsProvider().get()
+        val newMapSquaresProvider = MapSquaresProvider(newMapsProvider)
+        val newMapSquares = newMapSquaresProvider.read()
+        
+        newMapsProvider.forEachIndexed { index, resource ->
+            val original = maps[index]
+            assertEquals(original.id, resource.id)
+            assertEquals(original.name, resource.name)
+            assertEquals(original.x, resource.x)
+            assertEquals(original.z, resource.z)
+            assertEquals(original.crc, resource.crc)
+            assertEquals(original.type, resource.type)
+        }
+        
+        newMapSquares.forEach { 
+            val original = mapSquares[it.key]
+            assertEquals(original?.mapSquare, it.value.mapSquare)
+            assertEquals(original?.locs?.size, it.value.locs.size)
+            assertContentEquals(original?.lands, it.value.lands)
+            assertContentEquals(original?.locs?.keys?.toIntArray(), it.value.locs.keys.toIntArray())
         }
     }
 }

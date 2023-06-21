@@ -3,6 +3,7 @@ package kt225.cache225.map
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.cache.EntryProvider
+import kt225.cache.bzip2.bzip2Compress
 import kt225.cache.bzip2.bzip2Decompress
 import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquares
@@ -13,8 +14,11 @@ import kt225.common.buffer.g4
 import kt225.common.buffer.gdata
 import kt225.common.buffer.gsmarts
 import kt225.common.buffer.p1
+import kt225.common.buffer.p4
+import kt225.common.buffer.pdata
 import kt225.common.buffer.psmarts
 import java.nio.ByteBuffer
+import java.util.zip.CRC32
 
 /**
  * @author Jordan Abraham
@@ -55,7 +59,42 @@ class MapSquaresProvider @Inject constructor(
     }
 
     override fun write(entries: MapSquares<MapSquareEntryType>) {
-        TODO("Not yet implemented")
+        entries.values.forEach { entry ->
+            val mapSquare = MapSquare(entry.mapSquare)
+            val id = mapSquare.id
+            val x = mapSquare.x
+            val z = mapSquare.z
+
+            val landName = "m${x}_$z"
+            val locName = "l${x}_$z"
+
+            val landBuffer = ByteBuffer.allocate(100_000)
+            entry.type = 0
+            encode(landBuffer, entry)
+            val locBuffer = ByteBuffer.allocate(100_000)
+            entry.type = 1
+            encode(locBuffer, entry)
+
+            landBuffer.flip()
+            locBuffer.flip()
+            
+            val landBytes = landBuffer.compress()
+            val locBytes = locBuffer.compress()
+            
+            val landCrc = CRC32().also { it.update(landBytes) }.value.toInt()
+            val locCrc = CRC32().also { it.update(locBytes) }.value.toInt()
+            
+            val existingLand = maps.firstOrNull { it.id == id && it.name == landName }
+            val existingLandIndex = maps.indexOf(existingLand)
+            if (existingLandIndex != -1) {
+                maps[existingLandIndex] = MapResource(landName, id, x, z, 0, landBytes, landCrc)
+            }
+            val existingLoc = maps.firstOrNull { it.id == id && it.name == locName }
+            val existingLocIndex = maps.indexOf(existingLoc)
+            if (existingLocIndex != -1) {
+                maps[existingLocIndex] = MapResource(locName, id, x, z, 1, locBytes, locCrc)
+            }
+        }
     }
 
     override fun decode(buffer: ByteBuffer, entry: MapSquareEntryType): MapSquareEntryType {
@@ -253,5 +292,15 @@ class MapSquaresProvider @Inject constructor(
         val buffer = ByteBuffer.wrap(bzip2Decompress(gdata(limit() - 4)))
         require(decompressed == buffer.limit())
         return buffer
+    }
+
+    private fun ByteBuffer.compress(): ByteArray {
+        val bytes = gdata()
+        val compressed = bzip2Compress(bytes)
+        val buffer = ByteBuffer.allocate(compressed.size + 4)
+        buffer.p4(bytes.size)
+        buffer.pdata(compressed)
+        buffer.flip()
+        return buffer.gdata()
     }
 }
