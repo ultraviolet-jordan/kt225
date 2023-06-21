@@ -60,7 +60,7 @@ class GameClient(
 
     private fun write(buffer: ByteBuffer, packet: Packet) {
         val builder = session.builders[packet::class] ?: return
-        buffer.p1(builder.id + serverIsaac.nextInt and 0xff)
+        buffer.p1(builder.id + serverIsaac.nextInt)
         if (builder.length != -1 && builder.length != -2) {
             builder.buildPacket(packet, buffer)
             return

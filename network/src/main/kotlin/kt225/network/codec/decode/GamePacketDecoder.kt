@@ -32,7 +32,7 @@ class GamePacketDecoder @Inject constructor(
     }
 
     private suspend fun ByteReadChannel.awaitPacket(session: Session, isaac: IsaacRandom): Packet? {
-        val id = ((readByte().toInt() and 0xff) - isaac.nextInt and 0xff)
+        val id = ((readByte().toInt() - isaac.nextInt) and 0xff)
         if (id > session.clientPacketLengths.size) {
             discard(availableForRead.toLong())
             return null

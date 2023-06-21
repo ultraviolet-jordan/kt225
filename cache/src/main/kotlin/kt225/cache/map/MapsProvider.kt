@@ -24,7 +24,7 @@ interface MapsProvider<T : MutableList<MapResource>> : Provider<T> {
         }
         Files.walk(start).forEach { path ->
             val name = path.fileName.toString()
-            if (!name.startsWith(prefix())) {
+            if (!name.startsWith(prefix()) || list.any { it.name == name }) {
                 return@forEach
             }
 

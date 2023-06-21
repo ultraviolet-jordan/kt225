@@ -79,20 +79,18 @@ class IsaacRandom(
 
     private fun isaac() {
         randb += ++randc
-        repeat(256) {
-            when (it and 0x3) {
+        repeat(256) { index ->
+            when (index and 0x3) {
                 0 -> randa = randa xor (randa shl 13)
                 1 -> randa = randa xor (randa ushr 6)
                 2 -> randa = randa xor (randa shl 2)
                 3 -> randa = randa xor (randa ushr 16)
             }
-            val position = mem[it]
-            randa += mem[(it + 128) and 0xff]
-            mem[it] = (mem[position shr 2 and 0xff] + randa + randb).also { memVal ->
-                rsl[it] = (mem[memVal shr 8 shr 2 and 0xff] + position).also { rslVal ->
-                    randb = rslVal
-                }
-            }
+            val position = mem[index]
+            randa += mem[(index + 128) and 0xff]
+            (mem[position shr 2 and 0xFF] + randa + randb)
+                .also { mem[index] = it }
+                .also { randb = (mem[it shr 8 shr 2 and 0xFF] + position).also { next -> rsl[index] = next } }
         }
     }
 
