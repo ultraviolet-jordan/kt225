@@ -173,7 +173,7 @@ class TestMapSquares {
         
         for (locs in entryType.locs.values) {
             val packed = locs.indices
-                .map { MapSquareLoc(locs[it]) }
+                .mapNotNull { locs[it]?.let(::MapSquareLoc) }
                 .associateWith { Position(it.x + baseX, it.z + baseZ, it.plane) }
                 .filter { it.value == position }
                 .keys
@@ -210,14 +210,14 @@ class TestMapSquares {
 
         for (locs in entryType.locs.values) {
             val packed = locs.indices
-                .map { MapSquareLoc(locs[it]) }
+                .mapNotNull { locs[it]?.let(::MapSquareLoc) }
                 .associateWith { Position(it.x + baseX, it.z + baseZ, it.plane) }
                 .filter { it.value == position }
                 .keys
                 .firstOrNull { it.id == 1124 }
                 ?.packed
 
-            packed?.let { 
+            packed?.let {
                 val index = locs.indexOf(it)
                 locs[index] = -1
             }

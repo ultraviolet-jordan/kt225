@@ -77,8 +77,7 @@ class MapSquareLocsProvider @Inject constructor(
         // Then sorted in order by their locId.
         val sortedLocs = entry
             .locs
-            .flatMap { e -> e.value.map { e.key to MapSquareLoc(it) } }
-            .filter { it.second.packed.toInt() != -1 } // -1 is removed from array.
+            .flatMap { e -> e.value.mapNotNull { it?.let { e.key to MapSquareLoc(it) } } }
             .groupBy { it.second.id }
             .toSortedMap()
         buffer.encodeMapSquareLocs(sortedLocs)
@@ -134,7 +133,7 @@ class MapSquareLocsProvider @Inject constructor(
         require(slots < 5)
         entry.locs[localPositionPacked] = entry.locs[localPositionPacked]?.copyOf(slots + 1)?.also {
             it[slots] = loc.packed
-        } ?: LongArray(1) { loc.packed }
+        } ?: Array(1) { loc.packed }
 
         // Checks the bitpacking.
         require(loc.id == locId)
