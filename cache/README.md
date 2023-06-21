@@ -18,6 +18,28 @@ data directly from the cache can be a complex and challenging task. This deliber
 obfuscation aims to deter cheating, hacking, or any other form of unauthorized
 manipulation of the game.
 
+- **Archive** (Raw Input Archive)
+  - `u24` (Decompressed length)
+  - `u24` (Compressed length)
+    - `if (Decompressed length != Compressed length)`
+      - `Decompress with Bzip2 with length of "Compressed length" at the current read pointer`
+        - **Even though it uses Bzip2, this does not contain a Bzip2 header. ("BZh1")**
+  - `u16` (Number of files)
+  - **Files** (Array)
+    - `var fileBytesOffset = 8 + "Number of files" * 10`
+    - `u32` (Individual file hashed name)
+    - `u24` (Individual file decompressed length)
+    - `u24` (Individual file compressed length)
+    - `val pointer = "Mark the current read position pointer"`
+        - `if (Decompressed length != Compressed length)`
+            - `Decompress with Bzip2 starting at position "fileBytesOffset" with length of "Individual file compressed length"`
+              - **Even though it uses Bzip2, this does not contain a Bzip2 header. ("BZh1")**
+        - `else continue reading bytes with the length of "Individual file decompressed length"`
+    - `val bytes = "Decompressed bytes or not decompressed bytes from condition"`
+    - `Reset the read position pointer to the marked "pointer" above`
+    - `fileBytesOffset += "Individual file compressed length"`
+      - **File**
+
 ## Decompilation and Extraction
 While the RuneScape cache is in a proprietary format, the community has made
 considerable efforts to reverse engineer and understand its structure. Various
