@@ -15,6 +15,7 @@ import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * @author Jordan Abraham
@@ -225,9 +226,38 @@ class TestMapSquares {
         mapSquareLocsProvider.write(mapSquareLocs)
 
         // Uncomment this if you want to write the file out to use in the game.
-        // val mapResource = maps.first { it.id == mapSquare.id }
-        // val bytes = mapResource.bytes
-        // val file = File("./${mapResource.name}")
-        // file.writeBytes(bytes)
+//         val mapResource = maps.first { it.id == mapSquare.id }
+//         val bytes = mapResource.bytes
+//         val file = File("./${mapResource.name}")
+//         file.writeBytes(bytes)
+    }
+
+    @Test
+    fun `test edit remove bush2`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+        val mapSquareLocsProvider = injector.getInstance<MapSquareLocsProvider>()
+
+        val lumbridge = mapSquareLocs[12850]!!
+        
+        lumbridge.query(Position(3223, 3220, 0)) { result, local ->
+            val bush = result.firstOrNull { it.id == 1124 } ?: return@query
+            val removed = lumbridge.removeLoc(bush, local)
+            assertTrue(removed)
+        }
+
+        lumbridge.query(Position(3223, 3222, 0)) { _, local ->
+            val chest = MapSquareLoc(2191, local.x, local.z, local.plane, 10, 0)
+            val added = lumbridge.addLoc(chest, local)
+            assertTrue(added)
+        }
+
+        mapSquareLocsProvider.write(mapSquareLocs)
+
+        // Uncomment this if you want to write the file out to use in the game.
+//        val mapResource = mapLocs.first { it.id == 12850 }
+//        val bytes = mapResource.bytes
+//        val file = File("./${mapResource.name}")
+//        file.writeBytes(bytes)
     }
 }

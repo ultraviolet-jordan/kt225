@@ -63,6 +63,37 @@ val file = File("config")
 file.writeBytes(zipped)
 ```
 
+```kotlin
+val mapLocs = MapLocs()
+val mapSquareLocsProvider = MapSquareLocsProvider(mapLocs)
+val mapSquareLocs = mapSquareLocsProvider.read()
+
+val lumbridge = mapSquareLocs[12850]!!
+
+lumbridge.query(Position(3223, 3220, 0)) { result, local ->
+    val bush = result.firstOrNull { it.id == 1124 } ?: return@query
+    val removed = lumbridge.removeLoc(bush, local)
+    assertTrue(removed)
+}
+
+lumbridge.query(Position(3223, 3222, 0)) { _, local ->
+    val chest = MapSquareLoc(2191, local.x, local.z, local.plane, 10, 0)
+    val added = lumbridge.addLoc(chest, local)
+    assertTrue(added)
+}
+
+mapSquareLocsProvider.write(mapSquareLocs)
+
+val mapResource = mapLocs.first { it.id == 12850 }
+val bytes = mapResource.bytes
+val file = File("./${mapResource.name}")
+file.writeBytes(bytes)
+```
+
+<p align="center">
+  <img src="https://github.com/ultraviolet-jordan/kt225/blob/main/github/map_edit_example.jpg?raw=true" alt="An example of an edit to the map."/>
+</p>
+
 ## Guice
 This module is built with Guice. If your project also uses Guice, then you can install
 the entire module and Inject the archives you want.
