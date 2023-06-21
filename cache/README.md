@@ -1,6 +1,5 @@
 # Cache
 
-## Overview
 The RuneScape cache is a vital component of the popular MMORPG 
 (Massively Multiplayer Online Role-Playing Game) RuneScape. It contains various game assets, 
 such as media, sounds, maps, and other resources necessary for the game to function. However, 
