@@ -135,7 +135,7 @@ the entire module and Inject the archives you want.
 
 ```kotlin
 install(CacheModule)
-//or
+// or
 val injector = Guice.createInjector(CacheModule)
 
 class Test @Inject constructor(

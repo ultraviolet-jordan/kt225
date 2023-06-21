@@ -138,6 +138,8 @@ class TestObjs {
         val configArchive = injector.getInstance<ConfigArchive>()
         val objs = injector.getInstance<Objs<ObjEntryType>>()
         val objsProvider = injector.getInstance<ObjsProvider>()
+        
+        objs.size
 
         val obj = objs[1333] ?: return
         obj.name = "The God Slayer"

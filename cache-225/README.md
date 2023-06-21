@@ -1,132 +1,66 @@
-# Cache
+# Cache-225
 
-The RuneScape cache is a vital component of the popular MMORPG 
-(Massively Multiplayer Online Role-Playing Game) RuneScape. It contains various game assets, 
-such as media, sounds, maps, and other resources necessary for the game to function. However, 
-the RuneScape cache is stored in a proprietary format, which means it is not openly documented 
-and understood.
+This code module provides functionality for reading and writing specific files within
+the RuneScape cache files, using the proprietary file format employed by the game. 
+The module is tailored specifically for the 225 revision of RuneScape, allowing proper
+handling of files within the Jag archive.
 
-## Proprietary Format
-Jagex, the developer of RuneScape, has chosen to use a proprietary format
-for the RuneScape cache to protect their game's assets and prevent unauthorized
-access or modification. This format is designed to be difficult to decipher without
-the necessary tools and knowledge.
+## Overview
+The cache files in RuneScape undergo changes between game versions due to content 
+additions and engine updates. Each game revision introduces new content, necessitating
+modifications to the cache file format to accommodate the additional data.
 
-The specifics of the proprietary format used in the RuneScape cache are not
-publicly disclosed by Jagex. Reverse engineering or attempting to extract the
-data directly from the cache can be a complex and challenging task. This deliberate
-obfuscation aims to deter cheating, hacking, or any other form of unauthorized
-manipulation of the game.
+The module's purpose is to read and write specific files within the Jag archive for the 
+225 revision of RuneScape. It understands the structure of the cache files and performs
+the necessary operations to manipulate them.
 
-- **Archive** (Raw Input Archive)
-  - `u24` (Decompressed length)
-  - `u24` (Compressed length)
-    - `if (Decompressed length != Compressed length)`
-      - `Decompress with Bzip2 with length of "Compressed length" at the current read pointer`
-        - **Even though it uses Bzip2, this does not contain a Bzip2 header. ("BZh1")**
-  - `u16` (Number of files)
-  - **Files** (Array)
-    - `var fileBytesOffset = 8 + "Number of files" * 10`
-    - `u32` (Individual file hashed name)
-    - `u24` (Individual file decompressed length)
-    - `u24` (Individual file compressed length)
-    - `val pointer = "Mark the current read position pointer"`
-        - `if (Decompressed length != Compressed length)`
-            - `Decompress with Bzip2 starting at position "fileBytesOffset" with length of "Individual file compressed length"`
-              - **Even though it uses Bzip2, this does not contain a Bzip2 header. ("BZh1")**
-        - `else continue reading bytes with the length of "Individual file decompressed length"`
-    - `val bytes = "Decompressed bytes or not decompressed bytes from condition"`
-    - `Reset the read position pointer to the marked "pointer" above`
-    - `fileBytesOffset += "Individual file compressed length"`
-      - **File**
+## Features
+The module includes the following features:
 
-## Decompilation and Extraction
-While the RuneScape cache is in a proprietary format, the community has made
-considerable efforts to reverse engineer and understand its structure. Various
-tools and utilities have been developed by dedicated individuals to extract
-specific assets from the cache for analysis or personal use. This module provides
-the ability to programmatically read and write contents of the cache files.
+1. **Parsing the cache file headers:** Extracts information about the files stored in the cache, such as their names, sizes, and locations within the archive.
+2. **Decompression and decoding:** Handles the decompression or decoding of cache files as required, to retrieve the original content.
+3. **File extraction and modification:** Provides methods to extract specific files from the cache, allowing access to their content for reading or modification.
+4. **File creation and insertion:** Supports creating new cache files and inserting them into the appropriate locations within the cache.
 
-## Compression & Decompression
-When it comes to the RuneScape cache, either the entire archive or individual files
-are compressed using the **original Bzip2 algorithm**. This compression is applied to reduce the
-overall file size, optimize storage requirements, and potentially improve data 
-transfer speeds during game updates or downloads.
+## Current Support
+- `config`
+  - `obj`
+  - `varp`
+- `lands ("m")`
+- `locs ("l")`
 
-This module takes advantage of the Apache commons Bzip2 dependencies for handling
-the compression and decompression. However, for the algorithm to match the original
-RuneScape implementation bit by bit, the fix was done 
-by [OpenRS2](https://github.com/openrs2/openrs2) instead of using the pure Java implementation.
-
-### Examples
-_All of the following examples use the "config" archive as an example archive.
-Please keep in mind there are multiple archives used by the game._
-
+## Usage
 _You can also look at the unit tests for more in depth examples._
 
-#### Reading and Writing a Jag cache archive.
+#### Reading, Modifying and Writing a Specific File
 ```kotlin
 val bytes = File("config").readBytes() // may or may not have .jag extension.
 val original = JagArchive.decode(bytes)
 val configArchive = ConfigArchive(original)
-val zipped = JagArchive.encode(configArchive)
-val unzipped = JagArchive.decode(zipped)
+val objsProvider = ObjsProvider(configArchive)
 
-// Will produce the following crc.
-assertEquals(original.crc, unzipped.crc)
-assertEquals(511217062, original.crc)
-```
+// Reads the "obj.dat" file from this archive.
+val objs = objsProvider.read()
 
-#### Reading a file from an archive.
-```kotlin
-// Generates a ByteBuffer backed by the specified file bytes.
-val objFileBuffer = configArchive.read("obj.dat")
-```
+val abyssalWhip = objs[4151]
+assertEquals("Abyssal whip", abyssalWhip.name)
+abyssalWhip?.name = "My new whip"
 
-#### Getting a file from an archive.
-```kotlin
-// Returns a possible file with the specified file name.
-val objFile = configArchive.file("obj.dat")
-```
+val purplePartyHat = objs[1046]
+assertEquals("Purple partyhat", purplePartyHat.name)
+purplePartyHat?.name = "My new partyhat"
 
-#### Adding a file to an archive.
+val size = objs.size
+// If you skip entries, the CacheModule will always encode the available files in order.
+// So if your last id was 100, and you create a new obj with id 500, it will be encoded as id 101.
+val newObj = ObjEntryType(id = size + 1, name = "My new item")
+objs[newObj.id] = newObj
 
-```kotlin
-val fileBuffer = ByteBuffer.allocate(100)
-// Encode the entire file to this buffer.
-fileBuffer.flip()
-val added = configArchive.add("obj.dat", fileBuffer)
+objsProvider.write(objs)
 
-// Example code at the end to save the config archive with the changes to obj.dat file.
 val zipped = JagArchive.encode(configArchive)
 val file = File("config")
 file.writeBytes(zipped)
-```
-
-#### Removing a file from an archive.
-
-```kotlin
-val removed = configArchive.remove("obj.dat")
-
-// Example code at the end to save the config archive with the changes to remove the obj.dat file.
-val zipped = JagArchive.encode(configArchive)
-val file = File("config")
-file.writeBytes(zipped)
-```
-
-#### Miscellaneous properties of an archive.
-
-```kotlin
-// Returns the crc of the raw file bytes.
-val crc = configArchive.crc
-// Returns the identifier of the last file contained in an archive.
-val lastFileId = configArchive.lastFileId
-// Returns the last file contained in an archive.
-val lastFile = configArchive.lastFile
-// Returns all the files contained in an archive.
-val files = configArchive.files
-// Returns if this archive used whole decompression or not during the decoding process.
-val isCompressed = configArchive.isCompressed
 ```
 
 ## Guice
@@ -134,14 +68,12 @@ This module is built with Guice. If your project also uses Guice, then you can i
 the entire module and Inject the archives you want.
 
 ```kotlin
-install(CacheModule)
-//or
-val injector = Guice.createInjector(CacheModule)
+install(Cache225Module)
+// or
+val injector = Guice.createInjector(Cache225Module)
 
 class Test @Inject constructor(
-    private val configArchive: ConfigArchive,
-    private val mediaArchive: MediaArchive,
-    private val mapLands: MapLands,
-    private val mapLocs: MapLocs
+    private val objs: Objs<ObjEntryType>,
+    private val objsProvider: ObjsProvider
 )
 ```
