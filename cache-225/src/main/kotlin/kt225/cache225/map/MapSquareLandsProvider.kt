@@ -24,7 +24,7 @@ class MapSquareLandsProvider @Inject constructor(
         val lengthZ = 0 until maps.maxOf(MapResource::z) + 1
         for (x in lengthX) {
             for (z in lengthZ) {
-                val land = maps.firstOrNull { m -> m.name == "m${x}_$z" } ?: continue
+                val land = maps.firstOrNull { it.name == "m${x}_$z" } ?: continue
 
                 val landId = land.id
                 val landX = land.x
