@@ -180,7 +180,6 @@ class TestMapSquares {
                 .firstOrNull()
 
             packed?.let {
-                println("Here")
                 val index = locs.indexOf(it.packed)
                 locs[index] = MapSquareLoc(2191, it.x, it.z, it.plane, 10, it.rotation).packed
             }
@@ -219,7 +218,7 @@ class TestMapSquares {
 
             packed?.let {
                 val index = locs.indexOf(it)
-                locs[index] = -1
+                locs[index] = null
             }
         }
 
