@@ -13,6 +13,6 @@ dependencies {
 application {
     mainClass.set("kt225.http.ApplicationKt")
     applicationDefaultJvmArgs += listOf(
-        "-Djava.library.path=$rootDir/common/src/main/resources/"
+        "-Djava.library.path=$rootDir/cache/src/main/resources/"
     )
 }

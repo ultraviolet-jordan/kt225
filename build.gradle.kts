@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain
 
 plugins {
     alias(deps.plugins.jvm)
@@ -25,29 +23,11 @@ allprojects {
         }
         systemProperty(
             "java.library.path",
-            "$rootDir/common/src/main/resources/"
-        )
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlin {
-            jvmToolchain {
-                languageVersion.set(JavaLanguageVersion.of(17))
-            }
-        }
-    }
-
-    tasks.withType<UsesKotlinJavaToolchain>().configureEach {
-        kotlinJavaToolchain.toolchain.use(
-            project.extensions.getByType<JavaToolchainService>().launcherFor {
-                languageVersion.set(JavaLanguageVersion.of(17))
-            }
+            "$rootDir/cache/src/main/resources/"
         )
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+kotlin {
+    jvmToolchain(17)
 }

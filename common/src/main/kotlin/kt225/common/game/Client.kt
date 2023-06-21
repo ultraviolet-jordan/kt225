@@ -1,6 +1,6 @@
 package kt225.common.game
 
-import com.runetopic.cryptography.isaac.ISAAC
+import kt225.common.crypto.IsaacRandom
 import kt225.common.game.entity.player.Player
 import kt225.common.packet.Packet
 
@@ -8,8 +8,8 @@ import kt225.common.packet.Packet
  * @author Jordan Abraham
  */
 abstract class Client(
-    val serverIsaac: ISAAC,
-    val clientIsaac: ISAAC
+    val serverIsaac: IsaacRandom,
+    val clientIsaac: IsaacRandom
 ) {
     var player: Player? = null
 

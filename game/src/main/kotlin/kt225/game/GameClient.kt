@@ -1,10 +1,10 @@
 package kt225.game
 
-import com.runetopic.cryptography.toISAAC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
+import kt225.common.crypto.IsaacRandom
 import kt225.common.game.Client
 import kt225.common.network.Session
 import kt225.common.packet.Packet
@@ -20,7 +20,7 @@ class GameClient(
     serverSeed: IntArray,
     clientSeed: IntArray,
     private val session: Session
-) : Client(serverSeed.toISAAC(), clientSeed.toISAAC()) {
+) : Client(IsaacRandom.create(serverSeed), IsaacRandom.create(clientSeed)) {
     private val readChannelQueue = ConcurrentHashMap<Int, ArrayBlockingQueue<PacketGroup>>()
     private val writeChannelQueue = ByteBuffer.allocateDirect(5_000)
 
@@ -60,7 +60,7 @@ class GameClient(
 
     private fun write(buffer: ByteBuffer, packet: Packet) {
         val builder = session.builders[packet::class] ?: return
-        buffer.p1(builder.id + serverIsaac.getNext() and 0xff)
+        buffer.p1(builder.id + serverIsaac.nextInt and 0xff)
         if (builder.length != -1 && builder.length != -2) {
             builder.buildPacket(packet, buffer)
             return

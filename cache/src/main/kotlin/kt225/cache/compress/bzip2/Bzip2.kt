@@ -1,4 +1,4 @@
-package kt225.cache.bzip2
+package kt225.cache.compress.bzip2
 
 import org.openrs2.compress.bzip2.Bzip2
 import java.io.ByteArrayInputStream

@@ -2,10 +2,10 @@ package kt225.network.codec.decode
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import com.runetopic.cryptography.isaac.ISAAC
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.time.withTimeout
+import kt225.common.crypto.IsaacRandom
 import kt225.common.network.CodecDecoder
 import kt225.common.network.Session
 import kt225.common.packet.Packet
@@ -31,8 +31,8 @@ class GamePacketDecoder @Inject constructor(
         }
     }
 
-    private suspend fun ByteReadChannel.awaitPacket(session: Session, isaac: ISAAC): Packet? {
-        val id = ((readByte().toInt() and 0xff) - isaac.getNext() and 0xff)
+    private suspend fun ByteReadChannel.awaitPacket(session: Session, isaac: IsaacRandom): Packet? {
+        val id = ((readByte().toInt() and 0xff) - isaac.nextInt and 0xff)
         if (id > session.clientPacketLengths.size) {
             discard(availableForRead.toLong())
             return null

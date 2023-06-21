@@ -1,7 +1,7 @@
 package kt225.cache
 
-import kt225.cache.bzip2.bzip2Compress
-import kt225.cache.bzip2.bzip2Decompress
+import kt225.cache.compress.bzip2.bzip2Compress
+import kt225.cache.compress.bzip2.bzip2Decompress
 import kt225.common.buffer.g2
 import kt225.common.buffer.g3
 import kt225.common.buffer.g4

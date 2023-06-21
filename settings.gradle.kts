@@ -3,8 +3,6 @@ rootProject.name = "kt225"
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        maven(url = "https://repo.openrs2.org/repository/openrs2-snapshots")
     }
 
     versionCatalogs {
@@ -13,10 +11,10 @@ dependencyResolutionManagement {
             version("kotlin", "1.8.20")
             version("ktor", "2.3.1")
             version("slf4j", "2.0.7")
-            version("cryptography", "1.2.0-SNAPSHOT")
             version("versions", "0.47.0")
             version("guice", "1.6.0")
-            version("openrs2", "0.1.0-SNAPSHOT")
+            version("jnr", "2.2.13")
+            version("commons-compress", "1.23.0")
 
             // Dependency plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
@@ -33,8 +31,8 @@ dependencyResolutionManagement {
 
             // Misc Dependencies
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
-            library("cryptography", "com.runetopic.cryptography", "cryptography").versionRef("cryptography")
-            library("openrs2-compress", "org.openrs2", "openrs2-compress").versionRef("openrs2")
+            library("jnr", "com.github.jnr", "jnr-ffi").versionRef("jnr")
+            library("commons-compress", "org.apache.commons", "commons-compress").versionRef("commons-compress")
 
             // Dependency bundles
             listOf(

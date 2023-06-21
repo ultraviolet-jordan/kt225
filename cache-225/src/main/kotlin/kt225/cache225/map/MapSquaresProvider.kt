@@ -2,8 +2,8 @@ package kt225.cache225.map
 
 import kt225.cache.EntryProvider
 import kt225.cache.EntryType
-import kt225.cache.bzip2.bzip2Compress
-import kt225.cache.bzip2.bzip2Decompress
+import kt225.cache.compress.bzip2.bzip2Compress
+import kt225.cache.compress.bzip2.bzip2Decompress
 import kt225.common.buffer.g4
 import kt225.common.buffer.gdata
 import kt225.common.buffer.p4

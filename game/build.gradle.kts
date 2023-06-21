@@ -6,7 +6,6 @@ plugins {
 dependencies {
     implementation(deps.bundles.ktor)
     implementation(deps.guice)
-    implementation(deps.cryptography)
 
     implementation(project(":cache"))
     implementation(project(":cache-225"))
@@ -19,6 +18,6 @@ application {
     mainClass.set("kt225.game.ApplicationKt")
     applicationDefaultJvmArgs += listOf(
         "-XX:+UseZGC",
-        "-Djava.library.path=$rootDir/common/src/main/resources/"
+        "-Djava.library.path=$rootDir/cache/src/main/resources/"
     )
 }

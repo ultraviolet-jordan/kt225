@@ -4,7 +4,8 @@ plugins {
 
 dependencies {
     implementation(deps.guice)
-    implementation(deps.openrs2.compress)
+    implementation(deps.jnr)
+    implementation(deps.commons.compress)
 
     implementation(project(":common"))
 }
