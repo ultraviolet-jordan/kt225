@@ -94,6 +94,10 @@ file.writeBytes(bytes)
   <img src="https://github.com/ultraviolet-jordan/kt225/blob/main/github/map_edit_example.jpg?raw=true" alt="An example of an edit to the map."/>
 </p>
 
+<p align="center">
+  <img src="https://github.com/ultraviolet-jordan/kt225/blob/main/github/map_edit_example_2.jpg?raw=true" alt="An example of an edit to the map."/>
+</p>
+
 ## Guice
 This module is built with Guice. If your project also uses Guice, then you can install
 the entire module and Inject the archives you want.
