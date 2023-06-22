@@ -1,6 +1,9 @@
 package kt225.cache225.map
 
 import kt225.cache.EntryType
+import kt225.common.game.world.MapSquare
+import kt225.common.game.world.MapSquareLoc
+import kt225.common.game.world.MapSquareLocalPosition
 import kt225.common.game.world.Position
 
 /**

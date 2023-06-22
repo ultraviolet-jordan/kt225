@@ -1,4 +1,4 @@
-package kt225.cache225.map
+package kt225.common.game.world
 
 /**
  * @author Jordan Abraham

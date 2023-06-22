@@ -8,6 +8,9 @@ import kt225.cache.map.MapSquareLands
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.p1
+import kt225.common.game.world.MapSquare
+import kt225.common.game.world.MapSquareLand
+import kt225.common.game.world.MapSquareLocalPosition
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 

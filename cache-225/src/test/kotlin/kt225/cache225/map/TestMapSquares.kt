@@ -10,6 +10,8 @@ import kt225.cache.map.MapLocsProvider
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.Cache225Module
+import kt225.common.game.world.MapSquare
+import kt225.common.game.world.MapSquareLoc
 import kt225.common.game.world.Position
 import java.nio.ByteBuffer
 import kotlin.test.Test
