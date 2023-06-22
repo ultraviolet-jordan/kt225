@@ -17,6 +17,7 @@ dependencies {
 application {
     mainClass.set("kt225.game.ApplicationKt")
     applicationDefaultJvmArgs += listOf(
+        "-Xmx1024m",
         "-XX:+UseZGC",
         "-Djava.library.path=$rootDir/cache/src/main/resources/"
     )
