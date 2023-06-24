@@ -13,7 +13,7 @@ class WordEncResourceProvider @Inject constructor(
     private val cache: Cache
 ) : Provider<WordEncResource> {
     override fun get(): WordEncResource {
-        val bytes = cache.getArchiveResource("wordenc")!!
+        val bytes = cache.getJagFileBytes("wordenc")!!
         return WordEncResource(cache.crcs[7], bytes)
     }
 }

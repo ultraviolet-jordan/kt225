@@ -13,7 +13,7 @@ class ConfigResourceProvider @Inject constructor(
     private val cache: Cache
 ) : Provider<ConfigResource> {
     override fun get(): ConfigResource {
-        val bytes = cache.getArchiveResource("config")!!
+        val bytes = cache.getJagFileBytes("config")!!
         return ConfigResource(cache.crcs[2], bytes)
     }
 }

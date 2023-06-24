@@ -13,7 +13,7 @@ class SoundsResourceProvider @Inject constructor(
     private val cache: Cache
 ) : Provider<SoundsResource> {
     override fun get(): SoundsResource {
-        val bytes = cache.getArchiveResource("sounds")!!
+        val bytes = cache.getJagFileBytes("sounds")!!
         return SoundsResource(cache.crcs[8], bytes)
     }
 }

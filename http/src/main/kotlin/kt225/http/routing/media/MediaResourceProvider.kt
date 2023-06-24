@@ -13,7 +13,7 @@ class MediaResourceProvider @Inject constructor(
     private val cache: Cache
 ) : Provider<MediaResource> {
     override fun get(): MediaResource {
-        val bytes = cache.getArchiveResource("media")!!
+        val bytes = cache.getJagFileBytes("media")!!
         return MediaResource(cache.crcs[4], bytes)
     }
 }

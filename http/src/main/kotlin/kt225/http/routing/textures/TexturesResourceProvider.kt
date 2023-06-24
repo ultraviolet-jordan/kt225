@@ -13,7 +13,7 @@ class TexturesResourceProvider @Inject constructor(
     private val cache: Cache
 ) : Provider<TexturesResource> {
     override fun get(): TexturesResource {
-        val bytes = cache.getArchiveResource("textures")!!
+        val bytes = cache.getJagFileBytes("textures")!!
         return TexturesResource(cache.crcs[6], bytes)
     }
 }

@@ -4,16 +4,16 @@ package kt225.cache
  * @author Jordan Abraham
  */
 class Cache(
-    private val archives: Map<String, JagFile?>
+    private val jagFiles: Map<String, JagFile?>
 ) {
-    val crcs = archives.map { it.value?.crc ?: 0 }.toIntArray()
+    val crcs = jagFiles.map { it.value?.crc ?: 0 }.toIntArray()
 
-    fun getArchiveResource(name: String): ByteArray? {
-        return archives[name]?.bytes
+    fun getJagFileBytes(name: String): ByteArray? {
+        return jagFiles[name]?.bytes
     }
 
     fun release() {
-        archives.values.forEach {
+        jagFiles.values.forEach {
             it?.release()
         }
     }
