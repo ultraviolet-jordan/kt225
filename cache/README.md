@@ -18,27 +18,27 @@ data directly from the cache can be a complex and challenging task. This deliber
 obfuscation aims to deter cheating, hacking, or any other form of unauthorized
 manipulation of the game.
 
-- **Archive** (Raw Input Archive)
+- **Jag File** (Raw Input File From Directory)
   - `u24` (Decompressed length)
   - `u24` (Compressed length)
     - `if (Decompressed length != Compressed length)`
       - `Decompress with Bzip2 with length of "Compressed length" at the current read pointer`
         - **Even though it uses Bzip2, this does not contain a Bzip2 header. ("BZh1")**
-  - `u16` (Number of files)
-  - **Files** (Array)
-    - `var fileBytesOffset = 8 + "Number of files" * 10`
-    - `u32` (Individual file hashed name)
-    - `u24` (Individual file decompressed length)
-    - `u24` (Individual file compressed length)
+  - `u16` (Number of entries)
+  - **Entries** (Array)
+    - `var offset = 8 + "Number of entries" * 10`
+    - `u32` (Individual entry hashed name)
+    - `u24` (Individual entry decompressed length)
+    - `u24` (Individual entry compressed length)
     - `val pointer = "Mark the current read position pointer"`
         - `if (Decompressed length != Compressed length)`
-            - `Decompress with Bzip2 starting at position "fileBytesOffset" with length of "Individual file compressed length"`
+            - `Decompress with Bzip2 starting at position "offset" with length of "Individual entry compressed length"`
               - **Even though it uses Bzip2, this does not contain a Bzip2 header. ("BZh1")**
-        - `else continue reading bytes with the length of "Individual file decompressed length"`
+        - `else continue reading bytes with the length of "Individual entry decompressed length"`
     - `val bytes = "Decompressed bytes or not decompressed bytes from condition"`
     - `Reset the read position pointer to the marked "pointer" above`
-    - `fileBytesOffset += "Individual file compressed length"`
-      - **File**
+    - `offset += "Individual entry compressed length"`
+      - **Entry**
 
 ## Decompilation and Extraction
 While the RuneScape cache is in a proprietary format, the community has made
@@ -67,14 +67,13 @@ _You can also look at the unit tests for more in depth examples._
 #### Reading and Writing a Jag cache archive.
 ```kotlin
 val bytes = File("config").readBytes() // may or may not have .jag extension.
-val original = JagArchive.decode(bytes)
-val configArchive = ConfigArchive(original)
-val zipped = JagArchive.encode(configArchive)
-val unzipped = JagArchive.decode(zipped)
+val configArchive = ConfigArchive(bytes)
+val zipped = configArchive.pack()
+val unzipped = ConfigArchive(zipped)
 
 // Will produce the following crc.
-assertEquals(original.crc, unzipped.crc)
-assertEquals(511217062, original.crc)
+assertEquals(configArchive.crc, unzipped.crc)
+assertEquals(511217062, configArchive.crc)
 ```
 
 #### Reading a file from an archive.
@@ -98,7 +97,7 @@ fileBuffer.flip()
 val added = configArchive.add("obj.dat", fileBuffer)
 
 // Example code at the end to save the config archive with the changes to obj.dat file.
-val zipped = JagArchive.encode(configArchive)
+val zipped = configArchive.pack()
 val file = File("config")
 file.writeBytes(zipped)
 ```
@@ -109,7 +108,7 @@ file.writeBytes(zipped)
 val removed = configArchive.remove("obj.dat")
 
 // Example code at the end to save the config archive with the changes to remove the obj.dat file.
-val zipped = JagArchive.encode(configArchive)
+val zipped = configArchive.pack()
 val file = File("config")
 file.writeBytes(zipped)
 ```
@@ -117,16 +116,12 @@ file.writeBytes(zipped)
 #### Miscellaneous properties of an archive.
 
 ```kotlin
-// Returns the crc of the raw file bytes.
+// Returns the crc of the raw jag file bytes.
 val crc = configArchive.crc
-// Returns the identifier of the last file contained in an archive.
-val lastFileId = configArchive.lastFileId
-// Returns the last file contained in an archive.
-val lastFile = configArchive.lastFile
-// Returns all the files contained in an archive.
-val files = configArchive.files
-// Returns if this archive used whole decompression or not during the decoding process.
-val isCompressed = configArchive.isCompressed
+// Returns the last entry of this jag file.
+val last = configArchive.last
+// Returns all the entries of this jag file.
+val view = configArchive.view
 ```
 
 ## Guice

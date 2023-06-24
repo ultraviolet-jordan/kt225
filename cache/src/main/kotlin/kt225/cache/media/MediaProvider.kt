@@ -12,6 +12,6 @@ class MediaProvider : Provider<Media> {
         val resource = javaClass.getResourceAsStream("/archives/media")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return Media(bytes).unpack()
+        return Media(bytes)
     }
 }

@@ -12,6 +12,6 @@ class WordEncProvider : Provider<WordEnc> {
         val resource = javaClass.getResourceAsStream("/archives/wordenc")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return WordEnc(bytes).unpack()
+        return WordEnc(bytes)
     }
 }

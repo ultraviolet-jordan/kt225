@@ -3,9 +3,8 @@ package kt225.cache225.config.obj
 import com.google.inject.Guice
 import dev.misfitlabs.kotlinguice4.getInstance
 import kt225.cache.CacheModule
-import kt225.cache.JagArchive
-import kt225.cache.archive.config.ConfigArchive
-import kt225.cache.archive.config.obj.Objs
+import kt225.cache.config.Config
+import kt225.cache.config.obj.Objs
 import kt225.cache225.Cache225Module
 import java.nio.ByteBuffer
 import kotlin.test.Test
@@ -79,15 +78,14 @@ class TestObjs {
     @Test
     fun `test obj rewrite`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val configArchive = injector.getInstance<ConfigArchive>()
+        val configArchive = injector.getInstance<Config>()
         val objs = injector.getInstance<Objs<ObjEntryType>>()
         val objsProvider = injector.getInstance<ObjsProvider>()
 
         objsProvider.write(objs)
 
-        val editedConfigArchiveEncoded = JagArchive.encode(configArchive)
-        val editedConfigArchiveDecoded = JagArchive.decode(editedConfigArchiveEncoded)
-        val editedConfigArchive = ConfigArchive(editedConfigArchiveDecoded)
+        val editedConfigArchiveEncoded = configArchive.pack()
+        val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)
         val editedObjs = editedObjsProviders.read()
 
@@ -135,7 +133,7 @@ class TestObjs {
     @Test
     fun `test edit obj`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
-        val configArchive = injector.getInstance<ConfigArchive>()
+        val configArchive = injector.getInstance<Config>()
         val objs = injector.getInstance<Objs<ObjEntryType>>()
         val objsProvider = injector.getInstance<ObjsProvider>()
         
@@ -145,9 +143,8 @@ class TestObjs {
         obj.name = "The God Slayer"
         objsProvider.write(objs)
 
-        val editedConfigArchiveEncoded = JagArchive.encode(configArchive)
-        val editedConfigArchiveDecoded = JagArchive.decode(editedConfigArchiveEncoded)
-        val editedConfigArchive = ConfigArchive(editedConfigArchiveDecoded)
+        val editedConfigArchiveEncoded = configArchive.pack()
+        val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)
         val editedObjs = editedObjsProviders.read()
 

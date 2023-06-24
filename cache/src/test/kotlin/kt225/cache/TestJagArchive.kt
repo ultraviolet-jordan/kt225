@@ -2,14 +2,14 @@ package kt225.cache
 
 import com.google.inject.Guice
 import dev.misfitlabs.kotlinguice4.getInstance
-import kt225.cache.archive.config.ConfigArchive
-import kt225.cache.archive.inter.InterfaceArchive
-import kt225.cache.archive.media.MediaArchive
-import kt225.cache.archive.models.ModelsArchive
-import kt225.cache.archive.sounds.SoundsArchive
-import kt225.cache.archive.textures.TexturesArchive
-import kt225.cache.archive.title.TitleArchive
-import kt225.cache.archive.wordenc.WordEncArchive
+import kt225.cache.config.Config
+import kt225.cache.inter.Interface
+import kt225.cache.media.Media
+import kt225.cache.models.Models
+import kt225.cache.sounds.Sounds
+import kt225.cache.textures.Textures
+import kt225.cache.title.Title
+import kt225.cache.wordenc.WordEnc
 import java.nio.ByteBuffer
 import kotlin.random.Random
 import kotlin.test.Test
@@ -27,187 +27,123 @@ class TestJagArchive {
 
     @Test
     fun `test add file`() {
-        val configArchive = injector.getInstance<ConfigArchive>()
-        val lastFiles = configArchive.files.size
+        val configArchive = injector.getInstance<Config>()
+        val lastFiles = configArchive.view.size
 
         val added = configArchive.add("test.dat", ByteBuffer.wrap(Random.nextBytes(250)))
         assertTrue(added)
 
-        val encoded = JagArchive.encode(configArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newConfigArchive = ConfigArchive(unzipped)
+        val encoded = configArchive.pack()
+//        val unzipped = JagArchive.decode(encoded)
+        val newConfigArchive = Config(encoded)
 
-        val newFiles = newConfigArchive.files.size
+        val newFiles = newConfigArchive.view.size
         assertNotEquals(lastFiles, newFiles)
-        assertNotNull(newConfigArchive.file("test.dat"))
+        assertNotNull(newConfigArchive.read("test.dat"))
     }
 
     @Test
     fun `test remove file`() {
-        val configArchive = injector.getInstance<ConfigArchive>()
-        val lastFiles = configArchive.files.size
+        val configArchive = injector.getInstance<Config>()
+        val lastFiles = configArchive.view.size
 
         val removed = configArchive.remove("varp.dat")
         assertTrue(removed)
 
-        val encoded = JagArchive.encode(configArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newConfigArchive = ConfigArchive(unzipped)
+        val encoded = configArchive.pack()
+//        val unzipped = JagArchive.decode(encoded)
+        val newConfigArchive = Config(encoded)
 
-        val newFiles = newConfigArchive.files.size
+        val newFiles = newConfigArchive.view.size
         assertNotEquals(lastFiles, newFiles)
-        assertNull(newConfigArchive.file("varp.dat"))
+        assertNull(newConfigArchive.read("varp.dat"))
     }
 
     @Test
     fun `test encode and decode config archive`() {
-        val configArchive = injector.getInstance<ConfigArchive>()
+        val configArchive = injector.getInstance<Config>()
 
-        val encoded = JagArchive.encode(configArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newConfigArchive = ConfigArchive(unzipped)
-
-        newConfigArchive.files.values.forEach {
-            val file = configArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
+        val encoded = configArchive.pack()
+        val newConfigArchive = Config(encoded)
+        
         assertEquals(configArchive.crc, newConfigArchive.crc)
-        assertTrue(configArchive.zipped.contentEquals(newConfigArchive.zipped))
+        assertTrue(configArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode interface archive`() {
-        val interfaceArchive = injector.getInstance<InterfaceArchive>()
+        val interfaceArchive = injector.getInstance<Interface>()
 
-        val encoded = JagArchive.encode(interfaceArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newInterfaceArchive = InterfaceArchive(unzipped)
+        val encoded = interfaceArchive.pack()
+        val newConfigArchive = Interface(encoded)
 
-        newInterfaceArchive.files.values.forEach {
-            val file = interfaceArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(interfaceArchive.crc, newInterfaceArchive.crc)
-        assertTrue(interfaceArchive.zipped.contentEquals(newInterfaceArchive.zipped))
+        assertEquals(interfaceArchive.crc, newConfigArchive.crc)
+        assertTrue(interfaceArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode media archive`() {
-        val mediaArchive = injector.getInstance<MediaArchive>()
+        val mediaArchive = injector.getInstance<Media>()
 
-        val encoded = JagArchive.encode(mediaArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newMediaArchive = MediaArchive(unzipped)
+        val encoded = mediaArchive.pack()
+        val newConfigArchive = Media(encoded)
 
-        newMediaArchive.files.values.forEach {
-            val file = mediaArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(mediaArchive.crc, newMediaArchive.crc)
-        assertTrue(mediaArchive.zipped.contentEquals(newMediaArchive.zipped))
+        assertEquals(mediaArchive.crc, newConfigArchive.crc)
+        assertTrue(mediaArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode models archive`() {
-        val modelsArchive = injector.getInstance<ModelsArchive>()
+        val modelsArchive = injector.getInstance<Models>()
 
-        val encoded = JagArchive.encode(modelsArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newModelsArchive = ModelsArchive(unzipped)
+        val encoded = modelsArchive.pack()
+        val newConfigArchive = Models(encoded)
 
-        newModelsArchive.files.values.forEach {
-            val file = modelsArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(modelsArchive.crc, newModelsArchive.crc)
-        assertTrue(modelsArchive.zipped.contentEquals(newModelsArchive.zipped))
+        assertEquals(modelsArchive.crc, newConfigArchive.crc)
+        assertTrue(modelsArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode sounds archive`() {
-        val soundsArchive = injector.getInstance<SoundsArchive>()
+        val soundsArchive = injector.getInstance<Sounds>()
 
-        val encoded = JagArchive.encode(soundsArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newSoundsArchive = SoundsArchive(unzipped)
+        val encoded = soundsArchive.pack()
+        val newConfigArchive = Sounds(encoded)
 
-        newSoundsArchive.files.values.forEach {
-            val file = soundsArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(soundsArchive.crc, newSoundsArchive.crc)
-        assertTrue(soundsArchive.zipped.contentEquals(newSoundsArchive.zipped))
+        assertEquals(soundsArchive.crc, newConfigArchive.crc)
+        assertTrue(soundsArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode textures archive`() {
-        val texturesArchive = injector.getInstance<TexturesArchive>()
+        val texturesArchive = injector.getInstance<Textures>()
 
-        val encoded = JagArchive.encode(texturesArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newTexturesArchive = TexturesArchive(unzipped)
+        val encoded = texturesArchive.pack()
+        val newConfigArchive = Textures(encoded)
 
-        newTexturesArchive.files.values.forEach {
-            val file = texturesArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(texturesArchive.crc, newTexturesArchive.crc)
-        assertTrue(texturesArchive.zipped.contentEquals(newTexturesArchive.zipped))
+        assertEquals(texturesArchive.crc, newConfigArchive.crc)
+        assertTrue(texturesArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode title archive`() {
-        val titleArchive = injector.getInstance<TitleArchive>()
+        val titleArchive = injector.getInstance<Title>()
 
-        val encoded = JagArchive.encode(titleArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newTitleArchive = TitleArchive(unzipped)
+        val encoded = titleArchive.pack()
+        val newConfigArchive = Title(encoded)
 
-        newTitleArchive.files.values.forEach {
-            val file = titleArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(titleArchive.crc, newTitleArchive.crc)
-        assertTrue(titleArchive.zipped.contentEquals(newTitleArchive.zipped))
+        assertEquals(titleArchive.crc, newConfigArchive.crc)
+        assertTrue(titleArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 
     @Test
     fun `test encode and decode wordenc archive`() {
-        val wordEncArchive = injector.getInstance<WordEncArchive>()
+        val wordEncArchive = injector.getInstance<WordEnc>()
 
-        val encoded = JagArchive.encode(wordEncArchive)
-        val unzipped = JagArchive.decode(encoded)
-        val newWordEncArchive = WordEncArchive(unzipped)
+        val encoded = wordEncArchive.pack()
+        val newConfigArchive = WordEnc(encoded)
 
-        newWordEncArchive.files.values.forEach {
-            val file = wordEncArchive.file(it.id)
-            assertEquals(file?.id, it.id)
-            file?.bytes?.contentEquals(it.bytes)?.let(::assertTrue)
-            assertEquals(file?.nameHash, it.nameHash)
-            assertEquals(file?.crc, it.crc)
-        }
-        assertEquals(wordEncArchive.crc, newWordEncArchive.crc)
-        assertTrue(wordEncArchive.zipped.contentEquals(newWordEncArchive.zipped))
+        assertEquals(wordEncArchive.crc, newConfigArchive.crc)
+        assertTrue(wordEncArchive.bytes.contentEquals(newConfigArchive.bytes))
     }
 }

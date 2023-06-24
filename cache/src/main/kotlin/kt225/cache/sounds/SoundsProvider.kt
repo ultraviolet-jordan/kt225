@@ -12,6 +12,6 @@ class SoundsProvider : Provider<Sounds> {
         val resource = javaClass.getResourceAsStream("/archives/sounds")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return Sounds(bytes).unpack()
+        return Sounds(bytes)
     }
 }

@@ -1,8 +1,8 @@
 package kt225.cache225
 
 import dev.misfitlabs.kotlinguice4.KotlinModule
-import kt225.cache.archive.config.obj.Objs
-import kt225.cache.archive.config.varp.Varps
+import kt225.cache.config.obj.Objs
+import kt225.cache.config.varp.Varps
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.config.obj.ObjEntryType

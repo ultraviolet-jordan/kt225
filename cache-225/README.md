@@ -26,8 +26,9 @@ The module includes the following features:
 - `config`
   - `obj`
   - `varp`
-- `lands ("m")`
-- `locs ("l")`
+- `map`
+  - `lands "m"`
+  - `locs "l"`
 
 ## Usage
 _You can also look at the unit tests for more in depth examples._
@@ -35,8 +36,7 @@ _You can also look at the unit tests for more in depth examples._
 #### Reading, Modifying and Writing a Specific File
 ```kotlin
 val bytes = File("config").readBytes() // may or may not have .jag extension.
-val original = JagArchive.decode(bytes)
-val configArchive = ConfigArchive(original)
+val configArchive = ConfigArchive(bytes)
 val objsProvider = ObjsProvider(configArchive)
 
 // Reads the "obj.dat" file from this archive.
@@ -58,7 +58,7 @@ objs[newObj.id] = newObj
 
 objsProvider.write(objs)
 
-val zipped = JagArchive.encode(configArchive)
+val zipped = configArchive.pack()
 val file = File("config")
 file.writeBytes(zipped)
 ```

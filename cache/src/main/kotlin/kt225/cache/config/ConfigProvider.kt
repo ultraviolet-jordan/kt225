@@ -12,6 +12,6 @@ class ConfigProvider : Provider<Config> {
         val resource = javaClass.getResourceAsStream("/archives/config")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return Config(bytes).unpack()
+        return Config(bytes)
     }
 }

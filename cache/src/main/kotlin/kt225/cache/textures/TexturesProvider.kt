@@ -12,6 +12,6 @@ class TexturesProvider : Provider<Textures> {
         val resource = javaClass.getResourceAsStream("/archives/textures")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return Textures(bytes).unpack()
+        return Textures(bytes)
     }
 }

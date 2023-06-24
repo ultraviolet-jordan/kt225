@@ -12,6 +12,6 @@ class TitleProvider : Provider<Title> {
         val resource = javaClass.getResourceAsStream("/archives/title")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return Title(bytes).unpack()
+        return Title(bytes)
     }
 }

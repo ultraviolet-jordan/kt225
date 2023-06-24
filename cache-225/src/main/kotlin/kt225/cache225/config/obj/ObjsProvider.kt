@@ -3,8 +3,12 @@ package kt225.cache225.config.obj
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.cache.EntryProvider
-import kt225.cache.archive.config.ConfigArchive
-import kt225.cache.archive.config.obj.Objs
+import kt225.cache.config.Config
+import kt225.cache.config.obj.Objs
+import kt225.cache225.config.pNotNegative1
+import kt225.cache225.config.pNotNull
+import kt225.cache225.config.pNotZero
+import kt225.cache225.config.pTrue
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.g2
@@ -21,10 +25,10 @@ import java.nio.ByteBuffer
  */
 @Singleton
 class ObjsProvider @Inject constructor(
-    private val configArchive: ConfigArchive
+    private val config: Config
 ) : EntryProvider<ObjEntryType, Objs<ObjEntryType>> {
     override fun read(): Objs<ObjEntryType> {
-        val buffer = configArchive.read("obj.dat") ?: error("obj.dat file not found.")
+        val buffer = config.read("obj.dat") ?: error("obj.dat file not found.")
         val objs = Objs<ObjEntryType>()
         repeat(buffer.g2()) {
             objs[it] = decode(buffer, ObjEntryType(it))
@@ -44,8 +48,8 @@ class ObjsProvider @Inject constructor(
         }
         datBuffer.flip()
         idxBuffer.flip()
-        configArchive.add("obj.dat", datBuffer)
-        configArchive.add("obj.idx", idxBuffer)
+        config.add("obj.dat", datBuffer)
+        config.add("obj.idx", idxBuffer)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: ObjEntryType): ObjEntryType {
@@ -119,105 +123,45 @@ class ObjsProvider @Inject constructor(
     }
 
     override fun encode(buffer: ByteBuffer, entry: ObjEntryType) {
-        if (entry.model != 0) {
-            buffer.p1(1)
-            require(entry.model in -65535..65535)
-            buffer.p2(entry.model)
-        }
-        entry.name?.let {
-            buffer.p1(2)
-            buffer.pjstr(it)
-        }
-        entry.desc?.let {
-            buffer.p1(3)
-            buffer.pjstr(it)
-        }
+        buffer.pNotZero(entry.model, 1, ByteBuffer::p2)
+        buffer.pNotNull(entry.name, 2, ByteBuffer::pjstr)
+        buffer.pNotNull(entry.desc, 3, ByteBuffer::pjstr)
         if (entry.zoom2d != 2000) {
             buffer.p1(4)
-            require(entry.zoom2d in -65535..65535)
             buffer.p2(entry.zoom2d)
         }
-        if (entry.xan2d != 0) {
-            buffer.p1(5)
-            require(entry.xan2d in -65535..65535)
-            buffer.p2(entry.xan2d)
-        }
-        if (entry.yan2d != 0) {
-            buffer.p1(6)
-            require(entry.yan2d in -65535..65535)
-            buffer.p2(entry.yan2d)
-        }
-        if (entry.xof2d != 0) {
-            buffer.p1(7)
-            require(entry.xof2d in -65535..65535)
-            buffer.p2(entry.xof2d)
-        }
-        if (entry.yof2d != 0) {
-            buffer.p1(8)
-            require(entry.yof2d in -65535..65535)
-            buffer.p2(entry.yof2d)
-        }
-        if (entry.opcode9) {
-            buffer.p1(9)
-        }
-        if (entry.opcode10 != -1) {
-            buffer.p1(10)
-            require(entry.opcode10 in -65535..65535)
-            buffer.p2(entry.opcode10)
-        }
-        if (entry.stackable) {
-            buffer.p1(11)
-        }
+        buffer.pNotZero(entry.xan2d, 5, ByteBuffer::p2)
+        buffer.pNotZero(entry.yan2d, 6, ByteBuffer::p2)
+        buffer.pNotZero(entry.xof2d, 7, ByteBuffer::p2)
+        buffer.pNotZero(entry.yof2d, 8, ByteBuffer::p2)
+        buffer.pTrue(entry.opcode9, 9)
+        buffer.pNotNegative1(entry.opcode10, 10, ByteBuffer::p2)
+        buffer.pTrue(entry.stackable, 11)
         if (entry.cost != 1) {
             buffer.p1(12)
-            require(entry.manwear in Int.MIN_VALUE..Int.MAX_VALUE)
             buffer.p4(entry.cost)
         }
-        if (entry.members) {
-            buffer.p1(16)
+        buffer.pTrue(entry.members, 16)
+        buffer.pNotNegative1(entry.manwear, 23) {
+            p2(it)
+            p1(entry.manwearOffsetY)
         }
-        if (entry.manwear != -1) {
-            buffer.p1(23)
-            require(entry.manwear in -65535..65535)
-            buffer.p2(entry.manwear)
-            require(entry.manwearOffsetY in -255..255)
-            buffer.p1(entry.manwearOffsetY)
+        buffer.pNotNegative1(entry.manwear2, 24, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.womanwear, 25) {
+            p2(it)
+            p1(entry.womanwearOffsetY)
         }
-        if (entry.manwear2 != -1) {
-            buffer.p1(24)
-            require(entry.manwear2 in -65535..65535)
-            buffer.p2(entry.manwear2)
-        }
-        if (entry.womanwear != -1) {
-            buffer.p1(25)
-            require(entry.womanwear in -65535..65535)
-            buffer.p2(entry.womanwear)
-            require(entry.womanwearOffsetY in -255..255)
-            buffer.p1(entry.womanwearOffsetY)
-        }
-        if (entry.womanwear2 != -1) {
-            buffer.p1(26)
-            require(entry.womanwear2 in -65535..65535)
-            buffer.p2(entry.womanwear2)
-        }
+        buffer.pNotNegative1(entry.womanwear2, 26, ByteBuffer::p2)
         entry.ops?.let {
             require(it.size <= 5)
             it.forEachIndexed { index, op ->
-                if (op == null) {
-                    return@forEachIndexed
-                }
-                buffer.p1(index + 30)
-                buffer.pjstr(op)
+                buffer.pNotNull(op, index + 30, ByteBuffer::pjstr)
             }
         }
         entry.iops?.let {
             require(it.size <= 5)
             it.forEachIndexed { index, op ->
-                if (op == null) {
-                    return@forEachIndexed
-                }
-                buffer.p1(index + 35)
-                buffer.pjstr(op)
+                buffer.pNotNull(op, index + 35, ByteBuffer::pjstr)
             }
         }
         entry.recol_s?.let {
@@ -226,62 +170,23 @@ class ObjsProvider @Inject constructor(
             requireNotNull(recol_d)
             require(length == recol_d.size)
             buffer.p1(40)
-            require(length in -255..255)
             buffer.p1(length)
             repeat(length) { index ->
                 val cols = it[index]
-                require(cols in -65535..65535)
                 buffer.p2(cols)
                 val cold = recol_d[index]
-                require(cold in -65535..65535)
                 buffer.p2(cold)
             }
         }
-        if (entry.manwear3 != -1) {
-            buffer.p1(78)
-            require(entry.manwear3 in -65535..65535)
-            buffer.p2(entry.manwear3)
-        }
-        if (entry.womanwear3 != -1) {
-            buffer.p1(79)
-            require(entry.womanwear3 in -65535..65535)
-            buffer.p2(entry.womanwear3)
-        }
-        if (entry.manhead != -1) {
-            buffer.p1(90)
-            require(entry.manhead in -65535..65535)
-            buffer.p2(entry.manhead)
-        }
-        if (entry.womanhead != -1) {
-            buffer.p1(91)
-            require(entry.womanhead in -65535..65535)
-            buffer.p2(entry.womanhead)
-        }
-        if (entry.manhead2 != -1) {
-            buffer.p1(92)
-            require(entry.manhead2 in -65535..65535)
-            buffer.p2(entry.manhead2)
-        }
-        if (entry.womanhead2 != -1) {
-            buffer.p1(93)
-            require(entry.womanhead2 in -65535..65535)
-            buffer.p2(entry.womanhead2)
-        }
-        if (entry.zan2d != 0) {
-            buffer.p1(95)
-            require(entry.zan2d in -65535..65535)
-            buffer.p2(entry.zan2d)
-        }
-        if (entry.certlink != -1) {
-            buffer.p1(97)
-            require(entry.certlink in -65535..65535)
-            buffer.p2(entry.certlink)
-        }
-        if (entry.certtemplate != -1) {
-            buffer.p1(98)
-            require(entry.certtemplate in -65535..65535)
-            buffer.p2(entry.certtemplate)
-        }
+        buffer.pNotNegative1(entry.manwear3, 78, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.womanwear3, 79, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.manhead, 90, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.womanhead, 91, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.manhead2, 92, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.womanhead2, 93, ByteBuffer::p2)
+        buffer.pNotZero(entry.zan2d, 95, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.certlink, 97, ByteBuffer::p2)
+        buffer.pNotNegative1(entry.certtemplate, 98, ByteBuffer::p2)
         entry.countobj?.let {
             val length = it.size
             val countco = entry.countco
@@ -290,10 +195,8 @@ class ObjsProvider @Inject constructor(
             repeat(length) { index ->
                 buffer.p1(index + 100)
                 val obj = it[index]
-                require(obj in -65535..65535)
                 buffer.p2(obj)
                 val co = countco[index]
-                require(co in -65535..65535)
                 buffer.p2(co)
             }
         }

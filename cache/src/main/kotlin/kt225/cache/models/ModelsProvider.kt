@@ -12,6 +12,6 @@ class ModelsProvider : Provider<Models> {
         val resource = javaClass.getResourceAsStream("/archives/models")!!
         val bytes = resource.readAllBytes()
         resource.close()
-        return Models(bytes).unpack()
+        return Models(bytes)
     }
 }

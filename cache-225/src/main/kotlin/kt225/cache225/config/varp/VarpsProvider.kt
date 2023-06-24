@@ -3,8 +3,12 @@ package kt225.cache225.config.varp
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import kt225.cache.EntryProvider
-import kt225.cache.archive.config.ConfigArchive
-import kt225.cache.archive.config.varp.Varps
+import kt225.cache.config.Config
+import kt225.cache.config.varp.Varps
+import kt225.cache225.config.pFalse
+import kt225.cache225.config.pNotNull
+import kt225.cache225.config.pNotZero
+import kt225.cache225.config.pTrue
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.g4
@@ -20,10 +24,10 @@ import java.nio.ByteBuffer
  */
 @Singleton
 class VarpsProvider @Inject constructor(
-    private val configArchive: ConfigArchive
+    private val config: Config
 ) : EntryProvider<VarpEntryType, Varps<VarpEntryType>> {
     override fun read(): Varps<VarpEntryType> {
-        val buffer = configArchive.read("varp.dat") ?: error("varp.dat file not found.")
+        val buffer = config.read("varp.dat") ?: error("varp.dat file not found.")
         val varps = Varps<VarpEntryType>()
         repeat(buffer.g2()) {
             varps[it] = decode(buffer, VarpEntryType(it))
@@ -39,7 +43,7 @@ class VarpsProvider @Inject constructor(
             encode(buffer, it)
         }
         buffer.flip()
-        configArchive.add("varp.dat", buffer)
+        config.add("varp.dat", buffer)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: VarpEntryType): VarpEntryType {
@@ -60,38 +64,15 @@ class VarpsProvider @Inject constructor(
     }
 
     override fun encode(buffer: ByteBuffer, entry: VarpEntryType) {
-        if (entry.opcode1 != 0) {
-            buffer.p1(1)
-            buffer.p1(entry.opcode1)
-        }
-        if (entry.opcode2 != 0) {
-            buffer.p1(2)
-            buffer.p1(entry.opcode2)
-        }
-        if (entry.opcode3) {
-            buffer.p1(3)
-        }
-        if (!entry.opcode4) {
-            buffer.p1(4)
-        }
-        if (entry.clientcode != 0) {
-            buffer.p1(5)
-            buffer.p2(entry.clientcode)
-        }
-        if (entry.opcode6) {
-            buffer.p1(6)
-        }
-        if (entry.opcode7 != 0) {
-            buffer.p1(7)
-            buffer.p4(entry.opcode7)
-        }
-        if (entry.opcode8) {
-            buffer.p1(8)
-        }
-        if (entry.opcode10 != null) {
-            buffer.p1(10)
-            buffer.pjstr(entry.opcode10!!)
-        }
+        buffer.pNotZero(entry.opcode1, 1, ByteBuffer::p1)
+        buffer.pNotZero(entry.opcode2, 2, ByteBuffer::p1)
+        buffer.pTrue(entry.opcode3, 3)
+        buffer.pFalse(entry.opcode4, 4)
+        buffer.pNotZero(entry.clientcode, 5, ByteBuffer::p2)
+        buffer.pTrue(entry.opcode6, 6)
+        buffer.pNotZero(entry.opcode7, 7, ByteBuffer::p4)
+        buffer.pTrue(entry.opcode8, 8)
+        buffer.pNotNull(entry.opcode10, 10, ByteBuffer::pjstr)
         buffer.p1(0)
     }
 }
