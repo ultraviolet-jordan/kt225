@@ -94,10 +94,10 @@ abstract class JagFile(
 
     private tailrec fun ByteBuffer.unpackEntries(
         length: Int,
-        id: Int = 0,
+        index: Int = 0,
         offset: Int = 2 + length * 10
     ) {
-        if (id == length) {
+        if (index == length) {
             return
         }
         require(remaining() >= 10) { "Invalid buffer length." }
@@ -105,7 +105,7 @@ abstract class JagFile(
         val decompressed = g3()
         val compressed = g3()
         accumulator.alloc(nameHash, decompressed, compressed, offset)
-        return unpackEntries(length, id + 1, offset + compressed)
+        return unpackEntries(length, index + 1, offset + compressed)
     }
 
     private tailrec fun ByteBuffer.packEntries(
