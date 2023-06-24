@@ -17,27 +17,27 @@ import kt225.cache.wordenc.WordEnc
  */
 @Singleton
 class CacheProvider @Inject constructor(
-    private val titleArchive: Title,
-    private val configArchive: Config,
-    private val interfaceArchive: Interface,
-    private val mediaArchive: Media,
-    private val modelsArchive: Models,
-    private val texturesArchive: Textures,
-    private val wordEncArchive: WordEnc,
-    private val soundsArchive: Sounds
+    private val title: Title,
+    private val config: Config,
+    private val inter: Interface,
+    private val media: Media,
+    private val models: Models,
+    private val textures: Textures,
+    private val wordenc: WordEnc,
+    private val sounds: Sounds
 ) : Provider<Cache> {
     override fun get(): Cache {
-        val archives = mapOf(
+        val jagFiles = mapOf(
             "none" to null,
-            "title" to titleArchive,
-            "config" to configArchive,
-            "interface" to interfaceArchive,
-            "media" to mediaArchive,
-            "models" to modelsArchive,
-            "textures" to texturesArchive,
-            "wordenc" to wordEncArchive,
-            "sounds" to soundsArchive
+            "title" to title,
+            "config" to config,
+            "interface" to inter,
+            "media" to media,
+            "models" to models,
+            "textures" to textures,
+            "wordenc" to wordenc,
+            "sounds" to sounds
         )
-        return Cache(archives)
+        return Cache(jagFiles)
     }
 }
