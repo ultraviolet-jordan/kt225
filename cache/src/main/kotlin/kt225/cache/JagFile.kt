@@ -30,14 +30,11 @@ abstract class JagFile(
     }
 
     fun read(name: String): ByteBuffer? {
-        val entry = accumulator.read(name.nameHash()) ?: return null
-        return entry.value?.let(ByteBuffer::wrap)
+        return accumulator.read(name.nameHash())?.value?.let(ByteBuffer::wrap)
     }
 
     fun add(name: String, buffer: ByteBuffer): Boolean {
-        val bytes = buffer.gdata()
-        accumulator.write(name.nameHash(), bytes)
-        return true
+        return accumulator.write(name.nameHash(), buffer.gdata())
     }
 
     fun remove(name: String): Boolean {
