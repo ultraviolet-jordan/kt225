@@ -1,6 +1,15 @@
 package kt225.cache225.config.flo
 
+import kt225.cache.EntryType
+
 /**
  * @author Jordan Abraham
- */class FloEntryType {
-}
+ */
+data class FloEntryType(
+    val id: Int,
+    var rgb: Int = 0,
+    var texture: Int = -1,
+    var opcode3: Boolean = false,
+    var occlude: Boolean = true,
+    var name: String? = null
+) : EntryType

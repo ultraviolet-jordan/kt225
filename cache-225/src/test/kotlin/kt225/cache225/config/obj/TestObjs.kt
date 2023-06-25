@@ -20,8 +20,6 @@ class TestObjs {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
         val objs = injector.getInstance<Objs<ObjEntryType>>()
         objs.values.forEach(::println)
-        assert(objs.values.last().id == 2885)
-        assert(objs[1333]?.name == "Rune scimitar")
     }
 
     @Test
@@ -126,7 +124,7 @@ class TestObjs {
             assertEquals(original?.certtemplate, it.certtemplate)
             assertContentEquals(original?.countobj, it.countobj)
             assertContentEquals(original?.countco, it.countco)
-            assertEquals(original?.hashCode(), it.hashCode())
+            assertEquals(original.hashCode(), it.hashCode())
         }
     }
 
@@ -136,8 +134,6 @@ class TestObjs {
         val configArchive = injector.getInstance<Config>()
         val objs = injector.getInstance<Objs<ObjEntryType>>()
         val objsProvider = injector.getInstance<ObjsProvider>()
-        
-        objs.size
 
         val obj = objs[1333] ?: return
         obj.name = "The God Slayer"

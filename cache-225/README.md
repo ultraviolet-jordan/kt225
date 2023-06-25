@@ -24,6 +24,7 @@ The module includes the following features:
 
 ## Current Support
 - `config`
+  - `flo`
   - `obj`
   - `varp`
 - `map`
