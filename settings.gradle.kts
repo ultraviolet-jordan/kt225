@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             version("slf4j", "2.0.7")
             version("versions", "0.47.0")
             version("guice", "1.6.0")
-            version("jnr", "2.2.13")
+            version("jnr", "2.2.14")
             version("commons-compress", "1.23.0")
 
             // Dependency plugins
@@ -45,9 +45,9 @@ dependencyResolutionManagement {
 }
 
 include("cache")
-include("game")
-include("common")
-include("http")
 include("cache-225")
-include("packet")
+include("common")
+include("game")
+include("http")
 include("network")
+include("packet")
