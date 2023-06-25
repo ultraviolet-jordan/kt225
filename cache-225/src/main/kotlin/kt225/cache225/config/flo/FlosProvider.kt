@@ -67,8 +67,8 @@ class FlosProvider @Inject constructor(
         if (entry.texture != -1) {
             buffer.pNotNegative1(entry.texture, 2, ByteBuffer::p1)
         }
-        buffer.pFalse(entry.occlude, 5)
         buffer.pTrue(entry.opcode3, 3)
+        buffer.pFalse(entry.occlude, 5)
         buffer.pNotNull(entry.name, 6, ByteBuffer::pjstr)
         buffer.p1(0)
     }
