@@ -18,7 +18,7 @@ import java.nio.ByteBuffer
 class IdksProvider @Inject constructor(
     private val config: Config
 ) : EntryProvider<IdkEntryType, Idks<IdkEntryType>> {
-    override fun read(): Idks<IdkEntryType> {
+    override fun get(): Idks<IdkEntryType> {
         val buffer = config.read("idk.dat") ?: error("idk.dat file not found.")
         val idk = Idks<IdkEntryType>()
         repeat(buffer.g2()) {

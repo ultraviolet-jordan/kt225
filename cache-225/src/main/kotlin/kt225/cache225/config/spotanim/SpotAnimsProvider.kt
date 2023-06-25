@@ -18,7 +18,7 @@ import java.nio.ByteBuffer
 class SpotAnimsProvider @Inject constructor(
     private val config: Config
 ) : EntryProvider<SpotAnimEntryType, SpotAnims<SpotAnimEntryType>> {
-    override fun read(): SpotAnims<SpotAnimEntryType> {
+    override fun get(): SpotAnims<SpotAnimEntryType> {
         val buffer = config.read("spotanim.dat") ?: error("spotanim.dat file not found.")
         val spotAnims = SpotAnims<SpotAnimEntryType>()
         repeat(buffer.g2()) {

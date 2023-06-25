@@ -23,7 +23,7 @@ import java.nio.ByteBuffer
 class ObjsProvider @Inject constructor(
     private val config: Config
 ) : EntryProvider<ObjEntryType, Objs<ObjEntryType>> {
-    override fun read(): Objs<ObjEntryType> {
+    override fun get(): Objs<ObjEntryType> {
         val buffer = config.read("obj.dat") ?: error("obj.dat file not found.")
         val objs = Objs<ObjEntryType>()
         repeat(buffer.g2()) {

@@ -57,7 +57,7 @@ class TestVarps {
         val configArchiveEncoded = configArchive.pack()
         val newConfigArchive = Config(configArchiveEncoded)
         val varpsProvider = VarpsProvider(newConfigArchive)
-        val varps = varpsProvider.read()
+        val varps = varpsProvider.get()
 
         assert(varps.values.last().id == 294)
     }
@@ -75,7 +75,7 @@ class TestVarps {
         val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedVarpsProviders = VarpsProvider(editedConfigArchive)
 
-        val editedVarps = editedVarpsProviders.read()
+        val editedVarps = editedVarpsProviders.get()
 
         assertEquals(configArchive.crc, editedConfigArchive.crc)
 
@@ -112,7 +112,7 @@ class TestVarps {
         val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedVarpsProviders = VarpsProvider(editedConfigArchive)
 
-        val editedVarps = editedVarpsProviders.read()
+        val editedVarps = editedVarpsProviders.get()
         val editedVarp = editedVarps[4] ?: return
 
         assertEquals(4, editedVarp.clientcode)

@@ -85,7 +85,7 @@ class TestObjs {
         val editedConfigArchiveEncoded = configArchive.pack()
         val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)
-        val editedObjs = editedObjsProviders.read()
+        val editedObjs = editedObjsProviders.get()
         
         editedObjs.values.forEach {
             val original = objs[it.id]
@@ -142,7 +142,7 @@ class TestObjs {
         val editedConfigArchiveEncoded = configArchive.pack()
         val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)
-        val editedObjs = editedObjsProviders.read()
+        val editedObjs = editedObjsProviders.get()
 
         val editedObj = editedObjs[1333] ?: return
 

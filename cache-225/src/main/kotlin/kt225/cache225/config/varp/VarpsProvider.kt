@@ -22,7 +22,7 @@ import java.nio.ByteBuffer
 class VarpsProvider @Inject constructor(
     private val config: Config
 ) : EntryProvider<VarpEntryType, Varps<VarpEntryType>> {
-    override fun read(): Varps<VarpEntryType> {
+    override fun get(): Varps<VarpEntryType> {
         val buffer = config.read("varp.dat") ?: error("varp.dat file not found.")
         val varps = Varps<VarpEntryType>()
         repeat(buffer.g2()) {

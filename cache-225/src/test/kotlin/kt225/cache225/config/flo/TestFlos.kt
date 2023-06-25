@@ -55,7 +55,7 @@ class TestFlos {
         val edited = config.pack()
         val editedConfig = Config(edited)
         val editedProvider = FlosProvider(editedConfig)
-        val editedFlos = editedProvider.read()
+        val editedFlos = editedProvider.get()
         
         editedFlos.values.forEach {
             val original = flos[it.id]

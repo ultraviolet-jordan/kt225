@@ -57,7 +57,7 @@ class TestIdks {
         val edited = config.pack()
         val editedConfig = Config(edited)
         val editedProvider = IdksProvider(editedConfig)
-        val editedFlos = editedProvider.read()
+        val editedFlos = editedProvider.get()
         
         editedFlos.values.forEach {
             val original = idks[it.id]

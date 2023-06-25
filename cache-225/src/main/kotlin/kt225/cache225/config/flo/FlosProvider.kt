@@ -22,7 +22,7 @@ import java.nio.ByteBuffer
 class FlosProvider @Inject constructor(
     private val config: Config
 ) : EntryProvider<FloEntryType, Flos<FloEntryType>> {
-    override fun read(): Flos<FloEntryType> {
+    override fun get(): Flos<FloEntryType> {
         val buffer = config.read("flo.dat") ?: error("flo.dat file not found.")
         val flos = Flos<FloEntryType>()
         repeat(buffer.g2()) {

@@ -22,7 +22,7 @@ import java.util.zip.CRC32
 class MapSquareLocsProvider @Inject constructor(
     private val maps: MapLocs
 ) : MapSquaresProvider<MapSquareLocEntryType, MapSquareLocs<MapSquareLocEntryType>> {
-    override fun read(): MapSquareLocs<MapSquareLocEntryType> {
+    override fun get(): MapSquareLocs<MapSquareLocEntryType> {
         val locs = MapSquareLocs<MapSquareLocEntryType>()
         val lengthX = 0 until maps.maxOf(MapResource::x) + 1
         val lengthZ = 0 until maps.maxOf(MapResource::z) + 1

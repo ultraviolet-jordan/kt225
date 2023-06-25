@@ -113,7 +113,7 @@ class TestMapSquares {
         
         val newMapLands = MapLandsProvider().get()
         val newMapSquareLandsProvider = MapSquareLandsProvider(newMapLands)
-        val newMapSquareLands = newMapSquareLandsProvider.read()
+        val newMapSquareLands = newMapSquareLandsProvider.get()
         
         newMapLands.forEachIndexed { index, resource ->
             val original = mapLands[index]
@@ -142,7 +142,7 @@ class TestMapSquares {
 
         val newMapLocs = MapLocsProvider().get()
         val newMapSquareLocsProvider = MapSquareLocsProvider(newMapLocs)
-        val newMapSquareLocs = newMapSquareLocsProvider.read()
+        val newMapSquareLocs = newMapSquareLocsProvider.get()
 
         newMapLocs.forEachIndexed { index, resource ->
             val original = mapLocs[index]

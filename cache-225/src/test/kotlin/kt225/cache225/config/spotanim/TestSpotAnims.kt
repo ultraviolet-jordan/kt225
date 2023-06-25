@@ -61,7 +61,7 @@ class TestSpotAnims {
         val edited = config.pack()
         val editedConfig = Config(edited)
         val editedProvider = SpotAnimsProvider(editedConfig)
-        val editSpotAnims = editedProvider.read()
+        val editSpotAnims = editedProvider.get()
 
         editSpotAnims.values.forEach {
             val original = spotAnims[it.id]
