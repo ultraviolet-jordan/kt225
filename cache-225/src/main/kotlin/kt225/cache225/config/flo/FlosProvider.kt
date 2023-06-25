@@ -32,9 +32,8 @@ class FlosProvider @Inject constructor(
     }
     
     override fun write(entries: Flos<FloEntryType>) {
-        val length = entries.size
         val buffer = ByteBuffer.allocate(100_000)
-        buffer.p2(length)
+        buffer.p2(entries.size)
         entries.values.forEach {
             encode(buffer, it)
         }

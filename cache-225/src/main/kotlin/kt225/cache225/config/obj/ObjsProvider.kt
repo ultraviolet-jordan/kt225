@@ -33,10 +33,9 @@ class ObjsProvider @Inject constructor(
     }
 
     override fun write(entries: Objs<ObjEntryType>) {
-        val length = entries.size
         val idxBuffer = ByteBuffer.allocate(100_000)
         val datBuffer = ByteBuffer.allocate(250_000)
-        datBuffer.p2(length)
+        datBuffer.p2(entries.size)
         entries.values.forEach {
             val position = datBuffer.position()
             encode(datBuffer, it)
