@@ -41,6 +41,7 @@ class TestIdks {
             assertContentEquals(it.recol_s, decoded.recol_s)
             assertContentEquals(it.recol_d, decoded.recol_d)
             assertContentEquals(it.headModels, decoded.headModels)
+            assertEquals(it.hashCode(), decoded.hashCode())
         }
     }
 

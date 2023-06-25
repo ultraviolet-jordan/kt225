@@ -6,6 +6,7 @@ import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.idk.Idks
 import kt225.cache225.config.pNotNegative1
+import kt225.cache225.config.pNotZero
 import kt225.cache225.config.pTrue
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
@@ -62,23 +63,14 @@ class IdksProvider @Inject constructor(
             it.forEach(buffer::p2)
         }
         buffer.pTrue(entry.disable, 3)
-        entry.recol_s.forEachIndexed { index, i ->
-            if (i != 0) {
-                buffer.p1(index + 40)
-                buffer.p2(i)
-            }
+        entry.recol_s.forEachIndexed { index, recol_s ->
+            buffer.pNotZero(recol_s, index + 40, ByteBuffer::p2)
         }
-        entry.recol_d.forEachIndexed { index, i ->
-            if (i != 0) {
-                buffer.p1(index + 50)
-                buffer.p2(i)
-            }
+        entry.recol_d.forEachIndexed { index, recol_d ->
+            buffer.pNotZero(recol_d, index + 50, ByteBuffer::p2)
         }
-        entry.headModels.forEachIndexed { index, i ->
-            if (i != -1) {
-                buffer.p1(index + 60)
-                buffer.p2(i)
-            }
+        entry.headModels.forEachIndexed { index, headModel ->
+            buffer.pNotNegative1(headModel, index + 60, ByteBuffer::p2)
         }
         buffer.p1(0)
     }
