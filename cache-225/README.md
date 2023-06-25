@@ -24,10 +24,12 @@ The module includes the following features:
 
 ## Current Support
 - `config`
-  - `flo`
-  - `idk`
-  - `obj`
-  - `varp`
+  - `flo.dat`
+  - `idk.dat`
+  - `obj.dat`
+  - `obj.idx`
+  - `spotanim.dat`
+  - `varp.dat`
 - `map`
   - `lands "m"`
   - `locs "l"`

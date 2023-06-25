@@ -1,19 +1,20 @@
-package kt225.cache225.config.varp
+package kt225.cache225.config.spotanim
 
 import kt225.cache.EntryType
 
 /**
  * @author Jordan Abraham
  */
-data class VarpEntryType(
+data class SpotAnimEntryType(
     val id: Int,
-    var opcode1: Int = 0,
-    var opcode2: Int = 0,
-    var opcode3: Boolean = false,
-    var opcode4: Boolean = true,
-    var clientcode: Int = 0,
-    var opcode6: Boolean = false,
-    var opcode7: Int = 0,
-    var opcode8: Boolean = false,
-    var opcode10: String? = null
+    var model: Int = 0,
+    var anim: Int = -1,
+    var disposeAlpha: Boolean = false,
+    var resizeh: Int = 128,
+    var resizev: Int = 128,
+    var rotation: Int = 0,
+    var ambient: Int = 0,
+    var contrast: Int = 0,
+    var recol_s: IntArray = IntArray(6),
+    var recol_d: IntArray = IntArray(6)
 ) : EntryType
