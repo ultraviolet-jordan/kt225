@@ -47,8 +47,7 @@ class FlosProvider @Inject constructor(
     }
     
     override tailrec fun decode(buffer: ByteBuffer, entry: FloEntryType): FloEntryType {
-        val opcode = buffer.g1()
-        when (opcode) {
+        when (val opcode = buffer.g1()) {
             0 -> return entry
             1 -> entry.rgb = buffer.g3()
             2 -> entry.texture = buffer.g1()
