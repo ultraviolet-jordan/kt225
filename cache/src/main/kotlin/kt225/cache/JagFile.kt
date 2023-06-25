@@ -69,9 +69,9 @@ abstract class JagFile(
     }
 
     fun pack(): ByteArray {
-        accumulator.readFully()
-        val entries = ByteBuffer.allocate(accumulator.estimated + 10 + 6)
-        val keys = accumulator.entries
+        // Just encode up to 2mb. Models requires over 1mb when decompressed.
+        val entries = ByteBuffer.allocate(2_000_000)
+        val keys = accumulator.keys
         entries.p2(keys.size)
         val offset = entries.packEntries(keys)
         entries.position(offset)
@@ -106,7 +106,7 @@ abstract class JagFile(
     }
 
     private tailrec fun ByteBuffer.packEntries(
-        keys: Set<MutableMap.MutableEntry<Int, ByteArray?>>,
+        keys: Set<Int>,
         index: Int = 0,
         offset: Int = 2 + keys.size * 10
     ): Int {
@@ -114,8 +114,8 @@ abstract class JagFile(
             return offset
         }
         val key = keys.elementAt(index)
-        val bytes = key.value ?: return packEntries(keys, index + 1, offset)
-        p4(key.key)
+        val bytes = accumulator.read(key)?.value ?: return packEntries(keys, index + 1, offset)
+        p4(key)
         p3(bytes.size)
         val compressed = when {
             accumulator.compressedWhole -> bytes
@@ -139,7 +139,6 @@ abstract class JagFile(
         private var backing: ByteArray? = null
         private var released: Boolean = false
 
-        val estimated: Int get() = values.filterNotNull().sumOf(ByteArray::size)
         val last: Map.Entry<Int, ByteArray?>? get() = read(keys.lastOrNull())
         var compressedWhole = false
 
@@ -169,11 +168,6 @@ abstract class JagFile(
                 return null
             }
             return entries.firstOrNull { it.key == hash }
-        }
-
-        fun readFully() {
-            require(!released)
-            keys.forEach(::read)
         }
 
         fun write(hash: Int, bytes: ByteArray): Boolean {
