@@ -86,7 +86,7 @@ class TestObjs {
         val editedConfigArchive = Config(editedConfigArchiveEncoded)
         val editedObjsProviders = ObjsProvider(editedConfigArchive)
         val editedObjs = editedObjsProviders.read()
-
+        
         editedObjs.values.forEach {
             val original = objs[it.id]
             assertEquals(original?.id, it.id)

@@ -77,6 +77,8 @@ class TestVarps {
 
         val editedVarps = editedVarpsProviders.read()
 
+        assertEquals(configArchive.crc, editedConfigArchive.crc)
+
         editedVarps.values.forEach {
             val original = varps[it.id]
             assertEquals(original?.id, it.id)

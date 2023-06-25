@@ -2,12 +2,15 @@ package kt225.cache225
 
 import dev.misfitlabs.kotlinguice4.KotlinModule
 import kt225.cache.config.flo.Flos
+import kt225.cache.config.idk.Idks
 import kt225.cache.config.obj.Objs
 import kt225.cache.config.varp.Varps
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.config.flo.FloEntryType
 import kt225.cache225.config.flo.FlosProvider
+import kt225.cache225.config.idk.IdkEntryType
+import kt225.cache225.config.idk.IdksProvider
 import kt225.cache225.config.obj.ObjEntryType
 import kt225.cache225.config.obj.ObjsProvider
 import kt225.cache225.config.varp.VarpEntryType
@@ -27,6 +30,7 @@ object Cache225Module : KotlinModule() {
         bind<MapSquareLands<MapSquareLandEntryType>>().toProvider<MapSquareLandsProvider>().asEagerSingleton()
         bind<MapSquareLocs<MapSquareLocEntryType>>().toProvider<MapSquareLocsProvider>().asEagerSingleton()
         bind<Objs<ObjEntryType>>().toProvider<ObjsProvider>().asEagerSingleton()
+        bind<Idks<IdkEntryType>>().toProvider<IdksProvider>()
         
         // Lazy load ones for editing/reading etc.
         bind<Flos<FloEntryType>>().toProvider<FlosProvider>()

@@ -8,7 +8,6 @@ import kt225.cache.config.flo.Flos
 import kt225.cache225.config.pFalse
 import kt225.cache225.config.pNotNegative1
 import kt225.cache225.config.pNotNull
-import kt225.cache225.config.pNotZero
 import kt225.cache225.config.pTrue
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
@@ -30,6 +29,7 @@ class FlosProvider @Inject constructor(
     override fun read(): Flos<FloEntryType> {
         val buffer = config.read("flo.dat") ?: error("flo.dat file not found.")
         val flos = Flos<FloEntryType>()
+        println("DECODE")
         repeat(buffer.g2()) {
             flos[it] = decode(buffer, FloEntryType(it))
         }
@@ -48,7 +48,9 @@ class FlosProvider @Inject constructor(
     }
     
     override tailrec fun decode(buffer: ByteBuffer, entry: FloEntryType): FloEntryType {
-        when (val opcode = buffer.g1()) {
+        val opcode = buffer.g1()
+        println(opcode)
+        when (opcode) {
             0 -> return entry
             1 -> entry.rgb = buffer.g3()
             2 -> entry.texture = buffer.g1()
@@ -61,10 +63,12 @@ class FlosProvider @Inject constructor(
     }
 
     override fun encode(buffer: ByteBuffer, entry: FloEntryType) {
-        buffer.pNotZero(entry.rgb, 1, ByteBuffer::p3)
-        buffer.pNotNegative1(entry.texture, 2, ByteBuffer::p1)
-        buffer.pTrue(entry.opcode3, 3)
+        buffer.pNotNull(entry.rgb, 1, ByteBuffer::p3)
+        if (entry.texture != -1) {
+            buffer.pNotNegative1(entry.texture, 2, ByteBuffer::p1)
+        }
         buffer.pFalse(entry.occlude, 5)
+        buffer.pTrue(entry.opcode3, 3)
         buffer.pNotNull(entry.name, 6, ByteBuffer::pjstr)
         buffer.p1(0)
     }

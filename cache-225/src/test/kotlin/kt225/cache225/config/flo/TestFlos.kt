@@ -44,7 +44,7 @@ class TestFlos {
     }
 
     @Test
-    fun `test flo encode decode`() {
+    fun `test rewrite`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
         val config = injector.getInstance<Config>()
         val provider = injector.getInstance<FlosProvider>()
@@ -56,7 +56,7 @@ class TestFlos {
         val editedConfig = Config(edited)
         val editedProvider = FlosProvider(editedConfig)
         val editedFlos = editedProvider.read()
-
+        
         editedFlos.values.forEach {
             val original = flos[it.id]
             assertEquals(original?.id, it.id)
