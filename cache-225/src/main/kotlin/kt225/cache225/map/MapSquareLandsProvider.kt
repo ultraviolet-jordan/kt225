@@ -124,23 +124,11 @@ class MapSquareLandsProvider @Inject constructor(
     }
 
     private fun ByteBuffer.encodeLand(land: MapSquareLand) {
-        if (land.overlayId != 0) {
-            val path = land.overlayPath * 4 + 2
-            val rotation = land.overlayRotation and 0x3
-            val opcode = path + rotation
-            p1(opcode)
-            p1(land.overlayId)
-        }
-        if (land.collision != 0) {
-            p1(land.collision + 49)
-        }
-        if (land.underlayId != 0) {
-            p1(land.underlayId + 81)
-        }
-        if (land.height != 0) {
-            p1(1)
-            p1(land.height)
-        } else {
+        pNotZero(land.overlayId, (land.overlayPath * 4 + 2) + (land.overlayRotation and 0x3), ByteBuffer::p1)
+        pNotZero(land.collision, land.collision + 49) {}
+        pNotZero(land.underlayId, land.underlayId + 81) {}
+        pNotZero(land.height, 1, ByteBuffer::p1)
+        if (land.height == 0) {
             p1(0)
         }
     }

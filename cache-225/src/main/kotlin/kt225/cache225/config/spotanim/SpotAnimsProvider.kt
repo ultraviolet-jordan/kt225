@@ -5,9 +5,6 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.spotanim.SpotAnims
-import kt225.cache225.config.pNotNegative1
-import kt225.cache225.config.pNotZero
-import kt225.cache225.config.pTrue
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.p1
