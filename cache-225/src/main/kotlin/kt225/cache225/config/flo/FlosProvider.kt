@@ -29,7 +29,6 @@ class FlosProvider @Inject constructor(
     override fun read(): Flos<FloEntryType> {
         val buffer = config.read("flo.dat") ?: error("flo.dat file not found.")
         val flos = Flos<FloEntryType>()
-        println("DECODE")
         repeat(buffer.g2()) {
             flos[it] = decode(buffer, FloEntryType(it))
         }
