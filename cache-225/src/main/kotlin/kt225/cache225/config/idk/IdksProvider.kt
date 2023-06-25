@@ -6,6 +6,7 @@ import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.idk.Idks
 import kt225.cache225.config.pNotNegative1
+import kt225.cache225.config.pNotNull
 import kt225.cache225.config.pNotZero
 import kt225.cache225.config.pTrue
 import kt225.common.buffer.g1
@@ -57,9 +58,8 @@ class IdksProvider @Inject constructor(
 
     override fun encode(buffer: ByteBuffer, entry: IdkEntryType) {
         buffer.pNotNegative1(entry.type, 1, ByteBuffer::p1)
-        entry.models?.let {
-            buffer.p1(2)
-            buffer.p1(it.size)
+        buffer.pNotNull(entry.models, 2) {
+            p1(it.size)
             it.forEach(buffer::p2)
         }
         buffer.pTrue(entry.disable, 3)
