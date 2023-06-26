@@ -28,6 +28,7 @@ The module includes the following features:
   - `idk.dat`
   - `obj.dat`
   - `obj.idx`
+  - `seq.dat`
   - `spotanim.dat`
   - `varp.dat`
 - `map`
