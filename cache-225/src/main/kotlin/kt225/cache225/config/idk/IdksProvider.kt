@@ -20,11 +20,11 @@ class IdksProvider @Inject constructor(
 ) : EntryProvider<IdkEntryType, Idks<IdkEntryType>> {
     override fun get(): Idks<IdkEntryType> {
         val buffer = config.read("idk.dat") ?: error("idk.dat file not found.")
-        val idk = Idks<IdkEntryType>()
+        val idks = Idks<IdkEntryType>()
         repeat(buffer.g2()) {
-            idk[it] = decode(buffer, IdkEntryType(it))
+            idks[it] = decode(buffer, IdkEntryType(it))
         }
-        return idk
+        return idks
     }
     
     override fun write(entries: Idks<IdkEntryType>) {
