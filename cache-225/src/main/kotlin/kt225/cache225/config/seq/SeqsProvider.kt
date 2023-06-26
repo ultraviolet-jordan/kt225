@@ -20,11 +20,11 @@ class SeqsProvider @Inject constructor(
 ) : EntryProvider<SeqEntryType, Seqs<SeqEntryType>> {
     override fun get(): Seqs<SeqEntryType> {
         val buffer = config.read("seq.dat") ?: error("seq.dat file not found.")
-        val idk = Seqs<SeqEntryType>()
+        val seqs = Seqs<SeqEntryType>()
         repeat(buffer.g2()) {
-            idk[it] = decode(buffer, SeqEntryType(it))
+            seqs[it] = decode(buffer, SeqEntryType(it))
         }
-        return idk
+        return seqs
     }
     
     override fun write(entries: Seqs<SeqEntryType>) {
