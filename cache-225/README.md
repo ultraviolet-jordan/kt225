@@ -34,6 +34,8 @@ The module includes the following features:
 - `map`
   - `lands "m"`
   - `locs "l"`
+- `media`
+  - `sprite`
 
 ## Usage
 _You can also look at the unit tests for more in depth examples._

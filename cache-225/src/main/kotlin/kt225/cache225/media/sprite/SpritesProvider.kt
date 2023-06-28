@@ -16,7 +16,8 @@ import java.nio.ByteBuffer
  */
 @Singleton
 class SpritesProvider @Inject constructor(
-    private val media: Media
+    private val media: Media,
+    private val glossary: SpriteGlossary
 ) : EntryProvider<SpriteEntryType, Sprites<SpriteEntryType>> {
     
     override fun get(): Sprites<SpriteEntryType> {
@@ -26,7 +27,8 @@ class SpritesProvider @Inject constructor(
             .associateWith(media::read)
             .forEach { (hash, buffer) -> 
                 buffer?.let {
-                    sprites[hash] = decode(it, SpriteEntryType(hash))
+                    val name = glossary[hash] ?: hash.toString()
+                    sprites[hash] = decode(it, SpriteEntryType(hash, name))
                 }
             }
         return sprites
@@ -55,19 +57,21 @@ class SpritesProvider @Inject constructor(
         while (buffer.hasRemaining()) {
             spriteDeltasX.add(index.g1)
             spriteDeltasY.add(index.g1)
-            val width = index.g2
-            spriteWidths.add(width)
-            val height = index.g2
-            spriteHeights.add(height)
+            val width = index.g2.also(spriteWidths::add)
+            val height = index.g2.also(spriteHeights::add)
             val dimensions = width * height
             val pixels = IntArray(dimensions)
             when (index.g1) {
+                // Linear
                 0 -> {
+                    println("Linear = ${entry.name}")
                     repeat(dimensions) {
                         pixels[it] = palette[buffer.g1]
                     }
                 }
+                // Rectangular
                 1 -> {
+                    println("Rectangular = ${entry.name}")
                     repeat(width) { w ->
                         repeat(height) { h ->
                             pixels[w + h * width] = palette[buffer.g1]

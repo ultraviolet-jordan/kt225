@@ -7,6 +7,7 @@ import kt225.cache.EntryType
  */
 data class SpriteEntryType(
     val id: Int,
+    val name: String,
     var cellWidth: Int = 0,
     var cellHeight: Int = 0,
     var spriteDeltasX: IntArray? = null,

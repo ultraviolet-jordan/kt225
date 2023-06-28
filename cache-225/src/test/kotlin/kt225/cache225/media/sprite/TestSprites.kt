@@ -25,7 +25,7 @@ class TestSprites {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
         val sprites = injector.getInstance<Sprites<SpriteEntryType>>()
 
-        val path = Path("./sprites/")
+        val path = Path("./media/sprites/")
         if (path.notExists()) path.createDirectories()
 
         sprites.values.forEach {
@@ -35,7 +35,8 @@ class TestSprites {
             val rows = min(length, max(1, length * cellWidth / 400))
             val columns = max(1, length / rows)
 
-            val spriteSheet = BufferedImage(cellWidth * columns, cellHeight * rows, BufferedImage.TYPE_INT_ARGB).apply { 
+            val spriteSheet = BufferedImage(cellWidth * columns, cellHeight * rows, BufferedImage.TYPE_INT_ARGB).apply {
+                // Apply white background.
                 setRGB(0, 0, width, height, IntArray(width * height) { Color.WHITE.rgb }, 0, width)
             }
             
@@ -46,12 +47,13 @@ class TestSprites {
                     val offsetY = it.spriteDeltasY?.get(index) ?: error("Missing sprite deltaY at index $index.")
                     val width = it.spriteWidths?.get(index) ?: error("Missing sprite width at index $index.")
                     val height = it.spriteHeights?.get(index) ?: error("Missing sprite height at index $index.")
+                    // Swap black pixels with magenta.
                     val pixels = it.spritePixels?.get(index)?.map { rgb -> if (rgb == 0) Color(0xFF00FF).rgb else Color(rgb).rgb }?.toIntArray()
                     spriteSheet.setRGB(column * cellWidth + offsetX, row * cellHeight + offsetY, width, height, pixels, 0, width)
                 }
             }
 
-            ImageIO.write(spriteSheet, "png", File(path.toString(), "${it.id}.png"))
+            ImageIO.write(spriteSheet, "png", File(path.toString(), "${it.name}.png"))
         }
     }
 }
