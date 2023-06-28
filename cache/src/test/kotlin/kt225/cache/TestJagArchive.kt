@@ -28,7 +28,7 @@ class TestJagArchive {
     @Test
     fun `test add file`() {
         val configArchive = injector.getInstance<Config>()
-        val lastFiles = configArchive.view.size
+        val lastFiles = configArchive.keys.size
 
         val added = configArchive.add("test.dat", ByteBuffer.wrap(Random.nextBytes(250)))
         assertTrue(added)
@@ -37,7 +37,7 @@ class TestJagArchive {
 //        val unzipped = JagArchive.decode(encoded)
         val newConfigArchive = Config(encoded)
 
-        val newFiles = newConfigArchive.view.size
+        val newFiles = newConfigArchive.keys.size
         assertNotEquals(lastFiles, newFiles)
         assertNotNull(newConfigArchive.read("test.dat"))
     }
@@ -45,7 +45,7 @@ class TestJagArchive {
     @Test
     fun `test remove file`() {
         val configArchive = injector.getInstance<Config>()
-        val lastFiles = configArchive.view.size
+        val lastFiles = configArchive.keys.size
 
         val removed = configArchive.remove("varp.dat")
         assertTrue(removed)
@@ -54,7 +54,7 @@ class TestJagArchive {
 //        val unzipped = JagArchive.decode(encoded)
         val newConfigArchive = Config(encoded)
 
-        val newFiles = newConfigArchive.view.size
+        val newFiles = newConfigArchive.keys.size
         assertNotEquals(lastFiles, newFiles)
         assertNull(newConfigArchive.read("varp.dat"))
     }

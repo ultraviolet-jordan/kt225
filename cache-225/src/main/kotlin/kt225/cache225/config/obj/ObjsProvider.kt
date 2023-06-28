@@ -48,7 +48,7 @@ class ObjsProvider @Inject constructor(
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: ObjEntryType): ObjEntryType {
-        when (val opcode = buffer.g1()) {
+        when (val opcode = buffer.g1) {
             0 -> return entry
             1 -> entry.model = buffer.g2()
             2 -> entry.name = buffer.gstr()
@@ -85,7 +85,7 @@ class ObjsProvider @Inject constructor(
                 entry.iops = iops
             }
             40 -> {
-                val length = buffer.g1()
+                val length = buffer.g1
                 val recol_s = IntArray(length)
                 val recol_d = IntArray(length)
                 repeat(length) {

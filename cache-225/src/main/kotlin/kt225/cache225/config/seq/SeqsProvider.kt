@@ -38,10 +38,10 @@ class SeqsProvider @Inject constructor(
     }
     
     override tailrec fun decode(buffer: ByteBuffer, entry: SeqEntryType): SeqEntryType {
-        when (val opcode = buffer.g1()) {
+        when (val opcode = buffer.g1) {
             0 -> return entry
             1 -> {
-                val frameCount = buffer.g1()
+                val frameCount = buffer.g1
                 val primaryFrames = IntArray(frameCount)
                 val secondaryFrames = IntArray(frameCount)
                 val frameDelay = IntArray(frameCount)
@@ -57,16 +57,16 @@ class SeqsProvider @Inject constructor(
             }
             2 -> entry.replayOff = buffer.g2()
             3 -> {
-                val length = buffer.g1()
+                val length = buffer.g1
                 entry.labelGroups = IntArray(length + 1) {
-                    if (it != length) buffer.g1() else 9999999
+                    if (it != length) buffer.g1 else 9999999
                 }
             }
             4 -> entry.stretches = true
-            5 -> entry.priority = buffer.g1()
+            5 -> entry.priority = buffer.g1
             6 -> entry.mainhand = buffer.g2()
             7 -> entry.offhand = buffer.g2()
-            8 -> entry.replayCount = buffer.g1()
+            8 -> entry.replayCount = buffer.g1
             else -> error("Missing opcode $opcode.")
         }
         return decode(buffer, entry)

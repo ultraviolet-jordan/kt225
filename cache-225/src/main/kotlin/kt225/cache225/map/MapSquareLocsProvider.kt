@@ -121,7 +121,7 @@ class MapSquareLocsProvider @Inject constructor(
             return decodeLocs(entry, locId, localPosition.packed)
         }*/
 
-        val attributes = g1()
+        val attributes = g1
         val shape = attributes shr 2
         val rotation = attributes and 0x3
         val loc = MapSquareLoc(locId, x, z, plane, shape, rotation)
@@ -136,7 +136,7 @@ class MapSquareLocsProvider @Inject constructor(
         require(slots < 5)
         entry.locs[localPositionPacked] = entry.locs[localPositionPacked]?.copyOf(slots + 1)?.also {
             it[slots] = loc.packed
-        } ?: Array(1) { loc.packed }
+        } ?: arrayOf(loc.packed)
 
         // Checks the bitpacking.
         require(loc.id == locId)

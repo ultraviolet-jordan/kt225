@@ -9,6 +9,7 @@ import kt225.cache.config.spotanim.SpotAnims
 import kt225.cache.config.varp.Varps
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
+import kt225.cache.media.sprite.Sprites
 import kt225.cache225.config.flo.FloEntryType
 import kt225.cache225.config.flo.FlosProvider
 import kt225.cache225.config.idk.IdkEntryType
@@ -25,6 +26,8 @@ import kt225.cache225.map.MapSquareLandEntryType
 import kt225.cache225.map.MapSquareLandsProvider
 import kt225.cache225.map.MapSquareLocEntryType
 import kt225.cache225.map.MapSquareLocsProvider
+import kt225.cache225.media.sprite.SpriteEntryType
+import kt225.cache225.media.sprite.SpritesProvider
 
 /**
  * @author Jordan Abraham
@@ -42,5 +45,6 @@ object Cache225Module : KotlinModule() {
         
         // Lazy load ones for editing/reading etc.
         bind<Flos<FloEntryType>>().toProvider<FlosProvider>()
+        bind<Sprites<SpriteEntryType>>().toProvider<SpritesProvider>()
     }
 }

@@ -42,10 +42,10 @@ class VarpsProvider @Inject constructor(
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: VarpEntryType): VarpEntryType {
-        when (val opcode = buffer.g1()) {
+        when (val opcode = buffer.g1) {
             0 -> return entry
-            1 -> entry.opcode1 = buffer.g1()
-            2 -> entry.opcode2 = buffer.g1()
+            1 -> entry.opcode1 = buffer.g1
+            2 -> entry.opcode2 = buffer.g1
             3 -> entry.opcode3 = true
             4 -> entry.opcode4 = false
             5 -> entry.clientcode = buffer.g2()

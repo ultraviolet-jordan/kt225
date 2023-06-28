@@ -5,7 +5,7 @@ import kt225.common.buffer.p2
 import kt225.common.buffer.p8
 import kt225.common.game.entity.render.RenderBlockBuilder
 import kt225.common.game.entity.render.type.Appearance
-import kt225.common.string.StringUtils
+import kt225.common.string.toBase37
 import java.nio.ByteBuffer
 
 /**
@@ -27,7 +27,7 @@ class PlayerAppearanceRenderBlockBuilder : RenderBlockBuilder<Appearance>(
         }
         render.bodyPartColors.forEach(buffer::p1)
         render.renderSequences.forEach(buffer::p2)
-        buffer.p8(StringUtils.toBase37(render.name))
+        buffer.p8(render.name.toBase37)
         buffer.p1(render.combatLevel)
     }
 

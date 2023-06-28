@@ -38,10 +38,10 @@ class IdksProvider @Inject constructor(
     }
     
     override tailrec fun decode(buffer: ByteBuffer, entry: IdkEntryType): IdkEntryType {
-        when (val opcode = buffer.g1()) {
+        when (val opcode = buffer.g1) {
             0 -> return entry
-            1 -> entry.type = buffer.g1()
-            2 -> entry.models = IntArray(buffer.g1()) { buffer.g2() }
+            1 -> entry.type = buffer.g1
+            2 -> entry.models = IntArray(buffer.g1) { buffer.g2() }
             3 -> entry.disable = true
             in 40..49 -> entry.recol_s[opcode - 40] = buffer.g2()
             in 50..59 -> entry.recol_d[opcode - 50] = buffer.g2()

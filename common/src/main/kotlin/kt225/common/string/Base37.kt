@@ -3,14 +3,14 @@ package kt225.common.string
 /**
  * @author Jordan Abraham
  */
-private val base37 = charArrayOf(
+val base37 = charArrayOf(
     '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
     'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
     't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
     '3', '4', '5', '6', '7', '8', '9'
 )
 
-val String.toBase37: Long get() {
+inline val String.toBase37: Long get() {
     var value = 0L
     repeat(length.coerceAtMost(12)) {
         value *= 37L
@@ -26,7 +26,7 @@ val String.toBase37: Long get() {
     return value
 }
 
-val Long.fromBase37: String get() {
+inline val Long.fromBase37: String get() {
     if (this <= 0L || this >= 0x5b5b57f8a98a5dd1L || this % 37L == 0L) {
         return "invalid_name"
     }

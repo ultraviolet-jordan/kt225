@@ -1,4 +1,4 @@
-package kt225.common.string // ktlint-disable filename
+package kt225.common.string
 
 /**
  * @author Jordan Abraham

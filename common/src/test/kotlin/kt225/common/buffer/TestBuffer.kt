@@ -18,7 +18,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(1)
         buffer.p1(255)
         buffer.flip()
-        val result = buffer.g1()
+        val result = buffer.g1
         assertEquals(255, result)
     }
 
@@ -124,7 +124,7 @@ class TestBuffer {
         buffer.rsaenc(BigInteger(public), BigInteger(modulus))
         buffer.flip()
         buffer.rsadec(BigInteger(private), BigInteger(modulus))
-        val result = buffer.g1()
+        val result = buffer.g1
         assertEquals(69, result)
     }
 

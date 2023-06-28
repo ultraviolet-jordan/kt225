@@ -11,9 +11,7 @@ import kotlin.math.min
 /**
  * Get 1 byte from this ByteBuffer.
  */
-fun ByteBuffer.g1(): Int {
-    return get().toInt() and 0xff
-}
+inline val ByteBuffer.g1: Int get() = get().toInt() and 0xff
 
 /**
  * Get 1 signed byte from this ByteBuffer.
@@ -62,7 +60,7 @@ fun ByteBuffer.g8(): Long {
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 fun ByteBuffer.gsmarts(): Int {
-    return if ((this[position()].toInt() and 0xff) < 128) g1() else g2() - 32768
+    return if ((this[position()].toInt() and 0xff) < 128) g1 else g2() - 32768
 }
 
 /**
@@ -70,7 +68,7 @@ fun ByteBuffer.gsmarts(): Int {
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 fun ByteBuffer.gsmart(): Int {
-    return if ((this[position()].toInt() and 0xff) < 128) g1() - 64 else g2() - 49152
+    return if ((this[position()].toInt() and 0xff) < 128) g1 - 64 else g2() - 49152
 }
 
 /**
@@ -100,7 +98,7 @@ fun ByteBuffer.gdata(size: Int = limit(), position: Int = position(), length: In
  * The position is set to 0 after this function is called.
  */
 fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger) {
-    val length = g1()
+    val length = g1
     val dec = BigInteger(gdata(length)).modPow(exponent, modulus).toByteArray()
     position(0)
     pdata(dec)

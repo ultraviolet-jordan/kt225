@@ -99,9 +99,9 @@ class MapSquareLandsProvider @Inject constructor(
         collision: Int = 0,
         underlayId: Int = 0
     ): MapSquareLand {
-        val opcode = g1()
+        val opcode = g1
         if (opcode == 0 || opcode == 1) {
-            val adjustedHeight = if (opcode == 1) g1()/*.let { if (it == 1) 0 else it }*/ else height
+            val adjustedHeight = if (opcode == 1) g1/*.let { if (it == 1) 0 else it }*/ else height
             val land = MapSquareLand(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
 
             // Checks the bitpacking.

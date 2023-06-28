@@ -21,7 +21,7 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
             return null
         }
         val requests = Array(size) {
-            MapRequest(buffer.g1(), buffer.g1(), buffer.g1())
+            MapRequest(buffer.g1, buffer.g1, buffer.g1)
         }
         return RequestMapPacket(requests)
     }

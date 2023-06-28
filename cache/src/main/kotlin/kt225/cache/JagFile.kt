@@ -10,6 +10,7 @@ import kt225.common.buffer.p2
 import kt225.common.buffer.p3
 import kt225.common.buffer.p4
 import kt225.common.buffer.pdata
+import kt225.common.string.jagNameHash
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
@@ -22,23 +23,34 @@ abstract class JagFile(
     private val accumulator = JagFileAccumulator()
 
     val crc: Int get() = CRC32().apply { update(bytes) }.value.toInt()
-    val view: Set<Map.Entry<Int, ByteArray?>> get() = accumulator.entries
-    val last: Map.Entry<Int, ByteArray?>? get() = accumulator.last
+    val keys: Set<Int> get() = accumulator.keys
     
     init {
         unpack()
     }
 
     fun read(name: String): ByteBuffer? {
-        return accumulator.read(name.nameHash())?.value?.let(ByteBuffer::wrap)
+        return read(name.jagNameHash)
+    }
+
+    fun read(hash: Int): ByteBuffer? {
+        return accumulator.read(hash)?.value?.let(ByteBuffer::wrap)
     }
 
     fun add(name: String, buffer: ByteBuffer): Boolean {
-        return accumulator.write(name.nameHash(), buffer.gdata())
+        return add(name.jagNameHash, buffer)
+    }
+
+    fun add(hash: Int, buffer: ByteBuffer): Boolean {
+        return accumulator.write(hash, buffer.gdata())
     }
 
     fun remove(name: String): Boolean {
-        return accumulator.remove(name.nameHash()) == null
+        return remove(name.jagNameHash)
+    }
+
+    fun remove(hash: Int): Boolean {
+        return accumulator.remove(hash) == null
     }
     
     fun release() {
@@ -126,10 +138,6 @@ abstract class JagFile(
         pdata(compressed, offset) // This moves the position.
         reset()
         return packEntries(keys, index + 1, offset + compressed.size)
-    }
-
-    private fun String.nameHash(): Int {
-        return uppercase().fold(0) { hash, char -> hash * 61 + char.code - 32 }
     }
 
     private class JagFileAccumulator : MutableMap<Int, ByteArray?> by LinkedHashMap() {
