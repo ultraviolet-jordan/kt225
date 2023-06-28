@@ -87,7 +87,7 @@ class MapSquareLocsProvider @Inject constructor(
     }
 
     private tailrec fun ByteBuffer.decodeMapSquareLocs(entry: MapSquareLocEntryType, locId: Int = -1): MapSquareLocEntryType {
-        val offset = gsmarts()
+        val offset = gsmarts
         if (offset == 0) {
             return entry
         }
@@ -96,14 +96,11 @@ class MapSquareLocsProvider @Inject constructor(
     }
 
     private tailrec fun ByteBuffer.decodeLocs(entry: MapSquareLocEntryType, locId: Int, packedPosition: Int) {
-        val offset = gsmarts()
+        val offset = gsmarts
         if (offset == 0) {
             return
         }
         val localPosition = MapSquareLocalPosition(packedPosition + offset - 1)
-        val x = localPosition.x
-        val z = localPosition.z
-        val plane = localPosition.plane
 
         // TODO 
         // The client does the commented out logic.
@@ -124,7 +121,7 @@ class MapSquareLocsProvider @Inject constructor(
         val attributes = g1
         val shape = attributes shr 2
         val rotation = attributes and 0x3
-        val loc = MapSquareLoc(locId, x, z, plane, shape, rotation)
+        val loc = MapSquareLoc(locId, localPosition.x, localPosition.z, localPosition.plane, shape, rotation)
 
         // New adjusted packed location after adjusting for bridge.
         // val adjustedLocalPosition = MapSquareLocalPosition(plane, x, z).packed
@@ -140,9 +137,9 @@ class MapSquareLocsProvider @Inject constructor(
 
         // Checks the bitpacking.
         require(loc.id == locId)
-        require(loc.x == x)
-        require(loc.z == z)
-        require(loc.plane == plane)
+        require(loc.x == localPosition.x)
+        require(loc.z == localPosition.z)
+        require(loc.plane == localPosition.plane)
         require(loc.rotation == rotation)
         require(loc.shape == shape)
         return decodeLocs(entry, locId, localPosition.packed)

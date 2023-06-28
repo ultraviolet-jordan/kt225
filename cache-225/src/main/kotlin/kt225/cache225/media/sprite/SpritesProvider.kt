@@ -38,12 +38,12 @@ class SpritesProvider @Inject constructor(
     
     override fun decode(buffer: ByteBuffer, entry: SpriteEntryType): SpriteEntryType {
         val index = media.read("index.dat") ?: error("index.dat file not found.")
-        index.position(buffer.g2())
-        entry.cellWidth = index.g2()
-        entry.cellHeight = index.g2()
+        index.position(buffer.g2)
+        entry.cellWidth = index.g2
+        entry.cellHeight = index.g2
         val palette = IntArray(index.g1)
         for (p in 0 until palette.size - 1) {
-            palette[p + 1] = index.g3().let { if (it == 0) 1 else it }
+            palette[p + 1] = index.g3.let { if (it == 0) 1 else it }
         }
         
         val spriteDeltasX = mutableListOf<Int>()
@@ -55,9 +55,9 @@ class SpritesProvider @Inject constructor(
         while (buffer.hasRemaining()) {
             spriteDeltasX.add(index.g1)
             spriteDeltasY.add(index.g1)
-            val width = index.g2()
+            val width = index.g2
             spriteWidths.add(width)
-            val height = index.g2()
+            val height = index.g2
             spriteHeights.add(height)
             val dimensions = width * height
             val pixels = IntArray(dimensions)

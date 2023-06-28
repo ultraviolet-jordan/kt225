@@ -9,8 +9,8 @@ abstract class Renderer(
     val lowDefinitionRenderBlocks: Array<LowDefinitionRenderBlock<*>?>,
     val highDefinitionRenderBlocks: Array<HighDefinitionRenderBlock<*>?>
 ) {
-    val highDefinitionRendering: Boolean get() = highDefinitionRenderBlocks.any { it != null }
-    val lowDefinitionRendering: Boolean get() = highDefinitionRenderBlocks.any { it != null }
+    inline val highDefinitionRendering: Boolean get() = highDefinitionRenderBlocks.any { it != null }
+    inline val lowDefinitionRendering: Boolean get() = highDefinitionRenderBlocks.any { it != null }
     
     abstract fun <R : RenderType> render(type: R): R?
 

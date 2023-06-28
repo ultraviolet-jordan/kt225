@@ -16,66 +16,50 @@ inline val ByteBuffer.g1: Int get() = get().toInt() and 0xff
 /**
  * Get 1 signed byte from this ByteBuffer.
  */
-fun ByteBuffer.g1b(): Int {
-    return get().toInt()
-}
+inline val ByteBuffer.g1b: Int get() = get().toInt()
 
 /**
  * Get 2 bytes from this ByteBuffer.
  */
-fun ByteBuffer.g2(): Int {
-    return getShort().toInt() and 0xffff
-}
+inline val ByteBuffer.g2: Int get() = getShort().toInt() and 0xffff
 
 /**
  * Get 2 bytes from this ByteBuffer LE.
  */
-fun ByteBuffer.ig2(): Int {
-    return (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8)
-}
+inline val ByteBuffer.ig2: Int get() = (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8)
 
 /**
  * Get 3 bytes from this ByteBuffer.
  */
-fun ByteBuffer.g3(): Int {
-    return (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
-}
+inline val ByteBuffer.g3: Int get() = (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
 
 /**
  * Get 4 bytes from this ByteBuffer.
  */
-fun ByteBuffer.g4(): Int {
-    return getInt()
-}
+inline val ByteBuffer.g4: Int get() = getInt()
 
 /**
  * Get 8 bytes from this ByteBuffer.
  */
-fun ByteBuffer.g8(): Long {
-    return getLong()
-}
+inline val ByteBuffer.g8: Long get() = getLong()
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
-fun ByteBuffer.gsmarts(): Int {
-    return if ((this[position()].toInt() and 0xff) < 128) g1 else g2() - 32768
-}
+inline val ByteBuffer.gsmarts: Int get() = if ((this[position()].toInt() and 0xff) < 128) g1 else g2 - 32768
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
-fun ByteBuffer.gsmart(): Int {
-    return if ((this[position()].toInt() and 0xff) < 128) g1 - 64 else g2() - 49152
-}
+inline val ByteBuffer.gsmart: Int get() = if ((this[position()].toInt() and 0xff) < 128) g1 - 64 else g2 - 49152
 
 /**
  * Get a string from this ByteBuffer.
  * Moves the buffer position from the current position + string.length + 1
  */
-fun ByteBuffer.gstr(): String {
+inline val ByteBuffer.gstr: String get() {
     return String(gdata(lengthToByte(10))).also {
         skip(1)
     }
@@ -246,6 +230,11 @@ fun ByteBuffer.skip(amount: Int) {
     position(position() + amount)
 }
 
+tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
+    if (this[position() + length].toInt() == terminator) return length
+    return lengthToByte(terminator, length + 1)
+}
+
 /**
  * Gives access to bits of this ByteBuffer.
  * The ByteBuffer is properly repositioned for byte access after function invocation.
@@ -319,9 +308,4 @@ private tailrec fun ByteBuffer.gbit(remainingBits: Int, byteIndex: Int, bitIndex
     val byteValue = (get(byteIndex).toInt() ushr (bitOffset - bitsToRead)) and mask
     val nextValue = (accumulator shl bitsToRead) or byteValue
     return gbit(remainingBits - bitsToRead, byteIndex + 1, 0, nextValue)
-}
-
-private tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
-    if (this[position() + length].toInt() == terminator) return length
-    return lengthToByte(terminator, length + 1)
 }

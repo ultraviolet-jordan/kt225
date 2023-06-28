@@ -21,7 +21,7 @@ class IdksProvider @Inject constructor(
     override fun get(): Idks<IdkEntryType> {
         val buffer = config.read("idk.dat") ?: error("idk.dat file not found.")
         val idks = Idks<IdkEntryType>()
-        repeat(buffer.g2()) {
+        repeat(buffer.g2) {
             idks[it] = decode(buffer, IdkEntryType(it))
         }
         return idks
@@ -41,11 +41,11 @@ class IdksProvider @Inject constructor(
         when (val opcode = buffer.g1) {
             0 -> return entry
             1 -> entry.type = buffer.g1
-            2 -> entry.models = IntArray(buffer.g1) { buffer.g2() }
+            2 -> entry.models = IntArray(buffer.g1) { buffer.g2 }
             3 -> entry.disable = true
-            in 40..49 -> entry.recol_s[opcode - 40] = buffer.g2()
-            in 50..59 -> entry.recol_d[opcode - 50] = buffer.g2()
-            in 60..69 -> entry.headModels[opcode - 60] = buffer.g2()
+            in 40..49 -> entry.recol_s[opcode - 40] = buffer.g2
+            in 50..59 -> entry.recol_d[opcode - 50] = buffer.g2
+            in 60..69 -> entry.headModels[opcode - 60] = buffer.g2
             else -> error("Missing opcode $opcode.")
         }
         return decode(buffer, entry)

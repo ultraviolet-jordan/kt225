@@ -21,7 +21,7 @@ class SeqsProvider @Inject constructor(
     override fun get(): Seqs<SeqEntryType> {
         val buffer = config.read("seq.dat") ?: error("seq.dat file not found.")
         val seqs = Seqs<SeqEntryType>()
-        repeat(buffer.g2()) {
+        repeat(buffer.g2) {
             seqs[it] = decode(buffer, SeqEntryType(it))
         }
         return seqs
@@ -46,16 +46,16 @@ class SeqsProvider @Inject constructor(
                 val secondaryFrames = IntArray(frameCount)
                 val frameDelay = IntArray(frameCount)
                 repeat(frameCount) {
-                    primaryFrames[it] = buffer.g2()
-                    secondaryFrames[it] = buffer.g2()
-                    frameDelay[it] = buffer.g2()
+                    primaryFrames[it] = buffer.g2
+                    secondaryFrames[it] = buffer.g2
+                    frameDelay[it] = buffer.g2
                 }
                 entry.framecount = frameCount
                 entry.primaryFrames = primaryFrames
                 entry.secondaryFrames = secondaryFrames
                 entry.frameDelay = frameDelay
             }
-            2 -> entry.replayOff = buffer.g2()
+            2 -> entry.replayOff = buffer.g2
             3 -> {
                 val length = buffer.g1
                 entry.labelGroups = IntArray(length + 1) {
@@ -64,8 +64,8 @@ class SeqsProvider @Inject constructor(
             }
             4 -> entry.stretches = true
             5 -> entry.priority = buffer.g1
-            6 -> entry.mainhand = buffer.g2()
-            7 -> entry.offhand = buffer.g2()
+            6 -> entry.mainhand = buffer.g2
+            7 -> entry.offhand = buffer.g2
             8 -> entry.replayCount = buffer.g1
             else -> error("Missing opcode $opcode.")
         }

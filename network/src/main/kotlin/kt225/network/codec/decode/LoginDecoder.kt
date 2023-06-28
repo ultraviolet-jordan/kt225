@@ -39,14 +39,14 @@ class LoginDecoder @Inject constructor(
 
         val version = buffer.g1
         val properties = buffer.g1
-        val crcs = IntArray(9) { buffer.g4() }
+        val crcs = IntArray(9) { buffer.g4 }
         buffer.rsadec(BigInteger(exponent), BigInteger(modulus))
         val rsaTen = buffer.g1
-        val clientSeed = IntArray(4) { buffer.g4() }
+        val clientSeed = IntArray(4) { buffer.g4 }
         val serverSeed = IntArray(clientSeed.size) { clientSeed[it] + 50 }
-        val uid = buffer.g4()
-        val username = buffer.gstr()
-        val password = buffer.gstr()
+        val uid = buffer.g4
+        val username = buffer.gstr
+        val password = buffer.gstr
 
         session.codec(
             type = LoginEncoder::class,

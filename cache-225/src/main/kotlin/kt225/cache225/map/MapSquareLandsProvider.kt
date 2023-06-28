@@ -115,7 +115,7 @@ class MapSquareLandsProvider @Inject constructor(
         }
         return decodeLand(
             height = height,
-            overlayId = if (opcode in 2..49) g1b() else overlayId,
+            overlayId = if (opcode in 2..49) g1b else overlayId,
             overlayPath = if (opcode in 2..49) (opcode - 2) / 4 else overlayPath,
             overlayRotation = if (opcode in 2..49) opcode - 2 and 3 else overlayRotation,
             collision = if (opcode in 50..81) opcode - 49 else collision,

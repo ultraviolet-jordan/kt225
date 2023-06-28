@@ -21,7 +21,7 @@ class SpotAnimsProvider @Inject constructor(
     override fun get(): SpotAnims<SpotAnimEntryType> {
         val buffer = config.read("spotanim.dat") ?: error("spotanim.dat file not found.")
         val spotAnims = SpotAnims<SpotAnimEntryType>()
-        repeat(buffer.g2()) {
+        repeat(buffer.g2) {
             spotAnims[it] = decode(buffer, SpotAnimEntryType(it))
         }
         return spotAnims
@@ -40,16 +40,16 @@ class SpotAnimsProvider @Inject constructor(
     override tailrec fun decode(buffer: ByteBuffer, entry: SpotAnimEntryType): SpotAnimEntryType {
         when (val opcode = buffer.g1) {
             0 -> return entry
-            1 -> entry.model = buffer.g2()
-            2 -> entry.anim = buffer.g2()
+            1 -> entry.model = buffer.g2
+            2 -> entry.anim = buffer.g2
             3 -> entry.disposeAlpha = true
-            4 -> entry.resizeh = buffer.g2()
-            5 -> entry.resizev = buffer.g2()
-            6 -> entry.rotation = buffer.g2()
+            4 -> entry.resizeh = buffer.g2
+            5 -> entry.resizev = buffer.g2
+            6 -> entry.rotation = buffer.g2
             7 -> entry.ambient = buffer.g1
             8 -> entry.contrast = buffer.g1
-            in 40..49 -> entry.recol_s[opcode - 40] = buffer.g2()
-            in 50..59 -> entry.recol_d[opcode - 50] = buffer.g2()
+            in 40..49 -> entry.recol_s[opcode - 40] = buffer.g2
+            in 50..59 -> entry.recol_d[opcode - 50] = buffer.g2
             else -> error("Missing opcode $opcode.")
         }
         return decode(buffer, entry)

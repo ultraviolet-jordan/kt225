@@ -25,7 +25,7 @@ class FlosProvider @Inject constructor(
     override fun get(): Flos<FloEntryType> {
         val buffer = config.read("flo.dat") ?: error("flo.dat file not found.")
         val flos = Flos<FloEntryType>()
-        repeat(buffer.g2()) {
+        repeat(buffer.g2) {
             flos[it] = decode(buffer, FloEntryType(it))
         }
         return flos
@@ -44,11 +44,11 @@ class FlosProvider @Inject constructor(
     override tailrec fun decode(buffer: ByteBuffer, entry: FloEntryType): FloEntryType {
         when (val opcode = buffer.g1) {
             0 -> return entry
-            1 -> entry.rgb = buffer.g3()
+            1 -> entry.rgb = buffer.g3
             2 -> entry.texture = buffer.g1
             3 -> entry.opcode3 = true
             5 -> entry.occlude = false
-            6 -> entry.name = buffer.gstr()
+            6 -> entry.name = buffer.gstr
             else -> error("Missing opcode $opcode.")
         }
         return decode(buffer, entry)

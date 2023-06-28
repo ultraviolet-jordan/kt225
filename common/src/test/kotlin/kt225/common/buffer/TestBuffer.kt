@@ -27,7 +27,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(1)
         buffer.p1(69)
         buffer.flip()
-        val result = buffer.g1b()
+        val result = buffer.g1b
         assertEquals(69, result)
     }
 
@@ -36,7 +36,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(2)
         buffer.p2(65535)
         buffer.flip()
-        val result = buffer.g2()
+        val result = buffer.g2
         assertEquals(65535, result)
     }
 
@@ -45,7 +45,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(2)
         buffer.ip2(65535)
         buffer.flip()
-        val result = buffer.ig2()
+        val result = buffer.ig2
         assertEquals(65535, result)
     }
 
@@ -54,7 +54,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(3)
         buffer.p3(696969)
         buffer.flip()
-        val result = buffer.g3()
+        val result = buffer.g3
         assertEquals(696969, result)
     }
 
@@ -63,7 +63,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(4)
         buffer.p4(Int.MAX_VALUE)
         buffer.flip()
-        val result = buffer.g4()
+        val result = buffer.g4
         assertEquals(Int.MAX_VALUE, result)
     }
 
@@ -72,7 +72,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(8)
         buffer.p8(Long.MAX_VALUE)
         buffer.flip()
-        val result = buffer.g8()
+        val result = buffer.g8
         assertEquals(Long.MAX_VALUE, result)
     }
 
@@ -81,7 +81,7 @@ class TestBuffer {
         val byte = ByteBuffer.allocate(2)
         byte.psmart(2)
         byte.flip()
-        val result = byte.gsmart()
+        val result = byte.gsmart
         assertEquals(2, result)
     }
 
@@ -90,7 +90,7 @@ class TestBuffer {
         val byte = ByteBuffer.allocate(2)
         byte.psmarts(69)
         byte.flip()
-        val result = byte.gsmarts()
+        val result = byte.gsmarts
         assertEquals(69, result)
     }
 
@@ -100,7 +100,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(expected.length + 1)
         buffer.pjstr(expected)
         buffer.flip()
-        val result = buffer.gstr()
+        val result = buffer.gstr
         assertEquals(expected, result)
     }
 

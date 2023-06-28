@@ -5,25 +5,25 @@ package kt225.common.game.world
  */
 @JvmInline
 value class Position(
-    private val packed: Int
+    val packed: Int
 ) {
     constructor(x: Int, z: Int, plane: Int = 0) : this((z and 0x3FFF) or ((x and 0x3FFF) shl 14) or ((plane and 0x3) shl 28))
 
-    val plane get() = packed shr 28 and 0x3
-    val x get() = packed shr 14 and 0x3FFF
-    val z get() = packed and 0x3FFF
+    inline val plane get() = packed shr 28 and 0x3
+    inline val x get() = packed shr 14 and 0x3FFF
+    inline val z get() = packed and 0x3FFF
 
-    val mapSquareX get() = (x shr 6)
-    val mapSquareZ get() = (z shr 6)
-    val mapSquareId get() = mapSquareX shl 8 or mapSquareZ
+    inline val mapSquareX get() = (x shr 6)
+    inline val mapSquareZ get() = (z shr 6)
+    inline val mapSquareId get() = mapSquareX shl 8 or mapSquareZ
 
-    val zoneX get() = (x shr 3)
-    val zoneZ get() = (z shr 3)
-    val zoneCenterX get() = zoneX - 6
-    val zoneCenterZ get() = zoneZ - 6
-    val zoneOriginX get() = zoneCenterX shl 3
-    val zoneOriginZ get() = zoneCenterZ shl 3
-    val zoneId get() = zoneX or (zoneZ shl 11) or (plane shl 22)
+    inline val zoneX get() = (x shr 3)
+    inline val zoneZ get() = (z shr 3)
+    inline val zoneCenterX get() = zoneX - 6
+    inline val zoneCenterZ get() = zoneZ - 6
+    inline val zoneOriginX get() = zoneCenterX shl 3
+    inline val zoneOriginZ get() = zoneCenterZ shl 3
+    inline val zoneId get() = zoneX or (zoneZ shl 11) or (plane shl 22)
 
     companion object {
         val None = Position(0, 0, 0)

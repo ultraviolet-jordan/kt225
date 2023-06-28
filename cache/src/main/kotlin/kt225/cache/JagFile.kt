@@ -22,7 +22,7 @@ abstract class JagFile(
 ) {
     private val accumulator = JagFileAccumulator()
 
-    val crc: Int get() = CRC32().apply { update(bytes) }.value.toInt()
+    inline val crc: Int get() = CRC32().apply { update(bytes) }.value.toInt()
     val keys: Set<Int> get() = accumulator.keys
     
     init {
@@ -60,8 +60,8 @@ abstract class JagFile(
     fun unpack() {
         val jag = ByteBuffer.wrap(bytes)
         require(jag.remaining() >= 6) { "Invalid input byte array." }
-        val decompressed = jag.g3()
-        val compressed = jag.g3()
+        val decompressed = jag.g3
+        val compressed = jag.g3
         val isCompressed = decompressed != compressed
         val bytes = when {
             isCompressed -> {
@@ -76,7 +76,7 @@ abstract class JagFile(
         accumulator.attach(bytes)
         val entries = ByteBuffer.wrap(bytes)
         require(entries.remaining() >= 2) { "Invalid buffer length." }
-        val length = entries.g2()
+        val length = entries.g2
         entries.unpackEntries(length)
     }
 
@@ -110,9 +110,9 @@ abstract class JagFile(
             return
         }
         require(remaining() >= 10) { "Invalid buffer length." }
-        val nameHash = g4()
-        val decompressed = g3()
-        val compressed = g3()
+        val nameHash = g4
+        val decompressed = g3
+        val compressed = g3
         accumulator.alloc(nameHash, decompressed, compressed, offset)
         return unpackEntries(length, index + 1, offset + compressed)
     }

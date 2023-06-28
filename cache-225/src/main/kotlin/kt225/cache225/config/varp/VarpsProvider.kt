@@ -25,7 +25,7 @@ class VarpsProvider @Inject constructor(
     override fun get(): Varps<VarpEntryType> {
         val buffer = config.read("varp.dat") ?: error("varp.dat file not found.")
         val varps = Varps<VarpEntryType>()
-        repeat(buffer.g2()) {
+        repeat(buffer.g2) {
             varps[it] = decode(buffer, VarpEntryType(it))
         }
         return varps
@@ -48,11 +48,11 @@ class VarpsProvider @Inject constructor(
             2 -> entry.opcode2 = buffer.g1
             3 -> entry.opcode3 = true
             4 -> entry.opcode4 = false
-            5 -> entry.clientcode = buffer.g2()
+            5 -> entry.clientcode = buffer.g2
             6 -> entry.opcode6 = true
-            7 -> entry.opcode7 = buffer.g4()
+            7 -> entry.opcode7 = buffer.g4
             8 -> entry.opcode8 = true
-            10 -> entry.opcode10 = buffer.gstr()
+            10 -> entry.opcode10 = buffer.gstr
             else -> error("Missing opcode $opcode.")
         }
         return decode(buffer, entry)
