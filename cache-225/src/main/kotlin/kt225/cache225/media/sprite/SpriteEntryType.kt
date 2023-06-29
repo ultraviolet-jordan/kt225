@@ -10,9 +10,5 @@ data class SpriteEntryType(
     val name: String,
     var cellWidth: Int = 0,
     var cellHeight: Int = 0,
-    var spriteDeltasX: IntArray? = null,
-    var spriteDeltasY: IntArray? = null,
-    var spriteWidths: IntArray? = null,
-    var spriteHeights: IntArray? = null,
-    var spritePixels: Array<IntArray>? = null
+    var sprites: MutableList<Sprite>? = null
 ) : EntryType

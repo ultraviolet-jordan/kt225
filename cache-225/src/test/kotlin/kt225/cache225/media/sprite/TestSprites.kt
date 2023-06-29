@@ -29,7 +29,7 @@ class TestSprites {
         if (path.notExists()) path.createDirectories()
 
         sprites.values.forEach {
-            val length = it.spritePixels?.size ?: 0
+            val length = it.sprites?.size ?: 0
             val cellWidth = it.cellWidth
             val cellHeight = it.cellHeight
             val rows = min(length, max(1, length * cellWidth / 400))
@@ -43,13 +43,10 @@ class TestSprites {
             repeat(rows) { row ->
                 repeat(columns) { column ->
                     val index = row * columns + column
-                    val offsetX = it.spriteDeltasX?.get(index) ?: error("Missing sprite deltaX at index $index.")
-                    val offsetY = it.spriteDeltasY?.get(index) ?: error("Missing sprite deltaY at index $index.")
-                    val width = it.spriteWidths?.get(index) ?: error("Missing sprite width at index $index.")
-                    val height = it.spriteHeights?.get(index) ?: error("Missing sprite height at index $index.")
-                    // Swap black pixels with magenta.
-                    val pixels = it.spritePixels?.get(index)?.map { rgb -> if (rgb == 0) Color(0xFF00FF).rgb else Color(rgb).rgb }?.toIntArray()
-                    spriteSheet.setRGB(column * cellWidth + offsetX, row * cellHeight + offsetY, width, height, pixels, 0, width)
+                    val sprite = it.sprites?.get(index) ?: error("Missing sprite at index $index.")
+                    val startX = column * cellWidth + sprite.deltaX
+                    val startY = row * cellHeight + sprite.deltaY
+                    spriteSheet.setRGB(startX, startY, sprite.width, sprite.height, sprite.raster, 0, sprite.width)
                 }
             }
 
