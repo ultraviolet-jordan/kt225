@@ -3,6 +3,7 @@ package kt225.cache225
 import dev.misfitlabs.kotlinguice4.KotlinModule
 import kt225.cache.config.flo.Flos
 import kt225.cache.config.idk.Idks
+import kt225.cache.config.npc.Npcs
 import kt225.cache.config.obj.Objs
 import kt225.cache.config.seq.Seqs
 import kt225.cache.config.spotanim.SpotAnims
@@ -14,6 +15,8 @@ import kt225.cache225.config.flo.FloEntryType
 import kt225.cache225.config.flo.FlosProvider
 import kt225.cache225.config.idk.IdkEntryType
 import kt225.cache225.config.idk.IdksProvider
+import kt225.cache225.config.npc.NpcEntryType
+import kt225.cache225.config.npc.NpcsProvider
 import kt225.cache225.config.obj.ObjEntryType
 import kt225.cache225.config.obj.ObjsProvider
 import kt225.cache225.config.seq.SeqEntryType
@@ -35,13 +38,15 @@ import kt225.cache225.media.sprite.SpritesProvider
 object Cache225Module : KotlinModule() {
     override fun configure() {
         // Eager ones required for game server.
+        bind<Idks<IdkEntryType>>().toProvider<IdksProvider>().asEagerSingleton()
+        bind<Npcs<NpcEntryType>>().toProvider<NpcsProvider>().asEagerSingleton()
+        bind<Objs<ObjEntryType>>().toProvider<ObjsProvider>().asEagerSingleton()
+        bind<Seqs<SeqEntryType>>().toProvider<SeqsProvider>().asEagerSingleton()
+        bind<SpotAnims<SpotAnimEntryType>>().toProvider<SpotAnimsProvider>().asEagerSingleton()
         bind<Varps<VarpEntryType>>().toProvider<VarpsProvider>().asEagerSingleton()
+
         bind<MapSquareLands<MapSquareLandEntryType>>().toProvider<MapSquareLandsProvider>().asEagerSingleton()
         bind<MapSquareLocs<MapSquareLocEntryType>>().toProvider<MapSquareLocsProvider>().asEagerSingleton()
-        bind<Objs<ObjEntryType>>().toProvider<ObjsProvider>().asEagerSingleton()
-        bind<Idks<IdkEntryType>>().toProvider<IdksProvider>().asEagerSingleton()
-        bind<SpotAnims<SpotAnimEntryType>>().toProvider<SpotAnimsProvider>().asEagerSingleton()
-        bind<Seqs<SeqEntryType>>().toProvider<SeqsProvider>().asEagerSingleton()
         
         // Lazy load ones for editing/reading etc.
         bind<Flos<FloEntryType>>().toProvider<FlosProvider>()

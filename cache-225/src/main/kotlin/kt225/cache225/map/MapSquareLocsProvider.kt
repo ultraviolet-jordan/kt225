@@ -1,3 +1,5 @@
+@file:Suppress("DuplicatedCode")
+
 package kt225.cache225.map
 
 import com.google.inject.Inject

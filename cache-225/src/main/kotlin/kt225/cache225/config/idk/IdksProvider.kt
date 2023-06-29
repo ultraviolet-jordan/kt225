@@ -1,3 +1,5 @@
+@file:Suppress("LocalVariableName")
+
 package kt225.cache225.config.idk
 
 import com.google.inject.Inject

@@ -26,6 +26,8 @@ The module includes the following features:
 - `config`
   - `flo.dat`
   - `idk.dat`
+  - `npc.dat`
+  - `npc.idx`
   - `obj.dat`
   - `obj.idx`
   - `seq.dat`

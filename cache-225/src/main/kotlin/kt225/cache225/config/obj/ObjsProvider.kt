@@ -1,3 +1,5 @@
+@file:Suppress("DuplicatedCode", "PropertyName", "LocalVariableName")
+
 package kt225.cache225.config.obj
 
 import com.google.inject.Inject
