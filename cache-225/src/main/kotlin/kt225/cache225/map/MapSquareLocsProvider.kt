@@ -13,6 +13,7 @@ import kt225.common.buffer.p1
 import kt225.common.buffer.psmarts
 import kt225.common.game.world.map.MapSquare
 import kt225.common.game.world.map.MapSquareLoc
+import kt225.common.game.world.map.MapSquareLocResource
 import kt225.common.game.world.map.MapSquareLocRotation
 import kt225.common.game.world.map.MapSquareLocShape
 import kt225.common.game.world.map.MapSquarePosition
@@ -90,15 +91,15 @@ class MapSquareLocsProvider @Inject constructor(
         val sortedLocs = entry
             .locs
             .map { 
-                val adjusted = MapSquarePosition(it.key)
+                val resource = MapSquareLocResource(it)
+                val adjusted = MapSquarePosition(resource.position)
                 val actual = MapSquarePosition(
                     x = adjusted.x,
                     z = adjusted.z,
                     plane = adjusted.plane
                 )
-                actual to MapSquareLoc(it.value)
+                actual to MapSquareLoc(resource.loc)
             }
-            // .flatMap { e -> e.mapNotNull { it -> it.let { e.key to MapSquareLoc.create(it) } } }
             .groupBy { it.second.id }
             .toSortedMap()
         buffer.encodeMapSquareLocs(sortedLocs)
@@ -142,9 +143,6 @@ class MapSquareLocsProvider @Inject constructor(
         
         val loc = MapSquareLoc(
             id = locId,
-//            localX = localPosition.x,
-//            localZ = localPosition.z,
-//            plane = localPosition.plane,
             shape = MapSquareLocShape(shape),
             rotation = MapSquareLocRotation(rotation)
         )
@@ -156,16 +154,17 @@ class MapSquareLocsProvider @Inject constructor(
             layer = loc.shape.layer.id
         )
         
-        require(!entry.locs.containsKey(adjustedLocalPosition.packed))
-        entry.locs[adjustedLocalPosition.packed] = loc.packed
+        val resource = MapSquareLocResource(adjustedLocalPosition.packed, loc.packed)
+        
+        require(!entry.locs.contains(resource.packed))
+        entry.locs.add(resource.packed)
 
         // Checks the bitpacking.
         require(loc.id == locId)
-//        require(loc.localX == adjustedLocalPosition.x)
-//        require(loc.localZ == adjustedLocalPosition.z)
-//        require(loc.plane == adjustedLocalPosition.plane)
         require(loc.rotation.id == rotation)
         require(loc.shape.id == shape)
+        require(resource.position == adjustedLocalPosition.packed)
+        require(resource.loc == loc.packed)
         return decodeLocs(entry, locId, adjustedLocalPosition.packed)
     }
 

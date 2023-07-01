@@ -30,6 +30,6 @@ value class MapSquareLand(
     inline val overlayId: Int get() = (packed shr 8 and 0x7f).toInt()
     inline val overlayPath: Int get() = (packed shr 15 and 0x1f).toInt()
     inline val collision: Int get() = (packed shr 20 and 0xffffffffL).toInt() shr 2 and 0x1f
-    inline val overlayRotation: Int get() = (packed shr 20 and 0xffffffffL).toInt() and 0x3
-    inline val underlayId: Int get() = (packed shr 20 and 0xffffffffL).toInt() shr 7 and 0x7f
+    inline val overlayRotation: Int get() = (packed shr 20 and 0xffffffff).toInt() and 0x3
+    inline val underlayId: Int get() = (packed shr 20 and 0xffffffff).toInt() shr 7 and 0x7f
 }

@@ -16,7 +16,6 @@ import kt225.common.game.world.map.MapSquareLocLayer
 import kt225.common.game.world.map.MapSquareLocRotation
 import kt225.common.game.world.map.MapSquareLocShape
 import kt225.common.game.world.map.MapSquarePosition
-import java.io.File
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -78,9 +77,9 @@ class TestMapSquares {
         val decoded = mapSquareLocsProvider.decode(buffer, MapSquareLocEntryType(lumbridge.mapSquare))
         assertEquals(lumbridge.mapSquare, decoded.mapSquare)
         assertEquals(lumbridge.locs.size, decoded.locs.size)
-        assertContentEquals(lumbridge.locs.keys.toIntArray(), decoded.locs.keys.toIntArray())
-        for (loc in lumbridge.locs) {
-            assertEquals(loc.value, decoded.locs[loc.key])
+        assertContentEquals(lumbridge.locs.toLongArray(), decoded.locs.toLongArray())
+        repeat(lumbridge.locs.size) {
+            assertEquals(lumbridge.locs[it], decoded.locs[it])
         }
     }
 
@@ -99,9 +98,9 @@ class TestMapSquares {
             val decoded = mapSquareLocsProvider.decode(buffer, MapSquareLocEntryType(entry.mapSquare))
             assertEquals(entry.mapSquare, decoded.mapSquare)
             assertEquals(entry.locs.size, decoded.locs.size)
-            assertContentEquals(entry.locs.keys.toIntArray(), decoded.locs.keys.toIntArray())
-            for (loc in entry.locs) {
-                assertEquals(loc.value, decoded.locs[loc.key])
+            assertContentEquals(entry.locs.toLongArray(), decoded.locs.toLongArray())
+            repeat(entry.locs.size) {
+                assertEquals(entry.locs[it], decoded.locs[it])
             }
         }
     }
@@ -161,7 +160,7 @@ class TestMapSquares {
             val original = mapSquareLocs[it.key]
             assertEquals(original?.mapSquare, it.value.mapSquare)
             assertEquals(original?.locs?.size, it.value.locs.size)
-            assertContentEquals(original?.locs?.keys?.toIntArray(), it.value.locs.keys.toIntArray())
+            assertContentEquals(original?.locs?.toLongArray(), it.value.locs.toLongArray())
         }
     }
 
@@ -193,10 +192,10 @@ class TestMapSquares {
         mapSquareLocsProvider.write(mapSquareLocs)
 
         // Uncomment this if you want to write the file out to use in the game.
-        val mapLocs = injector.getInstance<MapLocs>()
+        /*val mapLocs = injector.getInstance<MapLocs>()
         val mapResource = mapLocs.first { it.id == 12850 }
         val bytes = mapResource.bytes
         val file = File("./${mapResource.name}")
-        file.writeBytes(bytes)
+        file.writeBytes(bytes)*/
     }
 }
