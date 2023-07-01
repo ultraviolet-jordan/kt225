@@ -11,7 +11,6 @@ import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.Cache225Module
 import kt225.common.game.world.Coordinates
-import kt225.common.game.world.map.MapSquareCoordinates
 import kt225.common.game.world.map.MapSquareLoc
 import kt225.common.game.world.map.MapSquareLocLayer
 import kt225.common.game.world.map.MapSquareLocRotation
@@ -20,12 +19,24 @@ import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
  * @author Jordan Abraham
  */
 class TestMapSquares {
+    
+    @Test
+    fun `test sums`() {
+        val injector = Guice.createInjector(CacheModule, Cache225Module)
+        val mapSquareLands = injector.getInstance<MapSquareLands<MapSquareLandEntryType>>()
+        val mapSquareLocs = injector.getInstance<MapSquareLocs<MapSquareLocEntryType>>()
+
+        assertEquals(4997120, mapSquareLands.values.sumOf { it.lands.size })
+        assertEquals(537124, mapSquareLocs.values.sumOf { it.locs.size })
+    }
+    
     @Test
     fun `test map land encoder decoder`() {
         val injector = Guice.createInjector(CacheModule, Cache225Module)
@@ -172,22 +183,24 @@ class TestMapSquares {
 
         val lumbridge = mapSquareLocs[12850]!!
         
-        lumbridge.getLoc(Coordinates(3223, 3220, 0), MapSquareLocLayer.GROUND) { bush, coords ->
-            requireNotNull(bush)
-            assertEquals(1124, bush.id)
-            val removed = lumbridge.removeLoc(bush, coords)
+        lumbridge.query(Coordinates(3223, 3220, 0), MapSquareLocLayer.GROUND) {
+            requireNotNull(it)
+            assertEquals(1124, it.id)
+            val removed = lumbridge.removeLoc(it)
             assertTrue(removed)
         }
         
-        val chestCoordinates = Coordinates(3223, 3222, 0)
-        val chest = MapSquareLoc(
-            id = 2191,
-            shape = MapSquareLocShape.CENTREPIECE_STRAIGHT,
-            rotation = MapSquareLocRotation.SOUTH
-        )
-        
-        val added = lumbridge.addLoc(chest, MapSquareCoordinates(chestCoordinates.localX, chestCoordinates.localZ, chestCoordinates.plane))
-        assertTrue(added)
+        lumbridge.queryWithCoordinates(Coordinates(3223, 3222, 0), MapSquareLocLayer.GROUND) { loc, coord ->
+            assertNull(loc)
+            val chest = MapSquareLoc(
+                id = 2191,
+                shape = MapSquareLocShape.CENTREPIECE_STRAIGHT,
+                rotation = MapSquareLocRotation.SOUTH,
+                coords = coord,
+            )
+            val added = lumbridge.addLoc(chest)
+            assertTrue(added)
+        }
 
         mapSquareLocsProvider.write(mapSquareLocs)
 

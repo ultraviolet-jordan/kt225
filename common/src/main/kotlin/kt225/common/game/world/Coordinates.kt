@@ -12,7 +12,7 @@ value class Coordinates(
     constructor(
         x: Int,
         z: Int,
-        plane: Int = 0
+        plane: Int
     ) : this(
         (z and COORDINATES_MASK) 
             or (x and COORDINATES_MASK shl COORDINATES_BITS) 

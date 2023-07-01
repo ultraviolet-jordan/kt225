@@ -9,7 +9,6 @@ import kt225.common.game.world.map.MapSquare
 import kt225.common.game.world.map.MapSquareCoordinates
 import kt225.common.game.world.map.MapSquareLand
 import kt225.common.game.world.map.MapSquareLoc
-import kt225.common.game.world.map.MapSquareLocResource
 import org.rsmod.pathfinder.ZoneFlags
 import org.rsmod.pathfinder.flag.CollisionFlag
 
@@ -29,12 +28,12 @@ class CollisionManager(
                 val x = remaining / 64
                 val z = remaining % 64
                 val mapSquareCoordinates = MapSquareCoordinates(x, z, plane)
-                val mapSquareLand = MapSquareLand(entry.value.lands[mapSquareCoordinates.packed])
+                val mapSquareLand = MapSquareLand(entry.value.lands[mapSquareCoordinates.packed.toInt()])
                 if (mapSquareLand.collision and 0x1 != 1) {
                     continue
                 }
                 val adjustedPlane = MapSquareCoordinates(x, z, 1)
-                val adjustedLand = MapSquareLand(entry.value.lands[adjustedPlane.packed])
+                val adjustedLand = MapSquareLand(entry.value.lands[adjustedPlane.packed.toInt()])
                 val actualPlane = if (adjustedLand.collision and 0x2 == 2) plane - 1 else plane
                 if (actualPlane < 0) {
                     continue
@@ -47,15 +46,14 @@ class CollisionManager(
         for (entry in locs) {
             val mapSquare = MapSquare(entry.key)
             for (packed in entry.value.locs) {
-                val resource = MapSquareLocResource(packed)
-                val mapSquareCoordinates = MapSquareCoordinates(resource.coords)
+                val loc = MapSquareLoc(packed)
+                val mapSquareCoordinates = loc.coords
                 val adjustedPlane = MapSquareCoordinates(mapSquareCoordinates.x, mapSquareCoordinates.z, 1)
-                val adjustedLand = lands[mapSquare.packed]?.lands?.get(adjustedPlane.packed)?.let(::MapSquareLand) ?: continue
+                val adjustedLand = lands[mapSquare.packed]?.lands?.get(adjustedPlane.packed.toInt())?.let(::MapSquareLand) ?: continue
                 val actualPlane = if (adjustedLand.collision and 0x2 == 2) mapSquareCoordinates.plane - 1 else mapSquareCoordinates.plane
                 if (actualPlane < 0) {
                     continue
                 }
-                val loc = MapSquareLoc(resource.loc)
                 val coordinates = Coordinates(mapSquareCoordinates.x + mapSquare.mapSquareX, mapSquareCoordinates.z + mapSquare.mapSquareZ, mapSquareCoordinates.plane)
                 addLocCollision(coordinates, loc)
             }

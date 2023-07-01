@@ -14,7 +14,6 @@ import kt225.common.buffer.psmarts
 import kt225.common.game.world.map.MapSquare
 import kt225.common.game.world.map.MapSquareCoordinates
 import kt225.common.game.world.map.MapSquareLoc
-import kt225.common.game.world.map.MapSquareLocResource
 import kt225.common.game.world.map.MapSquareLocRotation
 import kt225.common.game.world.map.MapSquareLocShape
 import java.nio.ByteBuffer
@@ -73,16 +72,11 @@ class MapSquareLocsProvider @Inject constructor(
         // Then sorted in order by their locId.
         val sortedLocs = entry
             .locs
-            .map { 
-                val resource = MapSquareLocResource(it)
-                val adjusted = MapSquareCoordinates(resource.coords)
-                val actual = MapSquareCoordinates(
-                    x = adjusted.x,
-                    z = adjusted.z,
-                    plane = adjusted.plane
-                )
-                actual to MapSquareLoc(resource.loc)
+            .map {
+                val loc = MapSquareLoc(it)
+                loc.coords to loc
             }
+            .distinct()
             .groupBy { it.second.id }
             .toSortedMap()
         buffer.encodeMapSquareLocs(sortedLocs)
@@ -103,27 +97,14 @@ class MapSquareLocsProvider @Inject constructor(
             return
         }
         val attributes = g1
-        val shape = attributes shr 2
-        val rotation = attributes and 0x3
-        
-        val loc = MapSquareLoc(
-            id = locId,
-            shape = MapSquareLocShape(shape),
-            rotation = MapSquareLocRotation(rotation)
-        )
-
+        val shape = MapSquareLocShape(attributes shr 2)
+        val rotation = MapSquareLocRotation(attributes and 0x3)
         val coordinates = MapSquareCoordinates(packed + offset - 1)
-        val adjustedCoordinates = MapSquareCoordinates(
-            x = coordinates.x,
-            z = coordinates.z,
-            plane = coordinates.plane,
-            layer = loc.shape.layer.id
-        )
-        
-        val resource = MapSquareLocResource(adjustedCoordinates.packed, loc.packed)
-        require(!entry.locs.contains(resource.packed))
-        entry.locs.add(resource.packed)
-        return decodeLocs(entry, locId, adjustedCoordinates.packed)
+        // Packed locs are unique because of their shape. Multiple locs on the same tile can't have the same shape.
+        val loc = MapSquareLoc(locId, shape, rotation, coordinates)
+        require(!entry.locs.contains(loc.packed))
+        entry.locs.add(loc.packed)
+        return decodeLocs(entry, locId, coordinates.packed)
     }
 
     private tailrec fun ByteBuffer.encodeMapSquareLocs(locs: Map<Int, List<Pair<MapSquareCoordinates, MapSquareLoc>>>, offset: Int = -1, accumulator: Int = 0) {
