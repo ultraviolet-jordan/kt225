@@ -3,7 +3,7 @@ package kt225.common.game.world.map
 /**
  * ```
  * ==================================================================================
- * | PROPERTY         | DECIMAL | HEX  |  BINARY  | DIGITS | ========================
+ * | PROPERTY         | DECIMAL | HEX  | BINARY   | DIGITS | ========================
  * ==================================================================================
  * | HEIGHT           | 255     | 0xff | 11111111 | 8      | ========================
  * ==================================================================================
@@ -26,7 +26,7 @@ package kt225.common.game.world.map
  * <b>An example of the highest possible bit-packed land.</b>
  * ```
  * val land = MapSquareLand(255, 127, 31, 3, 31, 127)
- * assert(0x3ffffffff == land.packed)
+ * assert(17179869183 == land.packed)
  * ```
  * 
  * @author Jordan Abraham
