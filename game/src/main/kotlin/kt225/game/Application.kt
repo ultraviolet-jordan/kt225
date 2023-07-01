@@ -9,6 +9,7 @@ import kt225.cache.CacheModule
 import kt225.cache225.Cache225Module
 import kt225.network.NetworkModule
 import kt225.packet.PacketModule
+import kotlin.system.measureTimeMillis
 
 /**
  * @author Jordan Abraham
@@ -22,19 +23,22 @@ fun main(args: Array<String>) {
         GameModule(args)
     )
 
-    val applicationEnvironment = injector.getInstance<ApplicationEnvironment>()
-    val applicationEngine = injector.getInstance<ApplicationEngine>()
     val server = injector.getInstance<GameServer>()
     val synchronizer = injector.getInstance<GameSynchronizer>()
-    val cache = injector.getInstance<Cache>()
-    
-    Runtime.getRuntime().addShutdownHook(ShutdownHook(applicationEnvironment.log, applicationEngine, server, synchronizer))
-
-    cache.release()
-    System.gc()
     
     try {
-        synchronizer.start()
+        val applicationEnvironment = injector.getInstance<ApplicationEnvironment>()
+        val time = measureTimeMillis {
+            val applicationEngine = injector.getInstance<ApplicationEngine>()
+            val cache = injector.getInstance<Cache>()
+            Runtime.getRuntime().addShutdownHook(ShutdownHook(applicationEnvironment.log, applicationEngine, server, synchronizer))
+
+            cache.release()
+            System.gc()
+
+            synchronizer.start()
+        }
+        applicationEnvironment.log.info("Game took $time ms to start.")
         server.bind()
     } catch (exception: Exception) {
         exception.printStackTrace()
