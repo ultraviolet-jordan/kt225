@@ -1,6 +1,28 @@
 package kt225.common.game.world.map
 
 /**
+ * ```
+ * ============================================================================
+ * | PROPERTY | DECIMAL | HEX    | BINARY         | DIGITS | ==================
+ * ============================================================================
+ * | ID       | 16383   | 0x3fff | 11111111111111 | 14     | ==================
+ * ============================================================================
+ * | X        | 255     | 0xff   | 11111111       | 8      | ==================
+ * ============================================================================
+ * | Z        | 255     | 0xff   | 11111111       | 8      | ==================
+ * ============================================================================
+ * ============================================================================
+ * ============================================================================
+ * | CAPACITY | 1073741823 | 0x3fffffff | 111111111111111111111111111111 | 30 |
+ * ============================================================================
+ * ```
+ *
+ * <b>An example of the highest possible bit-packed map square.</b>
+ * ```
+ * val mapSquare = MapSquare(16383, 255, 255)
+ * assert(1073741823 == mapSquare.packed)
+ * ```
+ *
  * @author Jordan Abraham
  */
 @JvmInline
@@ -12,9 +34,9 @@ value class MapSquare(
         x: Int,
         z: Int
     ) : this(
-        (x and COORDINATES_MASK shl COORDINATES_BITS) 
-            or (z and COORDINATES_MASK)
-            or (id and ID_MASK shl ID_BITS)
+        (id and ID_MASK)
+            or (x and COORDINATES_MASK shl X_BITS) 
+            or (z and COORDINATES_MASK shl Z_BITS)
     ) {
         require(this.id == id)
         require(this.x == x)
@@ -25,19 +47,19 @@ value class MapSquare(
      * The id of this MapSquare.
      */
     inline val id: Int 
-        get() = packed shr ID_BITS and ID_MASK // 12850
+        get() = packed and ID_MASK // 12850
 
     /**
      * The X-coordinate of this MapSquare within the game world.
      */
     inline val x: Int 
-        get() = packed shr COORDINATES_BITS and COORDINATES_MASK // 50
+        get() = packed shr X_BITS and COORDINATES_MASK // 50
 
     /**
      * The Z-coordinate of this MapSquare within the game world.
      */
     inline val z: Int 
-        get() = packed and COORDINATES_MASK // 50
+        get() = packed shr Z_BITS and COORDINATES_MASK // 50
 
     /**
      * The starting X-coordinate of this MapSquare.
@@ -55,9 +77,9 @@ value class MapSquare(
     
     companion object {
         const val AREA = 64 * 64
-        const val ID_BITS = 16
-        const val ID_MASK = 0x7fff
-        const val COORDINATES_BITS = 8
+        const val ID_MASK = 4 * AREA - 1
+        const val X_BITS = 14
+        const val Z_BITS = 22
         const val COORDINATES_MASK = 0xff
         const val SQUARE_SIZE_BITS = 6
     }
