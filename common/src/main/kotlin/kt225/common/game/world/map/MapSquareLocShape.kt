@@ -42,10 +42,6 @@ value class MapSquareLocShape(
             GROUND_DECOR.id -> MapSquareLocLayer.GROUNDECOR
             else -> throw AssertionError("Shape id must be between 0 and 22.")
         }
-    
-    init {
-        require(id in 0..22)
-    }
 
     companion object {
         val WALL_STRAIGHT = MapSquareLocShape(0)
