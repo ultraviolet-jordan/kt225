@@ -29,31 +29,27 @@ class MapSquareLocsProvider @Inject constructor(
 ) : MapSquaresProvider<MapSquareLocEntryType, MapSquareLocs<MapSquareLocEntryType>> {
     override fun get(): MapSquareLocs<MapSquareLocEntryType> {
         val locs = MapSquareLocs<MapSquareLocEntryType>()
-        val lengthX = 0 until maps.maxOf(MapResource::x) + 1
-        val lengthZ = 0 until maps.maxOf(MapResource::z) + 1
-        for (x in lengthX) {
-            for (z in lengthZ) {
-                val loc = maps.firstOrNull { it.name == "l${x}_$z" } ?: continue
+        
+        maps.filter { it.name.startsWith("l") }.parallelStream().forEach {
+            val locId = it.id
+            val locX = it.x
+            val locZ = it.z
 
-                val locId = loc.id
-                val locX = loc.x
-                val locZ = loc.z
-                
-                val mapSquare = MapSquare(
-                    id = locId,
-                    x = locX,
-                    z = locZ
-                )
-                
-                require(mapSquare.id == locId)
-                require(mapSquare.x == locX)
-                require(mapSquare.z == locZ)
-                
-                val entry = MapSquareLocEntryType(mapSquare.packed)
-                decode(ByteBuffer.wrap(loc.bytes).decompress(), entry)
-                locs[locId] = entry
-            }
+            val mapSquare = MapSquare(
+                id = locId,
+                x = locX,
+                z = locZ
+            )
+
+            require(mapSquare.id == locId)
+            require(mapSquare.x == locX)
+            require(mapSquare.z == locZ)
+
+            val entry = MapSquareLocEntryType(mapSquare.packed)
+            decode(ByteBuffer.wrap(it.bytes).decompress(), entry)
+            locs[locId] = entry
         }
+        
         return locs
     }
 

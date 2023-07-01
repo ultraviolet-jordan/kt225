@@ -8,6 +8,7 @@ import io.ktor.server.engine.ApplicationEngine
 import kt225.common.game.SynchronizerEntityRenderer
 import kt225.common.game.entity.player.Player
 import kt225.common.game.world.World
+import org.rsmod.pathfinder.ZoneFlags
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
 
@@ -22,6 +23,7 @@ class GameModule(
         bind<ApplicationEnvironment>().toProvider<ApplicationEnvironmentProvider>().asEagerSingleton()
         bind<ApplicationEngine>().toProvider<ApplicationEngineProvider>().asEagerSingleton()
         bind<SelectorManager>().toProvider<ServerSocketSelectorProvider>().asEagerSingleton()
+        bind<ZoneFlags>().toInstance(ZoneFlags())
         bind<World>().toProvider<GameWorldProvider>().asEagerSingleton()
         bind<ScheduledExecutorService>().toProvider<GameThreadExecutorProvider>().asEagerSingleton()
         bind<ExecutorService>().toProvider<EntityPoolExecutorProvider>().asEagerSingleton()

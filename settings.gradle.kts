@@ -3,6 +3,7 @@ rootProject.name = "kt225"
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
+        maven("https://jitpack.io")
     }
 
     versionCatalogs {
@@ -15,6 +16,7 @@ dependencyResolutionManagement {
             version("guice", "1.6.0")
             version("jnr", "2.2.14")
             version("commons-compress", "1.23.0")
+            version("pathfinder", "2.4.2")
 
             // Dependency plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
@@ -33,6 +35,7 @@ dependencyResolutionManagement {
             library("slf4j-simple", "org.slf4j", "slf4j-simple").versionRef("slf4j")
             library("jnr", "com.github.jnr", "jnr-ffi").versionRef("jnr")
             library("commons-compress", "org.apache.commons", "commons-compress").versionRef("commons-compress")
+            library("pathfinder", "com.github.blurite", "pathfinder").versionRef("pathfinder")
 
             // Dependency bundles
             listOf(

@@ -25,31 +25,27 @@ class MapSquareLandsProvider @Inject constructor(
 ) : MapSquaresProvider<MapSquareLandEntryType, MapSquareLands<MapSquareLandEntryType>> {
     override fun get(): MapSquareLands<MapSquareLandEntryType> {
         val lands = MapSquareLands<MapSquareLandEntryType>()
-        val lengthX = 0 until maps.maxOf(MapResource::x) + 1
-        val lengthZ = 0 until maps.maxOf(MapResource::z) + 1
-        for (x in lengthX) {
-            for (z in lengthZ) {
-                val land = maps.firstOrNull { it.name == "m${x}_$z" } ?: continue
 
-                val landId = land.id
-                val landX = land.x
-                val landZ = land.z
-                
-                val mapSquare = MapSquare(
-                    id = landId,
-                    x = landX,
-                    z = landZ
-                )
-                
-                require(mapSquare.id == landId)
-                require(mapSquare.x == landX)
-                require(mapSquare.z == landZ)
-                
-                val entry = MapSquareLandEntryType(mapSquare.packed)
-                decode(ByteBuffer.wrap(land.bytes).decompress(), entry)
-                lands[landId] = entry
-            }
+        maps.filter { it.name.startsWith("m") }.parallelStream().forEach {
+            val landId = it.id
+            val landX = it.x
+            val landZ = it.z
+
+            val mapSquare = MapSquare(
+                id = landId,
+                x = landX,
+                z = landZ
+            )
+
+            require(mapSquare.id == landId)
+            require(mapSquare.x == landX)
+            require(mapSquare.z == landZ)
+
+            val entry = MapSquareLandEntryType(mapSquare.packed)
+            decode(ByteBuffer.wrap(it.bytes).decompress(), entry)
+            lands[landId] = entry
         }
+        
         return lands
     }
 

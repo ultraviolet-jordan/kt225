@@ -11,6 +11,7 @@ import kt225.common.network.LoginRequest
 import kt225.game.GameClient
 import kt225.game.entity.player.EntityPlayer
 import kt225.game.world.map.CollisionManager
+import org.rsmod.pathfinder.ZoneFlags
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -18,13 +19,14 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class GameWorld(
     private val mapSquareLands: MapSquareLands<MapSquareLandEntryType>,
-    private val mapSquareLocs: MapSquareLocs<MapSquareLocEntryType>
+    private val mapSquareLocs: MapSquareLocs<MapSquareLocEntryType>,
+    private val zoneFlags: ZoneFlags
 ) : World(
     players = arrayOfNulls(2048),
     loginRequests = ConcurrentHashMap.newKeySet(),
     logoutRequests = ConcurrentHashMap.newKeySet()
 ) {
-    private val collisionManager = CollisionManager()
+    private val collisionManager = CollisionManager(zoneFlags)
 
     private var online = false
 
