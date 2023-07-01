@@ -54,7 +54,7 @@ value class MapSquare(
         get() = z shl SQUARE_SIZE_BITS // 3200
     
     companion object {
-        const val DIVISOR = 64 * 64
+        const val AREA = 64 * 64
         const val ID_BITS = 16
         const val ID_MASK = 0x7fff
         const val COORDINATES_BITS = 8

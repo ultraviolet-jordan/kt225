@@ -59,20 +59,20 @@ class MapSquareLandsProvider @Inject constructor(
     }
 
     override fun decode(buffer: ByteBuffer, entry: MapSquareLandEntryType): MapSquareLandEntryType {
-        val divisor = MapSquare.DIVISOR
-        for (index in 0 until 4 * divisor) {
-            val remaining = index % divisor
-            val mapSquareCoordinates = MapSquareCoordinates(remaining / 64, remaining % 64, index / divisor)
+        val area = MapSquare.AREA
+        for (index in 0 until 4 * area) {
+            val remaining = index % area
+            val mapSquareCoordinates = MapSquareCoordinates(remaining / 64, remaining % 64, index / area)
             entry.lands[mapSquareCoordinates.packed] = buffer.decodeLand().packed
         }
         return entry
     }
 
     override fun encode(buffer: ByteBuffer, entry: MapSquareLandEntryType) {
-        val divisor = MapSquare.DIVISOR
-        for (index in 0 until 4 * divisor) {
-            val remaining = index % divisor
-            val mapSquareCoordinates = MapSquareCoordinates(remaining / 64, remaining % 64, index / divisor)
+        val area = MapSquare.AREA
+        for (index in 0 until 4 * area) {
+            val remaining = index % area
+            val mapSquareCoordinates = MapSquareCoordinates(remaining / 64, remaining % 64, index / area)
             buffer.encodeLand(MapSquareLand(entry.lands[mapSquareCoordinates.packed]))
         }
     }

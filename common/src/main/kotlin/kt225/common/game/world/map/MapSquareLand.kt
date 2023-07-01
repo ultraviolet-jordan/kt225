@@ -48,19 +48,19 @@ value class MapSquareLand(
      * The collision flags of this land on a MapSquare coordinate.
      */
     inline val collision: Int 
-        get() = (packed shr LONG_BITS and 0xffffffffL).toInt() shr COLLISION_BITS and COLLISION_MASK
+        get() = (packed shr LONG_BITS and INT_MASK).toInt() shr COLLISION_BITS and COLLISION_MASK
 
     /**
      * The overlay rotation of this land on a MapSquare coordinate.
      */
     inline val overlayRotation: Int 
-        get() = (packed shr LONG_BITS and 0xffffffff).toInt() and OVERLAY_ROTATION_MASK
+        get() = (packed shr LONG_BITS and INT_MASK).toInt() and OVERLAY_ROTATION_MASK
 
     /**
      * The underlay of this land on a MapSquare coordinate.
      */
     inline val underlayId: Int 
-        get() = (packed shr LONG_BITS and 0xffffffff).toInt() shr UNDERLAY_BITS and UNDERLAY_MASK
+        get() = (packed shr LONG_BITS and INT_MASK).toInt() shr UNDERLAY_BITS and UNDERLAY_MASK
     
     companion object {
         const val HEIGHT_MASK = 0xff
@@ -72,6 +72,7 @@ value class MapSquareLand(
         const val OVERLAY_PATH_MASK = 0x1f
         const val OVERLAY_PATH_MASK_LONG = 0x1f.toLong()
         const val LONG_BITS = OVERLAY_PATH_BITS + OVERLAY_PATH_MASK
+        const val INT_MASK = 0xffffffff
         const val OVERLAY_ROTATION_MASK = 0x3
         const val COLLISION_BITS = 2
         const val COLLISION_MASK = 0x1f

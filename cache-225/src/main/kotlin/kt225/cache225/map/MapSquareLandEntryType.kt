@@ -8,7 +8,7 @@ import kt225.common.game.world.map.MapSquare
  */
 data class MapSquareLandEntryType(
     val mapSquare: Int,
-    val lands: LongArray = LongArray(4 * MapSquare.DIVISOR)
+    val lands: LongArray = LongArray(4 * MapSquare.AREA)
 ) : EntryType {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

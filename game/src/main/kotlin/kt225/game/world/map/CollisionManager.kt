@@ -20,12 +20,12 @@ class CollisionManager(
     private val zoneFlags: ZoneFlags
 ) {
     fun applyCollision(lands: MapSquareLands<MapSquareLandEntryType>, locs: MapSquareLocs<MapSquareLocEntryType>) {
-        val divisor = MapSquare.DIVISOR
+        val area = MapSquare.AREA
         for (entry in lands) {
             val mapSquare = MapSquare(entry.key)
-            for (index in 0 until 4 * divisor) {
-                val plane = index / divisor
-                val remaining = index % divisor
+            for (index in 0 until 4 * area) {
+                val plane = index / area
+                val remaining = index % area
                 val x = remaining / 64
                 val z = remaining % 64
                 val mapSquareCoordinates = MapSquareCoordinates(x, z, plane)
