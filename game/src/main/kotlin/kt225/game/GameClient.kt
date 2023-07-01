@@ -22,7 +22,7 @@ class GameClient(
     private val session: Session
 ) : Client(IsaacRandom.create(serverSeed), IsaacRandom.create(clientSeed)) {
     private val readChannelQueue = ConcurrentHashMap<Int, ArrayBlockingQueue<PacketGroup>>()
-    private val writeChannelQueue = ByteBuffer.allocateDirect(5_000)
+    private val writeChannelQueue = ByteBuffer.allocateDirect(5000)
 
     override fun writePacket(packet: Packet) {
         write(writeChannelQueue, packet)

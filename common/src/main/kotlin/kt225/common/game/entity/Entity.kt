@@ -11,13 +11,13 @@ abstract class Entity(
 ) {
     var index = 0
 
-    var position = Position.None
+    var position = Position.NONE
         protected set
 
-    var lastPosition = Position.None
+    var lastPosition = Position.NONE
         protected set
 
-    var scenePosition = Position.None
+    var scenePosition = Position.NONE
         protected set
 
     var mapSquareChanged = true

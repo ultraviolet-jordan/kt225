@@ -1,52 +1,39 @@
 package kt225.cache225.map
 
 import kt225.cache.EntryType
-import kt225.common.game.world.MapSquare
-import kt225.common.game.world.MapSquareLoc
-import kt225.common.game.world.MapSquareLocalPosition
 import kt225.common.game.world.Position
+import kt225.common.game.world.map.MapSquare
+import kt225.common.game.world.map.MapSquareLoc
+import kt225.common.game.world.map.MapSquareLocLayer
+import kt225.common.game.world.map.MapSquarePosition
+import java.util.TreeMap
 
 /**
  * @author Jordan Abraham
  */
 data class MapSquareLocEntryType(
     val mapSquare: Int,
-    val locs: MutableMap<Int, Array<Long?>> = HashMap()
+    val locs: MutableMap<Int, Int> = TreeMap()
 ) : EntryType {
-    fun query(position: Position, function: (result: List<MapSquareLoc>, local: MapSquareLocalPosition) -> Unit) {
-        val mapSquare = MapSquare(mapSquare)
-        val baseX = mapSquare.x shl 6
-        val baseZ = mapSquare.z shl 6
-        val localPosition = MapSquareLocalPosition(position.plane, position.x - baseX, position.z - baseZ)
-        val mapSquareLocs = locs[localPosition.packed]!!.mapNotNull { it?.let(::MapSquareLoc) }
-        function.invoke(mapSquareLocs, localPosition)
+    fun getLoc(position: Position, layer: MapSquareLocLayer, function: (loc: MapSquareLoc?, position: MapSquarePosition) -> Unit) {
+        require(position.mapSquare == MapSquare(mapSquare))
+        val mapSquarePosition = MapSquarePosition(
+            x = position.localX,
+            z = position.localZ,
+            plane = position.plane,
+            layer = layer.id
+        )
+        val loc = locs[mapSquarePosition.packed]?.let(::MapSquareLoc)
+        function.invoke(loc, mapSquarePosition)
     }
     
-    fun removeLoc(loc: MapSquareLoc, local: MapSquareLocalPosition): Boolean {
-        val locs = locs[local.packed] ?: return false
-        val index = locs.indexOf(loc.packed)
-        if (index == -1) {
-            return false
-        }
-        locs[index] = null
-        return true
+    fun removeLoc(loc: MapSquareLoc, position: MapSquarePosition): Boolean {
+        return locs.remove(position.packed, loc.packed)
     }
 
-    fun addLoc(loc: MapSquareLoc, local: MapSquareLocalPosition): Boolean {
-        val existing = locs[local.packed]
-        if (existing != null) {
-            val index = existing.indexOf(loc.packed)
-            if (index == -1) { // If new loc on this pos.
-                val length = existing.size
-                val clone = existing.copyOf(length + 1)
-                clone[length] = loc.packed
-                locs[local.packed] = clone
-                return true
-            }
-            existing[index] = loc.packed
-            return true
-        }
-        locs[local.packed] = Array(1) { loc.packed }
-        return locs[local.packed] != null
+    fun addLoc(loc: MapSquareLoc, position: MapSquarePosition): Boolean {
+        val packed = position.packed
+        locs[packed] = loc.packed
+        return locs[packed] == loc.packed
     }
 }

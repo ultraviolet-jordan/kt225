@@ -10,9 +10,9 @@ import kt225.cache.map.MapSquareLands
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.p1
-import kt225.common.game.world.MapSquare
-import kt225.common.game.world.MapSquareLand
-import kt225.common.game.world.MapSquareLocalPosition
+import kt225.common.game.world.map.MapSquare
+import kt225.common.game.world.map.MapSquareLand
+import kt225.common.game.world.map.MapSquarePosition
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
@@ -34,8 +34,13 @@ class MapSquareLandsProvider @Inject constructor(
                 val landId = land.id
                 val landX = land.x
                 val landZ = land.z
-
-                val mapSquare = MapSquare(landId, landX, landZ)
+                
+                val mapSquare = MapSquare(
+                    id = landId,
+                    x = landX,
+                    z = landZ
+                )
+                
                 require(mapSquare.id == landId)
                 require(mapSquare.x == landX)
                 require(mapSquare.z == landZ)
@@ -74,8 +79,8 @@ class MapSquareLandsProvider @Inject constructor(
         for (plane in 0 until 4) {
             for (x in 0 until 64) {
                 for (z in 0 until 64) {
-                    val localPosition = MapSquareLocalPosition(plane, x, z)
-                    entry.lands[localPosition.packed] = buffer.decodeLand().packed
+                    val mapSquarePosition = MapSquarePosition(x, z, plane)
+                    entry.lands[mapSquarePosition.packed] = buffer.decodeLand().packed
                 }
             }
         }
@@ -86,8 +91,8 @@ class MapSquareLandsProvider @Inject constructor(
         for (plane in 0 until 4) {
             for (x in 0 until 64) {
                 for (z in 0 until 64) {
-                    val localPosition = MapSquareLocalPosition(plane, x, z)
-                    buffer.encodeLand(MapSquareLand(entry.lands[localPosition.packed]))
+                    val mapSquarePosition = MapSquarePosition(x, z, plane)
+                    buffer.encodeLand(MapSquareLand(entry.lands[mapSquarePosition.packed]))
                 }
             }
         }
@@ -104,7 +109,15 @@ class MapSquareLandsProvider @Inject constructor(
         val opcode = g1
         if (opcode == 0 || opcode == 1) {
             val adjustedHeight = if (opcode == 1) g1/*.let { if (it == 1) 0 else it }*/ else height
-            val land = MapSquareLand(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
+            
+            val land = MapSquareLand(
+                height = adjustedHeight,
+                overlayId = overlayId,
+                overlayPath = overlayPath,
+                overlayRotation = overlayRotation,
+                collision = collision,
+                underlayId = underlayId
+            )
 
             // Checks the bitpacking.
             require(land.height == adjustedHeight)

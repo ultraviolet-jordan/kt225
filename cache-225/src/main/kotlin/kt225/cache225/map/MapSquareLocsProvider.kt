@@ -11,9 +11,11 @@ import kt225.common.buffer.g1
 import kt225.common.buffer.gsmarts
 import kt225.common.buffer.p1
 import kt225.common.buffer.psmarts
-import kt225.common.game.world.MapSquare
-import kt225.common.game.world.MapSquareLoc
-import kt225.common.game.world.MapSquareLocalPosition
+import kt225.common.game.world.map.MapSquare
+import kt225.common.game.world.map.MapSquareLoc
+import kt225.common.game.world.map.MapSquareLocRotation
+import kt225.common.game.world.map.MapSquareLocShape
+import kt225.common.game.world.map.MapSquarePosition
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
@@ -35,8 +37,13 @@ class MapSquareLocsProvider @Inject constructor(
                 val locId = loc.id
                 val locX = loc.x
                 val locZ = loc.z
-
-                val mapSquare = MapSquare(locId, locX, locZ)
+                
+                val mapSquare = MapSquare(
+                    id = locId,
+                    x = locX,
+                    z = locZ
+                )
+                
                 require(mapSquare.id == locId)
                 require(mapSquare.x == locX)
                 require(mapSquare.z == locZ)
@@ -82,7 +89,16 @@ class MapSquareLocsProvider @Inject constructor(
         // Then sorted in order by their locId.
         val sortedLocs = entry
             .locs
-            .flatMap { e -> e.value.mapNotNull { it?.let { e.key to MapSquareLoc(it) } } }
+            .map { 
+                val adjusted = MapSquarePosition(it.key)
+                val actual = MapSquarePosition(
+                    x = adjusted.x,
+                    z = adjusted.z,
+                    plane = adjusted.plane
+                )
+                actual to MapSquareLoc(it.value)
+            }
+            // .flatMap { e -> e.mapNotNull { it -> it.let { e.key to MapSquareLoc.create(it) } } }
             .groupBy { it.second.id }
             .toSortedMap()
         buffer.encodeMapSquareLocs(sortedLocs)
@@ -102,7 +118,7 @@ class MapSquareLocsProvider @Inject constructor(
         if (offset == 0) {
             return
         }
-        val localPosition = MapSquareLocalPosition(packedPosition + offset - 1)
+        val localPosition = MapSquarePosition(packedPosition + offset - 1)
 
         // TODO 
         // The client does the commented out logic.
@@ -123,31 +139,37 @@ class MapSquareLocsProvider @Inject constructor(
         val attributes = g1
         val shape = attributes shr 2
         val rotation = attributes and 0x3
-        val loc = MapSquareLoc(locId, localPosition.x, localPosition.z, localPosition.plane, shape, rotation)
-
-        // New adjusted packed location after adjusting for bridge.
-        // val adjustedLocalPosition = MapSquareLocalPosition(plane, x, z).packed
         
-        val localPositionPacked = localPosition.packed
-        // Dynamically increase the slot on this tile depending on the incoming data.
-        // There is a limit of 5 slots per tile.
-        val slots = entry.locs[localPositionPacked]?.size ?: 0
-        require(slots < 5)
-        entry.locs[localPositionPacked] = entry.locs[localPositionPacked]?.copyOf(slots + 1)?.also {
-            it[slots] = loc.packed
-        } ?: arrayOf(loc.packed)
+        val loc = MapSquareLoc(
+            id = locId,
+//            localX = localPosition.x,
+//            localZ = localPosition.z,
+//            plane = localPosition.plane,
+            shape = MapSquareLocShape(shape),
+            rotation = MapSquareLocRotation(rotation)
+        )
+        
+        val adjustedLocalPosition = MapSquarePosition(
+            x = localPosition.x,
+            z = localPosition.z,
+            plane = localPosition.plane,
+            layer = loc.shape.layer.id
+        )
+        
+        require(!entry.locs.containsKey(adjustedLocalPosition.packed))
+        entry.locs[adjustedLocalPosition.packed] = loc.packed
 
         // Checks the bitpacking.
         require(loc.id == locId)
-        require(loc.x == localPosition.x)
-        require(loc.z == localPosition.z)
-        require(loc.plane == localPosition.plane)
-        require(loc.rotation == rotation)
-        require(loc.shape == shape)
-        return decodeLocs(entry, locId, localPosition.packed)
+//        require(loc.localX == adjustedLocalPosition.x)
+//        require(loc.localZ == adjustedLocalPosition.z)
+//        require(loc.plane == adjustedLocalPosition.plane)
+        require(loc.rotation.id == rotation)
+        require(loc.shape.id == shape)
+        return decodeLocs(entry, locId, adjustedLocalPosition.packed)
     }
 
-    private tailrec fun ByteBuffer.encodeMapSquareLocs(locs: Map<Int, List<Pair<Int, MapSquareLoc>>>, offset: Int = -1, accumulator: Int = 0) {
+    private tailrec fun ByteBuffer.encodeMapSquareLocs(locs: Map<Int, List<Pair<MapSquarePosition, MapSquareLoc>>>, offset: Int = -1, accumulator: Int = 0) {
         val keys = locs.keys
         if (accumulator == keys.size) {
             psmarts(0)
@@ -157,21 +179,21 @@ class MapSquareLocsProvider @Inject constructor(
         val group = locs[key]
         requireNotNull(group)
         psmarts(key - offset)
-        encodeLocs(group.sortedBy(Pair<Int, MapSquareLoc>::first))
+        encodeLocs(group.sortedBy { it.first.packed })
         return encodeMapSquareLocs(locs, key, accumulator + 1)
     }
 
-    private tailrec fun ByteBuffer.encodeLocs(locs: List<Pair<Int, MapSquareLoc>>, offset: Int = 0, accumulator: Int = 0) {
+    private tailrec fun ByteBuffer.encodeLocs(locs: List<Pair<MapSquarePosition, MapSquareLoc>>, offset: Int = 0, accumulator: Int = 0) {
         if (accumulator == locs.size) {
             psmarts(0)
             return
         }
         val pair = locs[accumulator]
+        val packed = pair.first.packed
         val loc = pair.second
-        val localPosition = MapSquareLocalPosition(loc.plane, loc.x, loc.z).packed - offset + 1
-        psmarts(localPosition)
-        val attributes = (loc.shape shl 2) or (loc.rotation and 0x3)
+        psmarts(packed - offset + 1)
+        val attributes = (loc.shape.id shl 2) or (loc.rotation.id and 0x3)
         p1(attributes)
-        return encodeLocs(locs, pair.first, accumulator + 1)
+        return encodeLocs(locs, packed, accumulator + 1)
     }
 }

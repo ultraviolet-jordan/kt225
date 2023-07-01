@@ -50,7 +50,7 @@ class GameWorld(
         loginRequests.forEach {
             require(it is Player)
             players[players.indexOf(null)] = it
-            it.init(Position.Default)
+            it.init(Position.DEFAULT)
             it.login()
         }
         loginRequests.clear()
