@@ -11,8 +11,8 @@ import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.p1
 import kt225.common.game.world.map.MapSquare
+import kt225.common.game.world.map.MapSquareCoordinates
 import kt225.common.game.world.map.MapSquareLand
-import kt225.common.game.world.map.MapSquarePosition
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
@@ -27,23 +27,10 @@ class MapSquareLandsProvider @Inject constructor(
         val lands = MapSquareLands<MapSquareLandEntryType>()
 
         maps.filter { it.name.startsWith("m") }.parallelStream().forEach {
-            val landId = it.id
-            val landX = it.x
-            val landZ = it.z
-
-            val mapSquare = MapSquare(
-                id = landId,
-                x = landX,
-                z = landZ
-            )
-
-            require(mapSquare.id == landId)
-            require(mapSquare.x == landX)
-            require(mapSquare.z == landZ)
-
+            val mapSquare = MapSquare(it.id, it.x, it.z)
             val entry = MapSquareLandEntryType(mapSquare.packed)
             decode(ByteBuffer.wrap(it.bytes).decompress(), entry)
-            lands[landId] = entry
+            lands[it.id] = entry
         }
         
         return lands
@@ -72,25 +59,21 @@ class MapSquareLandsProvider @Inject constructor(
     }
 
     override fun decode(buffer: ByteBuffer, entry: MapSquareLandEntryType): MapSquareLandEntryType {
-        for (plane in 0 until 4) {
-            for (x in 0 until 64) {
-                for (z in 0 until 64) {
-                    val mapSquarePosition = MapSquarePosition(x, z, plane)
-                    entry.lands[mapSquarePosition.packed] = buffer.decodeLand().packed
-                }
-            }
+        val divisor = MapSquare.DIVISOR
+        for (index in 0 until 4 * divisor) {
+            val remaining = index % divisor
+            val mapSquareCoordinates = MapSquareCoordinates(remaining / 64, remaining % 64, index / divisor)
+            entry.lands[mapSquareCoordinates.packed] = buffer.decodeLand().packed
         }
         return entry
     }
 
     override fun encode(buffer: ByteBuffer, entry: MapSquareLandEntryType) {
-        for (plane in 0 until 4) {
-            for (x in 0 until 64) {
-                for (z in 0 until 64) {
-                    val mapSquarePosition = MapSquarePosition(x, z, plane)
-                    buffer.encodeLand(MapSquareLand(entry.lands[mapSquarePosition.packed]))
-                }
-            }
+        val divisor = MapSquare.DIVISOR
+        for (index in 0 until 4 * divisor) {
+            val remaining = index % divisor
+            val mapSquareCoordinates = MapSquareCoordinates(remaining / 64, remaining % 64, index / divisor)
+            buffer.encodeLand(MapSquareLand(entry.lands[mapSquareCoordinates.packed]))
         }
     }
 
@@ -105,24 +88,7 @@ class MapSquareLandsProvider @Inject constructor(
         val opcode = g1
         if (opcode == 0 || opcode == 1) {
             val adjustedHeight = if (opcode == 1) g1/*.let { if (it == 1) 0 else it }*/ else height
-            
-            val land = MapSquareLand(
-                height = adjustedHeight,
-                overlayId = overlayId,
-                overlayPath = overlayPath,
-                overlayRotation = overlayRotation,
-                collision = collision,
-                underlayId = underlayId
-            )
-
-            // Checks the bitpacking.
-            require(land.height == adjustedHeight)
-            require(land.overlayId == overlayId)
-            require(land.overlayPath == overlayPath)
-            require(land.overlayRotation == overlayRotation)
-            require(land.collision == collision)
-            require(land.underlayId == underlayId)
-            return land
+            return MapSquareLand(adjustedHeight, overlayId, overlayPath, overlayRotation, collision, underlayId)
         }
         return decodeLand(
             height = height,

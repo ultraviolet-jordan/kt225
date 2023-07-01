@@ -7,6 +7,10 @@ package kt225.common.game.world.map
 value class MapSquareLocLayer(
     val id: Int
 ) {
+    init {
+        require(id in 0..3)
+    }
+    
     companion object {
         val WALL = MapSquareLocLayer(0)
         val WALLDECOR = MapSquareLocLayer(1)

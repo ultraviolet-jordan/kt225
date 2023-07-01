@@ -7,6 +7,10 @@ package kt225.common.game.world.map
 value class MapSquareLocRotation(
     val id: Int
 ) {
+    init {
+        require(id in 0..3)
+    }
+    
     companion object {
         val SOUTH = MapSquareLocRotation(0)
         val WEST = MapSquareLocRotation(1)

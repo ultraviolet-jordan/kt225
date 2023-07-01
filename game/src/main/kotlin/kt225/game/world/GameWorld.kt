@@ -5,7 +5,7 @@ import kt225.cache.map.MapSquareLocs
 import kt225.cache225.map.MapSquareLandEntryType
 import kt225.cache225.map.MapSquareLocEntryType
 import kt225.common.game.entity.player.Player
-import kt225.common.game.world.Position
+import kt225.common.game.world.Coordinates
 import kt225.common.game.world.World
 import kt225.common.network.LoginRequest
 import kt225.game.GameClient
@@ -52,7 +52,7 @@ class GameWorld(
         loginRequests.forEach {
             require(it is Player)
             players[players.indexOf(null)] = it
-            it.init(Position.DEFAULT)
+            it.init(Coordinates.DEFAULT)
             it.login()
         }
         loginRequests.clear()

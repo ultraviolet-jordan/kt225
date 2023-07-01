@@ -7,17 +7,44 @@ package kt225.common.game.world.map
 value class MapSquareLocShape(
     val id: Int
 ) {
-    inline val isWall: Boolean get() = id in WALL_STRAIGHT..WALL_SQUARE_CORNER || id == WALL_DIAGONAL.id
-    inline val isWallDecor: Boolean get() = id in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH
-    inline val isRoof: Boolean get() = id in ROOF_STRAIGHT..ROOF_FLAT
-    inline val isRoofEdge: Boolean get() = id in ROOFEDGE_STRAIGHT..ROOFEDGE_SQUARE_CORNER
+    /**
+     * If this MapSquareLocShape is a wall shape.
+     */
+    inline val isWall: Boolean 
+        get() = id in WALL_STRAIGHT..WALL_SQUARE_CORNER || id == WALL_DIAGONAL.id
+
+    /**
+     * If this MapSquareLocShape is a wall decor shape.
+     */
+    inline val isWallDecor: Boolean 
+        get() = id in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH
+
+    /**
+     * If this MapSquareLocShape is a roof shape.
+     */
+    inline val isRoof: Boolean 
+        get() = id in ROOF_STRAIGHT..ROOF_FLAT
+
+    /**
+     * If this MapSquareLocShape is a roof edge shape.
+     */
+    inline val isRoofEdge: Boolean 
+        get() = id in ROOFEDGE_STRAIGHT..ROOFEDGE_SQUARE_CORNER
+
+    /**
+     * Returns the MapSquareLocLayer associated with this MapSquareLocShape.
+     */
+    inline val layer: MapSquareLocLayer 
+        get() = when (id) {
+            in WALL_STRAIGHT..WALL_SQUARE_CORNER -> MapSquareLocLayer.WALL
+            in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH -> MapSquareLocLayer.WALLDECOR
+            in WALL_DIAGONAL..ROOFEDGE_SQUARE_CORNER -> MapSquareLocLayer.GROUND
+            GROUND_DECOR.id -> MapSquareLocLayer.GROUNDECOR
+            else -> throw AssertionError("Shape id must be between 0 and 22.")
+        }
     
-    inline val layer: MapSquareLocLayer get() = when (id) {
-        in WALL_STRAIGHT..WALL_SQUARE_CORNER -> MapSquareLocLayer.WALL
-        in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH -> MapSquareLocLayer.WALLDECOR
-        in WALL_DIAGONAL..ROOFEDGE_SQUARE_CORNER -> MapSquareLocLayer.GROUND
-        GROUND_DECOR.id -> MapSquareLocLayer.GROUNDECOR
-        else -> throw AssertionError("Shape id must be between 0 and 22.")
+    init {
+        require(id in 0..22)
     }
 
     companion object {

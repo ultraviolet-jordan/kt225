@@ -12,16 +12,38 @@ value class MapSquareLoc(
         shape: MapSquareLocShape,
         rotation: MapSquareLocRotation
     ) : this(
-        (id and 0xffff)
-            or ((shape.id and 0x1f) shl 16)
-            or ((rotation.id and 0x3) shl 21)
+        (id and ID_MASK)
+            or ((shape.id and SHAPE_MASK) shl SHAPE_BITS)
+            or ((rotation.id and ROTATION_MASK) shl ROTATION_BITS)
     ) {
-        require(id in 0..0xffff)
-        require(shape.id in 0..0x1f)
-        require(rotation.id in 0..0x3)
+        require(this.id == id)
+        require(this.shape == shape)
+        require(this.rotation == rotation)
     }
 
-    inline val id: Int get() = (packed and 0xffff)
-    inline val shape: MapSquareLocShape get() = MapSquareLocShape((packed shr 16 and 0x1f))
-    inline val rotation: MapSquareLocRotation get() = MapSquareLocRotation((packed shr 21 and 0x3))
+    /**
+     * The id of this loc.
+     */
+    inline val id: Int 
+        get() = (packed and ID_MASK)
+
+    /**
+     * The shape of this loc on a MapSquare coordinate.
+     */
+    inline val shape: MapSquareLocShape 
+        get() = MapSquareLocShape((packed shr SHAPE_BITS and SHAPE_MASK))
+
+    /**
+     * The rotation of this loc on a MapSquare coordinate.
+     */
+    inline val rotation: MapSquareLocRotation 
+        get() = MapSquareLocRotation((packed shr ROTATION_BITS and ROTATION_MASK))
+    
+    companion object {
+        const val ID_MASK = 0xffff
+        const val SHAPE_BITS = 16
+        const val SHAPE_MASK = 0x1f
+        const val ROTATION_BITS = 21
+        const val ROTATION_MASK = 0x3
+    }
 }

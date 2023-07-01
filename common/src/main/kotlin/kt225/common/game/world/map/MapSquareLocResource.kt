@@ -8,13 +8,33 @@ value class MapSquareLocResource(
     val packed: Long
 ) {
     constructor(
-        position: Int,
+        coords: Int,
         loc: Int
-    ) : this((position and 0x3ffff).toLong() or ((loc and 0xffffff).toLong() shl 18)) {
-        require(position in 0..0x3ffff)
-        require(loc in 0..0xffffff)
+    ) : this(
+        (coords and COORDINATES_MASK).toLong() 
+            or ((loc and LOC_MASK).toLong() shl LOC_BITS)
+    ) {
+        require(this.coords == coords)
+        require(this.loc == loc)
     }
 
-    inline val position: Int get() = (packed and 0x3ffff).toInt()
-    inline val loc: Int get() = (packed shr 18 and 0xffffff).toInt()
+    /**
+     * The MapSquareCoordinates of this resource.
+     */
+    inline val coords: Int 
+        get() = (packed and COORDINATES_MASK_LONG).toInt()
+
+    /**
+     * The MapSquareLoc of this resource.
+     */
+    inline val loc: Int 
+        get() = (packed shr LOC_BITS and LOC_MASK_LONG).toInt()
+    
+    companion object {
+        const val COORDINATES_MASK = 0x3ffff
+        const val COORDINATES_MASK_LONG = COORDINATES_MASK.toLong()
+        const val LOC_BITS = 18
+        const val LOC_MASK = 0xffffff
+        const val LOC_MASK_LONG = LOC_MASK.toLong()
+    }
 }

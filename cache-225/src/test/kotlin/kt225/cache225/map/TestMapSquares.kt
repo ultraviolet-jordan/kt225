@@ -10,12 +10,12 @@ import kt225.cache.map.MapLocsProvider
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.Cache225Module
-import kt225.common.game.world.Position
+import kt225.common.game.world.Coordinates
+import kt225.common.game.world.map.MapSquareCoordinates
 import kt225.common.game.world.map.MapSquareLoc
 import kt225.common.game.world.map.MapSquareLocLayer
 import kt225.common.game.world.map.MapSquareLocRotation
 import kt225.common.game.world.map.MapSquareLocShape
-import kt225.common.game.world.map.MapSquarePosition
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -172,21 +172,21 @@ class TestMapSquares {
 
         val lumbridge = mapSquareLocs[12850]!!
         
-        lumbridge.getLoc(Position(3223, 3220, 0), MapSquareLocLayer.GROUND) { bush, position ->
+        lumbridge.getLoc(Coordinates(3223, 3220, 0), MapSquareLocLayer.GROUND) { bush, coords ->
             requireNotNull(bush)
             assertEquals(1124, bush.id)
-            val removed = lumbridge.removeLoc(bush, position)
+            val removed = lumbridge.removeLoc(bush, coords)
             assertTrue(removed)
         }
         
-        val chestPosition = Position(3223, 3222, 0)
+        val chestCoordinates = Coordinates(3223, 3222, 0)
         val chest = MapSquareLoc(
             id = 2191,
             shape = MapSquareLocShape.CENTREPIECE_STRAIGHT,
             rotation = MapSquareLocRotation.SOUTH
         )
         
-        val added = lumbridge.addLoc(chest, MapSquarePosition(chestPosition.localX, chestPosition.localZ, chestPosition.plane))
+        val added = lumbridge.addLoc(chest, MapSquareCoordinates(chestCoordinates.localX, chestCoordinates.localZ, chestCoordinates.plane))
         assertTrue(added)
 
         mapSquareLocsProvider.write(mapSquareLocs)

@@ -1,6 +1,6 @@
 package kt225.common.game.entity
 
-import kt225.common.game.world.Position
+import kt225.common.game.world.Coordinates
 import kt225.common.game.world.World
 
 /**
@@ -11,13 +11,13 @@ abstract class Entity(
 ) {
     var index = 0
 
-    var position = Position.NONE
+    var coordinates = Coordinates.NONE
         protected set
 
-    var lastPosition = Position.NONE
+    var lastCoordinates = Coordinates.NONE
         protected set
 
-    var scenePosition = Position.NONE
+    var sceneCoordinates = Coordinates.NONE
         protected set
 
     var mapSquareChanged = true

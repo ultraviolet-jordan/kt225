@@ -1,13 +1,14 @@
 package kt225.cache225.map
 
 import kt225.cache.EntryType
+import kt225.common.game.world.map.MapSquare
 
 /**
  * @author Jordan Abraham
  */
 data class MapSquareLandEntryType(
     val mapSquare: Int,
-    val lands: LongArray = LongArray(4 * 64 * 64)
+    val lands: LongArray = LongArray(4 * MapSquare.DIVISOR)
 ) : EntryType {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
