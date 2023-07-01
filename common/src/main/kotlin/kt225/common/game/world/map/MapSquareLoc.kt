@@ -13,8 +13,8 @@ value class MapSquareLoc(
         rotation: MapSquareLocRotation
     ) : this(
         (id and ID_MASK)
-            or ((shape.id and SHAPE_MASK) shl SHAPE_BITS)
-            or ((rotation.id and ROTATION_MASK) shl ROTATION_BITS)
+            or (shape.id and SHAPE_MASK shl SHAPE_BITS)
+            or (rotation.id and ROTATION_MASK shl ROTATION_BITS)
     ) {
         require(this.id == id)
         require(this.shape == shape)

@@ -11,8 +11,8 @@ value class MapSquareLocResource(
         coords: Int,
         loc: Int
     ) : this(
-        (coords and COORDINATES_MASK).toLong() 
-            or ((loc and LOC_MASK).toLong() shl LOC_BITS)
+        (coords.toLong() and COORDINATES_MASK)
+            or (loc.toLong() and LOC_MASK shl LOC_BITS)
     ) {
         require(this.coords == coords)
         require(this.loc == loc)
@@ -22,19 +22,17 @@ value class MapSquareLocResource(
      * The MapSquareCoordinates of this resource.
      */
     inline val coords: Int 
-        get() = (packed and COORDINATES_MASK_LONG).toInt()
+        get() = (packed and COORDINATES_MASK).toInt()
 
     /**
      * The MapSquareLoc of this resource.
      */
     inline val loc: Int 
-        get() = (packed shr LOC_BITS and LOC_MASK_LONG).toInt()
+        get() = (packed shr LOC_BITS and LOC_MASK).toInt()
     
     companion object {
-        const val COORDINATES_MASK = 0x3ffff
-        const val COORDINATES_MASK_LONG = COORDINATES_MASK.toLong()
+        const val COORDINATES_MASK = 0x3ffffL
         const val LOC_BITS = 18
-        const val LOC_MASK = 0xffffff
-        const val LOC_MASK_LONG = LOC_MASK.toLong()
+        const val LOC_MASK = 0xffffffL
     }
 }

@@ -15,8 +15,8 @@ value class Coordinates(
         plane: Int = 0
     ) : this(
         (z and COORDINATES_MASK) 
-            or ((x and COORDINATES_MASK) shl COORDINATES_BITS) 
-            or ((plane and PLANE_MASK) shl PLANE_BITS)
+            or (x and COORDINATES_MASK shl COORDINATES_BITS) 
+            or (plane and PLANE_MASK shl PLANE_BITS)
     ) {
         require(this.x == x)
         require(this.z == z)
