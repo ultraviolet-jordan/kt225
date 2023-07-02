@@ -28,12 +28,12 @@ class CollisionManager(
                 val x = remaining / 64
                 val z = remaining % 64
                 val mapSquareCoordinates = MapSquareCoordinates(x, z, plane)
-                val mapSquareLand = MapSquareLand(entry.value.lands[mapSquareCoordinates.packed.toInt()])
+                val mapSquareLand = MapSquareLand(entry.value.lands[mapSquareCoordinates.packed])
                 if (mapSquareLand.collision and 0x1 != 1) {
                     continue
                 }
                 val adjustedPlane = MapSquareCoordinates(x, z, 1)
-                val adjustedLand = MapSquareLand(entry.value.lands[adjustedPlane.packed.toInt()])
+                val adjustedLand = MapSquareLand(entry.value.lands[adjustedPlane.packed])
                 val actualPlane = if (adjustedLand.collision and 0x2 == 2) plane - 1 else plane
                 if (actualPlane < 0) {
                     continue
@@ -49,7 +49,7 @@ class CollisionManager(
                 val loc = MapSquareLoc(packed)
                 val mapSquareCoordinates = loc.coords
                 val adjustedPlane = MapSquareCoordinates(mapSquareCoordinates.x, mapSquareCoordinates.z, 1)
-                val adjustedLand = lands[mapSquare.packed]?.lands?.get(adjustedPlane.packed.toInt())?.let(::MapSquareLand) ?: continue
+                val adjustedLand = lands[mapSquare.packed]?.lands?.get(adjustedPlane.packed)?.let(::MapSquareLand) ?: continue
                 val actualPlane = if (adjustedLand.collision and 0x2 == 2) mapSquareCoordinates.plane - 1 else mapSquareCoordinates.plane
                 if (actualPlane < 0) {
                     continue
