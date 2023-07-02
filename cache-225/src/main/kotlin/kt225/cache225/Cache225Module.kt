@@ -3,6 +3,7 @@ package kt225.cache225
 import dev.misfitlabs.kotlinguice4.KotlinModule
 import kt225.cache.config.flo.Flos
 import kt225.cache.config.idk.Idks
+import kt225.cache.config.loc.Locs
 import kt225.cache.config.npc.Npcs
 import kt225.cache.config.obj.Objs
 import kt225.cache.config.seq.Seqs
@@ -15,6 +16,8 @@ import kt225.cache225.config.flo.FloEntryType
 import kt225.cache225.config.flo.FlosProvider
 import kt225.cache225.config.idk.IdkEntryType
 import kt225.cache225.config.idk.IdksProvider
+import kt225.cache225.config.loc.LocEntryType
+import kt225.cache225.config.loc.LocsProvider
 import kt225.cache225.config.npc.NpcEntryType
 import kt225.cache225.config.npc.NpcsProvider
 import kt225.cache225.config.obj.ObjEntryType
@@ -39,6 +42,7 @@ object Cache225Module : KotlinModule() {
     override fun configure() {
         // Eager ones required for game server.
         bind<Idks<IdkEntryType>>().toProvider<IdksProvider>().asEagerSingleton()
+        bind<Locs<LocEntryType>>().toProvider<LocsProvider>().asEagerSingleton()
         bind<Npcs<NpcEntryType>>().toProvider<NpcsProvider>().asEagerSingleton()
         bind<Objs<ObjEntryType>>().toProvider<ObjsProvider>().asEagerSingleton()
         bind<Seqs<SeqEntryType>>().toProvider<SeqsProvider>().asEagerSingleton()

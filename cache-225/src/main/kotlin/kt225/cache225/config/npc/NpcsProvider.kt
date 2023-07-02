@@ -54,14 +54,14 @@ class NpcsProvider @Inject constructor(
             2 -> entry.name = buffer.gstr
             3 -> entry.desc = buffer.gstr
             12 -> entry.size = buffer.g1b
-            13 -> entry.readyanim = buffer.g2
-            14 -> entry.walkanim = buffer.g2
+            13 -> entry.readyseq = buffer.g2
+            14 -> entry.walkseq = buffer.g2
             16 -> entry.disposeAlpha = true
             17 -> {
-                entry.walkanim = buffer.g2
-                entry.walkanim_b = buffer.g2
-                entry.walkanim_r = buffer.g2
-                entry.walkanim_l = buffer.g2
+                entry.walkseq = buffer.g2
+                entry.walkseq_b = buffer.g2
+                entry.walkseq_r = buffer.g2
+                entry.walkseq_l = buffer.g2
             }
             in 30..39 -> {
                 val ops = entry.ops ?: arrayOfNulls(5)
@@ -104,18 +104,18 @@ class NpcsProvider @Inject constructor(
             buffer.p1(12)
             buffer.p1(entry.size)
         }
-        buffer.pNotNegative1(entry.readyanim, 13, ByteBuffer::p2)
-        if (entry.walkanim != -1 && entry.walkanim_b == -1 && entry.walkanim_r == -1 && entry.walkanim_l == -1) {
+        buffer.pNotNegative1(entry.readyseq, 13, ByteBuffer::p2)
+        if (entry.walkseq != -1 && entry.walkseq_b == -1 && entry.walkseq_r == -1 && entry.walkseq_l == -1) {
             buffer.p1(14)
-            buffer.p2(entry.walkanim)
+            buffer.p2(entry.walkseq)
         }
         buffer.pTrue(entry.disposeAlpha, 16)
-        if (entry.walkanim != -1 && entry.walkanim_b != -1 || entry.walkanim_r != -1 || entry.walkanim_l != -1) {
+        if (entry.walkseq != -1 && entry.walkseq_b != -1 || entry.walkseq_r != -1 || entry.walkseq_l != -1) {
             buffer.p1(17)
-            buffer.p2(entry.walkanim)
-            buffer.p2(entry.walkanim_b)
-            buffer.p2(entry.walkanim_r)
-            buffer.p2(entry.walkanim_l)
+            buffer.p2(entry.walkseq)
+            buffer.p2(entry.walkseq_b)
+            buffer.p2(entry.walkseq_r)
+            buffer.p2(entry.walkseq_l)
         }
         entry.ops?.let {
             require(it.size <= 5)

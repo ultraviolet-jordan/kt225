@@ -13,12 +13,12 @@ data class NpcEntryType(
     var name: String? = null,
     var desc: String? = null,
     var size: Int = 1,
-    var readyanim: Int = -1,
-    var walkanim: Int = -1,
+    var readyseq: Int = -1,
+    var walkseq: Int = -1,
     var disposeAlpha: Boolean = false,
-    var walkanim_b: Int = -1,
-    var walkanim_r: Int = -1,
-    var walkanim_l: Int = -1,
+    var walkseq_b: Int = -1,
+    var walkseq_r: Int = -1,
+    var walkseq_l: Int = -1,
     var ops: Array<String?>? = null,
     var recol_s: IntArray? = null,
     var recol_d: IntArray? = null,
@@ -45,12 +45,12 @@ data class NpcEntryType(
         if (name != other.name) return false
         if (desc != other.desc) return false
         if (size != other.size) return false
-        if (readyanim != other.readyanim) return false
-        if (walkanim != other.walkanim) return false
+        if (readyseq != other.readyseq) return false
+        if (walkseq != other.walkseq) return false
         if (disposeAlpha != other.disposeAlpha) return false
-        if (walkanim_b != other.walkanim_b) return false
-        if (walkanim_r != other.walkanim_r) return false
-        if (walkanim_l != other.walkanim_l) return false
+        if (walkseq_b != other.walkseq_b) return false
+        if (walkseq_r != other.walkseq_r) return false
+        if (walkseq_l != other.walkseq_l) return false
         if (ops != null) {
             if (other.ops == null) return false
             if (!ops.contentEquals(other.ops)) return false
@@ -82,12 +82,12 @@ data class NpcEntryType(
         result = 31 * result + (name?.hashCode() ?: 0)
         result = 31 * result + (desc?.hashCode() ?: 0)
         result = 31 * result + size
-        result = 31 * result + readyanim
-        result = 31 * result + walkanim
+        result = 31 * result + readyseq
+        result = 31 * result + walkseq
         result = 31 * result + disposeAlpha.hashCode()
-        result = 31 * result + walkanim_b
-        result = 31 * result + walkanim_r
-        result = 31 * result + walkanim_l
+        result = 31 * result + walkseq_b
+        result = 31 * result + walkseq_r
+        result = 31 * result + walkseq_l
         result = 31 * result + (ops?.contentHashCode() ?: 0)
         result = 31 * result + (recol_s?.contentHashCode() ?: 0)
         result = 31 * result + (recol_d?.contentHashCode() ?: 0)

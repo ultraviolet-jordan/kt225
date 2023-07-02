@@ -11,59 +11,75 @@ import kotlin.math.min
 /**
  * Get 1 byte from this ByteBuffer.
  */
-inline val ByteBuffer.g1: Int get() = get().toInt() and 0xff
+inline val ByteBuffer.g1: Int 
+    get() = get().toInt() and 0xff
 
 /**
  * Get 1 signed byte from this ByteBuffer.
  */
-inline val ByteBuffer.g1b: Int get() = get().toInt()
+inline val ByteBuffer.g1b: Int 
+    get() = get().toInt()
 
 /**
  * Get 2 bytes from this ByteBuffer.
  */
-inline val ByteBuffer.g2: Int get() = getShort().toInt() and 0xffff
+inline val ByteBuffer.g2: Int 
+    get() = getShort().toInt() and 0xffff
+
+/**
+ * Get 2 signed bytes from this ByteBuffer.
+ */
+inline val ByteBuffer.g2b: Int 
+    get() = getShort().toInt()
 
 /**
  * Get 2 bytes from this ByteBuffer LE.
  */
-inline val ByteBuffer.ig2: Int get() = (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8)
+inline val ByteBuffer.ig2: Int 
+    get() = (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8)
 
 /**
  * Get 3 bytes from this ByteBuffer.
  */
-inline val ByteBuffer.g3: Int get() = (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
+inline val ByteBuffer.g3: Int 
+    get() = (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
 
 /**
  * Get 4 bytes from this ByteBuffer.
  */
-inline val ByteBuffer.g4: Int get() = getInt()
+inline val ByteBuffer.g4: Int 
+    get() = getInt()
 
 /**
  * Get 8 bytes from this ByteBuffer.
  */
-inline val ByteBuffer.g8: Long get() = getLong()
+inline val ByteBuffer.g8: Long 
+    get() = getLong()
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
-inline val ByteBuffer.gsmarts: Int get() = if ((this[position()].toInt() and 0xff) < 128) g1 else g2 - 32768
+inline val ByteBuffer.gsmarts: Int 
+    get() = if ((this[position()].toInt() and 0xff) < 128) g1 else g2 - 32768
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
-inline val ByteBuffer.gsmart: Int get() = if ((this[position()].toInt() and 0xff) < 128) g1 - 64 else g2 - 49152
+inline val ByteBuffer.gsmart: Int 
+    get() = if ((this[position()].toInt() and 0xff) < 128) g1 - 64 else g2 - 49152
 
 /**
  * Get a string from this ByteBuffer.
  * Moves the buffer position from the current position + string.length + 1
  */
-inline val ByteBuffer.gstr: String get() {
-    return String(gdata(lengthToByte(10))).also {
-        skip(1)
+inline val ByteBuffer.gstr: String 
+    get() {
+        return String(gdata(lengthToByte(10))).also {
+            skip(1)
+        }
     }
-}
 
 /**
  * Get bytes from this ByteBuffer.
