@@ -12,9 +12,9 @@ value class MapSquareLocRotation(
     }
     
     companion object {
-        val SOUTH = MapSquareLocRotation(0)
-        val WEST = MapSquareLocRotation(1)
-        val NORTH = MapSquareLocRotation(2)
-        val EAST = MapSquareLocRotation(3)
+        val WEST = MapSquareLocRotation(0)
+        val NORTH = MapSquareLocRotation(1)
+        val EAST = MapSquareLocRotation(2)
+        val SOUTH = MapSquareLocRotation(3)
     }
 }

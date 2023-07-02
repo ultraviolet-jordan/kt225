@@ -66,8 +66,12 @@ class LocsProvider @Inject constructor(
             15 -> entry.length = buffer.g1
             17 -> entry.blockwalk = false
             18 -> entry.blockrange = false
-            19 -> if (buffer.g1 == 1) {
-                entry.interactable = true
+            19 -> {
+                val interactive = buffer.g1
+                if (interactive == 1) {
+                    entry.interactable = true
+                }
+                entry.interactive = interactive
             }
             21 -> entry.hillskew = true
             22 -> entry.computeVertexColors = true

@@ -195,7 +195,7 @@ class TestMapSquares {
             val chest = MapSquareLoc(
                 id = 2191,
                 shape = MapSquareLocShape.CENTREPIECE_STRAIGHT,
-                rotation = MapSquareLocRotation.SOUTH,
+                rotation = MapSquareLocRotation.WEST,
                 coords = coord,
             )
             val added = lumbridge.addLoc(chest)

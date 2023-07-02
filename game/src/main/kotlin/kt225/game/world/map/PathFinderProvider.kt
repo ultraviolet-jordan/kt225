@@ -15,7 +15,8 @@ class PathFinderProvider @Inject constructor(
 ) : Provider<PathFinder> {
     override fun get(): PathFinder {
         return PathFinder(
-            flags = zoneFlags.flags
+            flags = zoneFlags.flags,
+            useRouteBlockerFlags = false
         )
     }
 }

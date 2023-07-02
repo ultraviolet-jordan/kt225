@@ -18,9 +18,9 @@ value class Coordinates(
             or (x and COORDINATES_MASK shl COORDINATES_BITS) 
             or (plane and PLANE_MASK shl PLANE_BITS)
     ) {
-        require(this.x == x)
-        require(this.z == z)
-        require(this.plane == plane)
+        require(this.x == x) { "Invalid x: $x" }
+        require(this.z == z) { "Invalid z: $z" }
+        require(this.plane == plane) { "Invalid plane: $plane" }
     }
 
     /**
@@ -96,6 +96,12 @@ value class Coordinates(
         val deltaZ = other.z - z
         return deltaX <= distance && deltaX >= -distance && deltaZ <= distance && deltaZ >= -distance
     }
+
+    fun transform(deltaX: Int, deltaZ: Int, deltaPlane: Int = 0) = Coordinates(
+        x = x + deltaX,
+        z = z + deltaZ,
+        plane = plane + deltaPlane
+    )
 
     companion object {
         val NONE = Coordinates(0)

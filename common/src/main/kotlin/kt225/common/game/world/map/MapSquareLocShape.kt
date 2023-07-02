@@ -11,25 +11,25 @@ value class MapSquareLocShape(
      * If this MapSquareLocShape is a wall shape.
      */
     inline val isWall: Boolean 
-        get() = id in WALL_STRAIGHT..WALL_SQUARE_CORNER || id == WALL_DIAGONAL.id
+        get() = layer == MapSquareLocLayer.WALL
 
     /**
      * If this MapSquareLocShape is a wall decor shape.
      */
     inline val isWallDecor: Boolean 
-        get() = id in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH
+        get() = layer == MapSquareLocLayer.WALLDECOR
 
     /**
      * If this MapSquareLocShape is a roof shape.
      */
-    inline val isRoof: Boolean 
-        get() = id in ROOF_STRAIGHT..ROOF_FLAT
+    inline val isGround: Boolean 
+        get() = layer == MapSquareLocLayer.GROUND
 
     /**
      * If this MapSquareLocShape is a roof edge shape.
      */
-    inline val isRoofEdge: Boolean 
-        get() = id in ROOFEDGE_STRAIGHT..ROOFEDGE_SQUARE_CORNER
+    inline val isGroundDecor: Boolean 
+        get() = layer == MapSquareLocLayer.GROUNDECOR
 
     /**
      * Returns the MapSquareLocLayer associated with this MapSquareLocShape.

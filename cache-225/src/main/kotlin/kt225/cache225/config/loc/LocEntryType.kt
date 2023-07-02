@@ -17,6 +17,7 @@ data class LocEntryType(
     var length: Int = 1,
     var blockwalk: Boolean = true,
     var blockrange: Boolean = true,
+    var interactive: Int = -1,
     var interactable: Boolean = false,
     var hillskew: Boolean = false,
     var computeVertexColors: Boolean = false,
@@ -63,6 +64,7 @@ data class LocEntryType(
         if (length != other.length) return false
         if (blockwalk != other.blockwalk) return false
         if (blockrange != other.blockrange) return false
+        if (interactive != other.interactive) return false
         if (interactable != other.interactable) return false
         if (hillskew != other.hillskew) return false
         if (computeVertexColors != other.computeVertexColors) return false
@@ -108,6 +110,7 @@ data class LocEntryType(
         result = 31 * result + length
         result = 31 * result + blockwalk.hashCode()
         result = 31 * result + blockrange.hashCode()
+        result = 31 * result + interactive
         result = 31 * result + interactable.hashCode()
         result = 31 * result + hillskew.hashCode()
         result = 31 * result + computeVertexColors.hashCode()
