@@ -50,12 +50,12 @@ value class MapSquareLand(
             or (collision.toLong() and COLLISION_MASK shl COLLISION_BITS)
             or (underlayId.toLong() and UNDERLAY_MASK shl UNDERLAY_BITS)
     ) {
-        require(this.height == height)
-        require(this.overlayId == overlayId)
-        require(this.overlayPath == overlayPath)
-        require(this.overlayRotation == overlayRotation)
-        require(this.collision == collision)
-        require(this.underlayId == underlayId)
+        require(this.height == height) { "Invalid height: $height" }
+        require(this.overlayId == overlayId) { "Invalid overlay ID: $overlayId" }
+        require(this.overlayPath == overlayPath) { "Invalid overlay path: $overlayPath" }
+        require(this.overlayRotation == overlayRotation) { "Invalid overlay rotation: $overlayRotation" }
+        require(this.collision == collision) { "Invalid collision: $collision" }
+        require(this.underlayId == underlayId) { "Invalid underlay ID: $underlayId" }
     }
 
     /**

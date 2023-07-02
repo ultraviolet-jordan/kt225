@@ -46,10 +46,10 @@ value class MapSquareLoc(
             or (rotation.id.toLong() and ROTATION_MASK shl ROTATION_BITS)
             or (coords.packed.toLong() and COORDINATES_MASK shl COORDINATES_BITS)
     ) {
-        require(this.id == id)
-        require(this.shape == shape)
-        require(this.rotation == rotation)
-        require(this.coords == coords)
+        require(this.id == id) { "Invalid id: $id" }
+        require(this.shape == shape) { "Invalid shape: $shape" }
+        require(this.rotation == rotation) { "Invalid rotation: $rotation" }
+        require(this.coords == coords) { "Invalid coords: $coords" }
     }
 
     /**

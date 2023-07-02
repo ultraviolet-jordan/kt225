@@ -38,9 +38,9 @@ value class MapSquareCoordinates(
             or (x and COORDINATES_MASK shl COORDINATES_BITS) 
             or (plane and PLANE_MASK shl PLANE_BITS)
     ) {
-        require(this.x == x)
-        require(this.z == z)
-        require(this.plane == plane)
+        require(this.x == x) { "Invalid x: $x" }
+        require(this.z == z) { "Invalid z: $z" }
+        require(this.plane == plane) { "Invalid plane: $plane" }
     }
 
     /**

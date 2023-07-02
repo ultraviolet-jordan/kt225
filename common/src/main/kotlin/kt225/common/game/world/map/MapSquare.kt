@@ -38,9 +38,9 @@ value class MapSquare(
             or (x and COORDINATES_MASK shl X_BITS) 
             or (z and COORDINATES_MASK shl Z_BITS)
     ) {
-        require(this.id == id)
-        require(this.x == x)
-        require(this.z == z)
+        require(this.id == id) { "Invalid id: $id" }
+        require(this.x == x) { "Invalid x: $x" }
+        require(this.z == z) { "Invalid x: $z" }
     }
 
     /**

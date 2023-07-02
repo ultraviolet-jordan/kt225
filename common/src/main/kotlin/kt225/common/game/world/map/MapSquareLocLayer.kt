@@ -8,7 +8,7 @@ value class MapSquareLocLayer(
     val id: Int
 ) {
     init {
-        require(id in 0..3)
+        require(id in 0..3) { "Invalid id: $id" }
     }
     
     companion object {
