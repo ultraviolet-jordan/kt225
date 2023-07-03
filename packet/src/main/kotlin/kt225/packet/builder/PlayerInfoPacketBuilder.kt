@@ -22,6 +22,9 @@ class PlayerInfoPacketBuilder @Inject constructor(
     id = 184,
     length = -2
 ) {
+    private val highDefinitionRenders = synchronizerEntityRenderer.highDefinitionRenders
+    private val animatorRenders = synchronizerEntityRenderer.animatorRenders
+    
     override fun buildPacket(packet: PlayerInfoPacket, buffer: ByteBuffer) {
         val viewport = packet.viewport
         buffer.accessBits {
@@ -33,8 +36,8 @@ class PlayerInfoPacketBuilder @Inject constructor(
     }
 
     private fun ByteBuffer.updateLocalPlayer(index: Int, viewport: Viewport) {
-        val rendering = synchronizerEntityRenderer.highDefinitionRenders[index] != null
-        val animatedBlock = synchronizerEntityRenderer.animatorRenders[index]
+        val rendering = highDefinitionRenders[index] != null
+        val animatedBlock = animatorRenders[index]
         if (animatedBlock == null) {
             pbit(1, 0)
             return
@@ -63,7 +66,7 @@ class PlayerInfoPacketBuilder @Inject constructor(
 
     private fun ByteBuffer.updatePlayerMasks(viewport: Viewport, packet: PlayerInfoPacket) {
         for (index in viewport.localRenderUpdates) {
-            val render = synchronizerEntityRenderer.highDefinitionRenders[index] ?: continue
+            val render = highDefinitionRenders[index] ?: continue
             pdata(render)
         }
         viewport.localRenderUpdates.clear()
