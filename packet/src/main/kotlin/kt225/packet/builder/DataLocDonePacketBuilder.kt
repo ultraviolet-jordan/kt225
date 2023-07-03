@@ -15,8 +15,7 @@ class DataLocDonePacketBuilder : PacketBuilder<DataLocDonePacket>(
     length = 2
 ) {
     override fun buildPacket(packet: DataLocDonePacket, buffer: ByteBuffer) {
-        val (x, z) = packet
-        buffer.p1(x)
-        buffer.p1(z)
+        buffer.p1(packet.x)
+        buffer.p1(packet.z)
     }
 }
