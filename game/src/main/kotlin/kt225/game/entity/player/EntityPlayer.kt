@@ -29,7 +29,7 @@ class EntityPlayer(
     }
 
     override fun login() {
-        client.writePacket(LoadAreaPacket(coordinates.zoneX, coordinates.zoneZ))
+        client.writePacket(LoadAreaPacket(sceneCoordinates.zoneX, sceneCoordinates.zoneZ))
         renderer.render(
             Appearance(
                 headIcon = 0,
@@ -50,6 +50,11 @@ class EntityPlayer(
 
     override fun processRoute() {
         route.process(this)
+    }
+
+    override fun rebuildScene() {
+        super.rebuildScene()
+        client.writePacket(LoadAreaPacket(sceneCoordinates.zoneX, sceneCoordinates.zoneZ))
     }
 
     override fun canTravel(coordinates: Coordinates, direction: EntityDirection): Boolean {

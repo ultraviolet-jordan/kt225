@@ -31,6 +31,10 @@ abstract class Player(
         this.sceneCoordinates = coordinates
     }
 
+    override fun rebuildScene() {
+        this.sceneCoordinates = coordinates
+    }
+
     override fun moveTo(coordinates: Coordinates, stepDirection: RouteStepDirection) {
         this.coordinates = coordinates
         
