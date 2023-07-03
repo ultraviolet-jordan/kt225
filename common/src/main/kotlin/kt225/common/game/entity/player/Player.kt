@@ -28,6 +28,11 @@ abstract class Player(
     open fun init(coordinates: Coordinates) {
         this.coordinates = coordinates
         this.lastCoordinates = coordinates
+        this.sceneCoordinates = coordinates
+    }
+
+    override fun rebuildScene() {
+        this.sceneCoordinates = coordinates
     }
 
     override fun moveTo(coordinates: Coordinates, stepDirection: RouteStepDirection) {

@@ -22,6 +22,9 @@ abstract class Entity(
     var lastCoordinates = Coordinates.NONE
         protected set
 
+    var sceneCoordinates = Coordinates.NONE
+        protected set
+
     var mapSquareChanged = true
         protected set
     
@@ -73,8 +76,8 @@ abstract class Entity(
     }
 
     private fun needSceneRebuild(buildArea: Int = 104): Boolean {
-        val lastZoneX = coordinates.zoneX
-        val lastZoneZ = coordinates.zoneZ
+        val lastZoneX = sceneCoordinates.zoneX
+        val lastZoneZ = sceneCoordinates.zoneZ
         val zoneX = coordinates.zoneX
         val zoneZ = coordinates.zoneZ
         val limit = ((buildArea shr 3) / 2) - 1

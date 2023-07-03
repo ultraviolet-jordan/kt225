@@ -49,6 +49,7 @@ class EntityPlayer(
     }
 
     override fun rebuildScene() {
+        super.rebuildScene()
         client.writePacket(LoadAreaPacket(coordinates.zoneX, coordinates.zoneZ))
     }
 
