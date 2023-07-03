@@ -1,12 +1,17 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 
+group = "org.example"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    maven("https://jitpack.io")
+}
+
 plugins {
     alias(deps.plugins.jvm)
     alias(deps.plugins.versions)
 }
-
-group = "org.example"
-version = "1.0-SNAPSHOT"
 
 allprojects {
     plugins.withType<KotlinPluginWrapper> {
