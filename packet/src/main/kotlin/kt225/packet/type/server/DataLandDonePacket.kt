@@ -5,7 +5,24 @@ import kt225.common.packet.Packet
 /**
  * @author Jordan Abraham
  */
-data class DataLandDonePacket(
-    val x: Int,
-    val z: Int
-) : Packet
+@JvmInline
+value class DataLandDonePacket(
+    val packed: Int
+) : Packet {
+    constructor(
+        x: Int,
+        z: Int
+    ) : this (
+        x and 0xff
+            or (z and 0xff shl 8)
+    ) {
+        require(this.x == x)
+        require(this.z == z)
+    }
+    
+    inline val x: Int
+        get() = packed and 0xff
+    
+    inline val z: Int
+        get() = packed shr 8 and 0xff
+}
