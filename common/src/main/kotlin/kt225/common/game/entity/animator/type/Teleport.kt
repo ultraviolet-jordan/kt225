@@ -16,9 +16,9 @@ value class Teleport(
         plane: Int
     ) : this (
         (if (rendering) 1 else 0) and 0x1
-            or (x and 0xff shl 1)
-            or (z and 0xff shl 9)
-            or (plane and 0x3 shl 17)
+            or (x and 0x7f shl 1)
+            or (z and 0x7f shl 8)
+            or (plane and 0x3 shl 15)
     ) {
         require(this.rendering == (if (rendering) 1 else 0))
         require(this.x == x)
@@ -30,11 +30,11 @@ value class Teleport(
         get() = packed and 0x1
 
     inline val x: Int
-        get() = packed shr 1 and 0xff
+        get() = packed shr 1 and 0x7f
 
     inline val z: Int
-        get() = packed shr 9 and 0xff
+        get() = packed shr 8 and 0x7f
 
     inline val plane: Int
-        get() = packed shr 17 and 0x3
+        get() = packed shr 15 and 0x3
 }
