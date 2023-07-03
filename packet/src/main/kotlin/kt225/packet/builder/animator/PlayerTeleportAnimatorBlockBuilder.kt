@@ -12,11 +12,10 @@ class PlayerTeleportAnimatorBlockBuilder : AnimatorBlockBuilder<Teleport>(
     index = 3
 ) {
     override fun buildAnimatorBlock(buffer: ByteBuffer, animator: Teleport) {
-        val (rendering, x, z, plane) = animator
-        buffer.pbit(2, plane)
-        buffer.pbit(7, x)
-        buffer.pbit(7, z)
-        buffer.pbit(1, 1) // Clear movement queue.
-        buffer.pbit(1, if (rendering) 1 else 0)
+        buffer.pbit(2, animator.plane)
+        buffer.pbit(7, animator.x)
+        buffer.pbit(7, animator.z)
+        buffer.pbit(1, 1)
+        buffer.pbit(1, animator.rendering)
     }
 }
