@@ -12,8 +12,7 @@ class PlayerWalkAnimatorBlockBuilder : AnimatorBlockBuilder<Walk>(
     index = 1
 ) {
     override fun buildAnimatorBlock(buffer: ByteBuffer, animator: Walk) {
-        val (rendering, direction) = animator
-        buffer.pbit(3, direction.id)
-        buffer.pbit(1, if (rendering) 1 else 0)
+        buffer.pbit(3, animator.direction)
+        buffer.pbit(1, animator.rendering)
     }
 }

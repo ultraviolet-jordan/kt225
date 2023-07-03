@@ -5,19 +5,10 @@ import kt225.common.game.world.Coordinates
 /**
  * @author Jordan Abraham
  */
-enum class EntityDirection(
+@JvmInline
+value class EntityDirection(
     val id: Int
 ) {
-    NONE(-1),
-    NORTH_WEST(0),
-    NORTH(1),
-    NORTH_EAST(2),
-    WEST(3),
-    EAST(4),
-    SOUTH_WEST(5),
-    SOUTH(6),
-    SOUTH_EAST(7);
-
     inline val deltaX: Int
         get() = when (this) {
             SOUTH_EAST, NORTH_EAST, EAST -> 1
@@ -31,35 +22,41 @@ enum class EntityDirection(
             SOUTH_WEST, SOUTH_EAST, SOUTH -> -1
             else -> 0
         }
-
+    
     companion object {
+        val NORTH_WEST = EntityDirection(0)
+        val NORTH = EntityDirection(1)
+        val NORTH_EAST = EntityDirection(2)
+        val WEST = EntityDirection(3)
+        val EAST = EntityDirection(4)
+        val SOUTH_WEST = EntityDirection(5)
+        val SOUTH = EntityDirection(6)
+        val SOUTH_EAST = EntityDirection(7)
+        val NONE = EntityDirection(127)
+
         fun between(start: Coordinates, end: Coordinates): EntityDirection {
             val deltaX = end.x - start.x
-            val deltaZ = end.z - start.z
-            when (deltaZ) {
-                1 -> {
-                    when (deltaX) {
-                        1 -> return NORTH_EAST
-                        0 -> return NORTH
-                        -1 -> return NORTH_WEST
-                    }
+            return when (end.z - start.z) {
+                1 -> when (deltaX) {
+                    1 -> NORTH_EAST
+                    0 -> NORTH
+                    -1 -> NORTH_WEST
+                    else -> NONE
                 }
-                -1 -> {
-                    when (deltaX) {
-                        1 -> return SOUTH_EAST
-                        0 -> return SOUTH
-                        -1 -> return SOUTH_WEST
-                    }
+                -1 -> when (deltaX) {
+                    1 -> SOUTH_EAST
+                    0 -> SOUTH
+                    -1 -> SOUTH_WEST
+                    else -> NONE
                 }
-                0 -> {
-                    when (deltaX) {
-                        1 -> return EAST
-                        0 -> return NONE
-                        -1 -> return WEST
-                    }
+                0 -> when (deltaX) {
+                    1 -> EAST
+                    0 -> NONE
+                    -1 -> WEST
+                    else -> NONE
                 }
+                else -> NONE
             }
-            throw IllegalArgumentException("Invalid deltas $deltaX, $deltaZ.")
         }
     }
 }

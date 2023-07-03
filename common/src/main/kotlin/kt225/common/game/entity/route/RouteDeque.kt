@@ -1,7 +1,5 @@
 package kt225.common.game.entity.route
 
-import kt225.common.game.entity.Entity
-import kt225.common.game.entity.EntityDirection
 import kt225.common.game.world.Coordinates
 import org.rsmod.pathfinder.Route
 import org.rsmod.pathfinder.RouteCoordinates
@@ -15,55 +13,41 @@ import kotlin.math.sign
 class RouteDeque(
     private val steps: Deque<Coordinates> = LinkedList()
 ) : Deque<Coordinates> by steps {
-    private val routeSteps: Deque<RouteCoordinates> = LinkedList()
+    private val checkpoints: Deque<RouteCoordinates> = LinkedList()
 
-    fun process(entity: Entity) {
-        calculateNextTravelPoint(entity.coordinates)
-        var nextWalkStep = poll() ?: return
-        val walkDirection = EntityDirection.between(entity.coordinates, nextWalkStep)
-        var runDirection = EntityDirection.NONE
-        if (walkDirection == EntityDirection.NONE || !entity.canTravel(entity.coordinates, walkDirection)) return
-        var nextCoordinates = nextWalkStep
-        if (entity.running) {
-            calculateNextTravelPoint(nextCoordinates)
-            nextWalkStep = poll() ?: return run {
-                entity.moveTo(nextCoordinates, RouteStepDirection(walkDirection, EntityDirection.NONE))
-            }
-            runDirection = EntityDirection.between(nextCoordinates, nextWalkStep)
-            if (!entity.canTravel(nextCoordinates, runDirection)) {
-                clear()
-                runDirection = EntityDirection.NONE
-            } else {
-                nextCoordinates = nextWalkStep
-            }
-        }
-        entity.moveTo(nextCoordinates, RouteStepDirection(walkDirection, runDirection))
-    }
-    
-    private fun calculateNextTravelPoint(coordinates: Coordinates) {
-        if (isNotEmpty() || routeSteps.isEmpty()) {
+    fun calculateNextSteps(location: Coordinates) {
+        if (isNotEmpty() || checkpoints.isEmpty()) {
             return
         }
         clear()
-        val step = routeSteps.poll()
-        var currentX = coordinates.x
-        var currentZ = coordinates.z
-        val destX = step.x
-        val destY = step.y
-        val xSign = (destX - currentX).sign
-        val ySign = (destY - currentZ).sign
-        var count = 0
-        while (currentX != destX || currentZ != destY) {
-            currentX += xSign
-            currentZ += ySign
-            add(Coordinates(currentX, currentZ, coordinates.plane))
-            if (++count > 25) break
+        val polled = checkpoints.poll()
+        val currentX = location.x
+        val currentZ = location.z
+        val waypointX = polled.x
+        val waypointZ = polled.y
+        queueStep(currentX, currentZ, waypointX, waypointZ, (waypointX - currentX).sign, (waypointZ - currentZ).sign, location.plane, 0)
+    }
+
+    private tailrec fun queueStep(
+        currentX: Int, 
+        currentZ: Int, 
+        waypointX: Int, 
+        waypointZ: Int, 
+        xSign: Int, 
+        zSign: Int, 
+        plane: Int,
+        count: Int
+    ) {
+        if ((currentX == waypointX && currentZ == waypointZ) || count == 25) {
+            return
         }
+        steps.add(Coordinates(currentX + xSign, currentZ + zSign, plane))
+        return queueStep(currentX + xSign, currentZ + zSign, waypointX, waypointZ, xSign, zSign, plane, count + 1)
     }
 
     fun appendRoute(route: Route) {
-        routeSteps.clear()
         clear()
-        routeSteps.addAll(route)
+        checkpoints.clear()
+        checkpoints.addAll(route)
     }
 }

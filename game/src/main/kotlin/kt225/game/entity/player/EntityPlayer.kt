@@ -13,9 +13,9 @@ import kt225.packet.type.server.LoadAreaPacket
  * @author Jordan Abraham
  */
 class EntityPlayer(
+    override val world: GameWorld,
     username: String,
-    client: Client,
-    override val world: GameWorld
+    client: Client
 ) : Player(
     username = username,
     client = client,
@@ -29,7 +29,7 @@ class EntityPlayer(
     }
 
     override fun login() {
-        client.writePacket(LoadAreaPacket(sceneCoordinates.zoneX, sceneCoordinates.zoneZ))
+        client.writePacket(LoadAreaPacket(coordinates.zoneX, coordinates.zoneZ))
         renderer.render(
             Appearance(
                 headIcon = 0,
@@ -48,13 +48,8 @@ class EntityPlayer(
         online = true
     }
 
-    override fun processRoute() {
-        route.process(this)
-    }
-
     override fun rebuildScene() {
-        super.rebuildScene()
-        client.writePacket(LoadAreaPacket(sceneCoordinates.zoneX, sceneCoordinates.zoneZ))
+        client.writePacket(LoadAreaPacket(coordinates.zoneX, coordinates.zoneZ))
     }
 
     override fun canTravel(coordinates: Coordinates, direction: EntityDirection): Boolean {

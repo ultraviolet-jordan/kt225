@@ -28,11 +28,6 @@ abstract class Player(
     open fun init(coordinates: Coordinates) {
         this.coordinates = coordinates
         this.lastCoordinates = coordinates
-        this.sceneCoordinates = coordinates
-    }
-
-    override fun rebuildScene() {
-        this.sceneCoordinates = coordinates
     }
 
     override fun moveTo(coordinates: Coordinates, stepDirection: RouteStepDirection) {
@@ -41,7 +36,7 @@ abstract class Player(
         val rendering = renderer.highDefinitionRendering
         val walkDirection = stepDirection.walkDirection
         val runDirection = stepDirection.runDirection
-        if (runDirection != EntityDirection.NONE) {
+        if (runDirection != EntityDirection.NONE.id) {
             animator.animate(Run(rendering, walkDirection, runDirection))
         } else {
             animator.animate(Walk(rendering, walkDirection))

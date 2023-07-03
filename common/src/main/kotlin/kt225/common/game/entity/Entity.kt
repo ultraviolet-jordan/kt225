@@ -22,9 +22,6 @@ abstract class Entity(
     var lastCoordinates = Coordinates.NONE
         protected set
 
-    var sceneCoordinates = Coordinates.NONE
-        protected set
-
     var mapSquareChanged = true
         protected set
     
@@ -33,12 +30,34 @@ abstract class Entity(
 
     abstract fun login()
     abstract fun rebuildScene()
-    abstract fun processRoute()
     abstract fun moveTo(coordinates: Coordinates, stepDirection: RouteStepDirection)
     abstract fun canTravel(coordinates: Coordinates, direction: EntityDirection): Boolean
     
     fun cycle() {
-        processRoute()
+        val coordinates = this.coordinates
+        route.calculateNextSteps(coordinates)
+        var polled = route.poll() ?: return
+        val walkDirection = EntityDirection.between(coordinates, polled)
+        if (walkDirection == EntityDirection.NONE || !canTravel(coordinates, walkDirection)) {
+            return
+        }
+        var runDirection = EntityDirection.NONE
+        var nextCoordinates = polled
+        if (running) {
+            route.calculateNextSteps(nextCoordinates)
+            polled = route.poll() ?: return run {
+                moveTo(nextCoordinates, RouteStepDirection(walkDirection, EntityDirection.NONE))
+            }
+            runDirection = EntityDirection.between(nextCoordinates, polled)
+            if (!canTravel(nextCoordinates, runDirection)) {
+                route.clear()
+                runDirection = EntityDirection.NONE
+            } else {
+                nextCoordinates = polled
+            }
+        }
+        moveTo(nextCoordinates, RouteStepDirection(walkDirection, runDirection))
+        
         if (needSceneRebuild()) {
             rebuildScene()
         }
@@ -54,11 +73,8 @@ abstract class Entity(
     }
 
     private fun needSceneRebuild(buildArea: Int = 104): Boolean {
-        if (sceneCoordinates == coordinates) {
-            return false
-        }
-        val lastZoneX = sceneCoordinates.zoneX
-        val lastZoneZ = sceneCoordinates.zoneZ
+        val lastZoneX = coordinates.zoneX
+        val lastZoneZ = coordinates.zoneZ
         val zoneX = coordinates.zoneX
         val zoneZ = coordinates.zoneZ
         val limit = ((buildArea shr 3) / 2) - 1
