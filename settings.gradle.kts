@@ -1,6 +1,13 @@
+@file:Suppress("UnstableApiUsage")
+
 rootProject.name = "kt225"
 
 dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+
     versionCatalogs {
         create("deps") {
             // Dependency versions.
