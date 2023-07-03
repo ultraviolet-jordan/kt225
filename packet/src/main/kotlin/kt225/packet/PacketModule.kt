@@ -14,10 +14,13 @@ import kt225.packet.builder.DataLocPacketBuilder
 import kt225.packet.builder.LoadAreaPacketBuilder
 import kt225.packet.builder.PlayerInfoPacketBuilder
 import kt225.packet.handler.MoveGamePacketHandler
+import kt225.packet.handler.MoveMiniMapPacketHandler
 import kt225.packet.handler.RequestMapPacketHandler
 import kt225.packet.reader.MoveGamePacketReader
+import kt225.packet.reader.MoveMiniMapPacketReader
 import kt225.packet.reader.RequestMapPacketReader
 import kt225.packet.type.client.MoveGamePacket
+import kt225.packet.type.client.MoveMiniMapPacket
 import kt225.packet.type.client.RequestMapPacket
 import kt225.packet.type.server.DataLandDonePacket
 import kt225.packet.type.server.DataLandPacket
@@ -52,6 +55,7 @@ object PacketModule : KotlinModule() {
         KotlinMultibinder.newSetBinder<PacketReader<Packet>>(kotlinBinder).apply {
             bindPacketReader<RequestMapPacketReader>()
             bindPacketReader<MoveGamePacketReader>()
+            bindPacketReader<MoveMiniMapPacketReader>()
         }
     }
 
@@ -59,6 +63,7 @@ object PacketModule : KotlinModule() {
         KotlinMapBinder.newMapBinder<KClass<*>, PacketHandler<Packet>>(kotlinBinder).apply {
             bindPacketHandler<RequestMapPacket, RequestMapPacketHandler>()
             bindPacketHandler<MoveGamePacket, MoveGamePacketHandler>()
+            bindPacketHandler<MoveMiniMapPacket, MoveMiniMapPacketHandler>()
         }
     }
 

@@ -243,7 +243,11 @@ fun ByteBuffer.pbit(count: Int, value: Int) {
 }
 
 fun ByteBuffer.skip(amount: Int) {
-    position(position() + amount)
+    val newPosition = position() + amount
+    if (newPosition > limit()) {
+        return
+    }
+    position(newPosition)
 }
 
 tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
