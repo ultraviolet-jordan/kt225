@@ -4,4 +4,5 @@ plugins {
 
 dependencies {
     implementation(deps.bundles.ktor)
+    implementation(deps.pathfinder)
 }

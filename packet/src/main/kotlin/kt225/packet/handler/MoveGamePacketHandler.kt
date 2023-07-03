@@ -25,5 +25,6 @@ class MoveGamePacketHandler @Inject constructor(
             destY = packet.destinationZ,
             z = player.coordinates.plane
         )
+        player.route.appendRoute(path)
     }
 }

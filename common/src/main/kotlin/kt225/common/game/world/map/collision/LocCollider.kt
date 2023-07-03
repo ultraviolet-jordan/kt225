@@ -1,4 +1,4 @@
-package kt225.game.world.map.collision
+package kt225.common.game.world.map.collision
 
 import kt225.common.game.world.Coordinates
 import org.rsmod.pathfinder.flag.CollisionFlag.OBJECT

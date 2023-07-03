@@ -1,11 +1,5 @@
 package kt225.game.world
 
-import kt225.cache.config.loc.Locs
-import kt225.cache.map.MapSquareLands
-import kt225.cache.map.MapSquareLocs
-import kt225.cache225.config.loc.LocEntryType
-import kt225.cache225.map.MapSquareLandEntryType
-import kt225.cache225.map.MapSquareLocEntryType
 import kt225.common.game.entity.player.Player
 import kt225.common.game.world.Coordinates
 import kt225.common.game.world.World
@@ -13,28 +7,21 @@ import kt225.common.network.LoginRequest
 import kt225.game.GameClient
 import kt225.game.entity.player.EntityPlayer
 import kt225.game.world.map.CollisionManager
-import org.rsmod.pathfinder.ZoneFlags
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author Jordan Abraham
  */
 class GameWorld(
-    private val mapSquareLands: MapSquareLands<MapSquareLandEntryType>,
-    private val mapSquareLocs: MapSquareLocs<MapSquareLocEntryType>,
-    private val zoneFlags: ZoneFlags,
-    private val locs: Locs<LocEntryType>
+    val collisionManager: CollisionManager
 ) : World(
     players = arrayOfNulls(2048),
     loginRequests = ConcurrentHashMap.newKeySet(),
     logoutRequests = ConcurrentHashMap.newKeySet()
 ) {
-    private val collisionManager = CollisionManager(zoneFlags, locs)
-
     private var online = false
 
     override fun start() {
-        collisionManager.applyCollision(mapSquareLands, mapSquareLocs)
         this.online = true
     }
 

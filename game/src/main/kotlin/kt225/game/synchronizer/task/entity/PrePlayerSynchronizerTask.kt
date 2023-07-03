@@ -13,6 +13,7 @@ class PrePlayerSynchronizerTask(
 ) : Runnable {
     override fun run() {
         player.client.consumeReadQueue()
+        player.cycle()
         renderer.renderEntity(player)
     }
 }
