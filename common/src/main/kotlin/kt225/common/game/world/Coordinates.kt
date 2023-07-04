@@ -97,15 +97,13 @@ value class Coordinates(
         return deltaX <= distance && deltaX >= -distance && deltaZ <= distance && deltaZ >= -distance
     }
 
-    fun transform(deltaX: Int, deltaZ: Int, deltaPlane: Int = 0) = Coordinates(
-        x = x + deltaX,
-        z = z + deltaZ,
-        plane = plane + deltaPlane
-    )
+    fun transform(deltaX: Int, deltaZ: Int, deltaPlane: Int = 0): Coordinates {
+        return Coordinates(x + deltaX, z + deltaZ, plane + deltaPlane)
+    }
 
     companion object {
         val NONE = Coordinates(0)
-        val DEFAULT = Coordinates(3222, 3222, 0)
+        val DEFAULT = Coordinates(3079, 3288, 0)
         
         const val PLANE_BITS = 28
         const val PLANE_MASK = 0x3

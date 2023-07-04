@@ -8,11 +8,12 @@ import kt225.cache225.map.MapSquareLandEntryType
 import kt225.cache225.map.MapSquareLocEntryType
 import kt225.common.game.entity.EntityDirection
 import kt225.common.game.world.Coordinates
-import kt225.common.game.world.map.MapSquare
-import kt225.common.game.world.map.MapSquareCoordinates
-import kt225.common.game.world.map.MapSquareLand
-import kt225.common.game.world.map.MapSquareLoc
-import kt225.common.game.world.map.MapSquareLocShape
+import kt225.common.game.world.map.*
+import kt225.common.game.world.map.MapSquareLocLayer.Companion.GROUND
+import kt225.common.game.world.map.MapSquareLocLayer.Companion.GROUND_DECOR
+import kt225.common.game.world.map.MapSquareLocLayer.Companion.WALL
+import kt225.common.game.world.map.MapSquareLocRotation.Companion.NORTH
+import kt225.common.game.world.map.MapSquareLocRotation.Companion.SOUTH
 import kt225.common.game.world.map.collision.Collider
 import kt225.common.game.world.map.collision.FloorCollider
 import kt225.common.game.world.map.collision.LocCollider
@@ -40,48 +41,71 @@ class CollisionManager(
     
     init {
         val area = MapSquare.AREA
-        for (entry in mapSquareLands) {
-            val mapSquare = MapSquare(entry.value.mapSquare)
+
+        for (entry in mapSquareLands.values) {
+            val mapSquare = MapSquare(entry.mapSquare)
+            val mapSquareX = mapSquare.mapSquareX
+            val mapSquareZ = mapSquare.mapSquareZ
             for (index in 0 until 4 * area) {
                 val plane = index / area
                 val remaining = index % area
                 val x = remaining / 64
                 val z = remaining % 64
-                val mapSquareCoordinates = MapSquareCoordinates(x, z, plane)
-                val mapSquareLand = MapSquareLand(entry.value.lands[mapSquareCoordinates.packed])
+                val absoluteX = x + mapSquareX
+                val absoluteZ = z + mapSquareZ
+                val coordinates = Coordinates(absoluteX, absoluteZ, plane)
+                // We must initialize the entire mapsquare with flag 0x0 because of how the pathfinder works.
+                // There is a possibility of an entire zone not being initialized with zero clipping
+                // depending on if that zone contains anything to clip from the cache or not.
+                // So this way guarantees every zone in our mapsquares are properly initialized for the pathfinder.
+                collider.setCollision(coordinates, 0x0)
+
+                val mapSquareLandEntryType = mapSquareLands[mapSquare.id] ?: continue
+                val originalCoords = MapSquareCoordinates(x, z, plane)
+                val mapSquareLand = MapSquareLand(mapSquareLandEntryType.lands[originalCoords.packed])
                 if (mapSquareLand.collision and 0x1 != 1) {
                     continue
                 }
-                val adjustedPlane = MapSquareCoordinates(x, z, 1)
-                val adjustedLand = MapSquareLand(entry.value.lands[adjustedPlane.packed])
-                val actualPlane = if (adjustedLand.collision and 0x2 == 2) plane - 1 else plane
-                if (actualPlane < 0) {
+                val adjustedCoords = MapSquareCoordinates(x, z, 1)
+                val adjustedLand = MapSquareLand(mapSquareLandEntryType.lands[adjustedCoords.packed])
+                val adjustedPlane = if (adjustedLand.collision and 0x2 == 2) plane - 1 else plane
+                if (adjustedPlane < 0) {
                     continue
                 }
-                val coordinates = Coordinates(x + mapSquare.mapSquareX, z + mapSquare.mapSquareZ, actualPlane)
-                changeLandCollision(coordinates, true)
+                changeLandCollision(
+                    coordinates = Coordinates(absoluteX, absoluteZ, adjustedPlane),
+                    add = true
+                )
             }
         }
 
-        for (entry in mapSquareLocs) {
-            val mapSquare = MapSquare(entry.value.mapSquare)
-            for (packed in entry.value.locs) {
+        for (entry in mapSquareLocs.values) {
+            val mapSquare = MapSquare(entry.mapSquare)
+            val mapSquareX = mapSquare.mapSquareX
+            val mapSquareZ = mapSquare.mapSquareZ
+            for (packed in entry.locs) {
                 val loc = MapSquareLoc(packed)
-                val mapSquareCoordinates = loc.coords
-                val adjustedPlane = MapSquareCoordinates(mapSquareCoordinates.x, mapSquareCoordinates.z, 1)
-                val adjustedLand = mapSquareLands[mapSquare.id]?.lands?.get(adjustedPlane.packed)?.let(::MapSquareLand) ?: continue
-                val actualPlane = if (adjustedLand.collision and 0x2 == 2) mapSquareCoordinates.plane - 1 else mapSquareCoordinates.plane
-                if (actualPlane < 0) {
+                val originalCoords = loc.coords
+                val plane = originalCoords.plane
+                val x = originalCoords.x
+                val z = originalCoords.z
+                val adjustedCoords = MapSquareCoordinates(x, z, 1)
+                val adjustedLand = mapSquareLands[mapSquare.id]?.lands?.get(adjustedCoords.packed)?.let(::MapSquareLand) ?: continue
+                val adjustedPlane = if (adjustedLand.collision and 0x2 == 2) plane - 1 else plane
+                if (adjustedPlane < 0) {
                     continue
                 }
-                val coordinates = Coordinates(mapSquareCoordinates.x + mapSquare.mapSquareX, mapSquareCoordinates.z + mapSquare.mapSquareZ, actualPlane)
-                changeLocCollision(loc, coordinates, true)
+                changeLocCollision(
+                    loc = loc,
+                    coordinates = Coordinates(x + mapSquareX, z + mapSquareZ, adjustedPlane),
+                    add = true
+                )
             }
         }
     }
 
-    fun collisionFlag(location: Coordinates): Int {
-        return zoneFlags[location.x, location.z, location.plane]
+    fun collisionFlag(coordinates: Coordinates): Int {
+        return zoneFlags[coordinates.x, coordinates.z, coordinates.plane]
     }
 
     fun canTravel(coordinates: Coordinates, direction: EntityDirection, isNPC: Boolean): Boolean {
@@ -92,38 +116,36 @@ class CollisionManager(
         floorCollider.change(coordinates, add)
     }
 
-    private fun changeLocCollision(obj: MapSquareLoc, coordinates: Coordinates, add: Boolean) {
-        val entry = locs[obj.id] ?: return
-        val blockrange = entry.blockrange
+    private fun changeLocCollision(loc: MapSquareLoc, coordinates: Coordinates, add: Boolean) {
+        val entry = locs[loc.id] ?: return
         val blockwalk = entry.blockwalk
-        val shape = obj.shape
-        val rotation = obj.rotation
+        // Blockwalk is required to apply collision changes.
+        if (!blockwalk) {
+            return
+        }
 
-        when {
-            shape.id in 0..3 && blockwalk -> {
+        val shape = loc.shape
+        val rotation = loc.rotation
+        when (shape.layer) {
+            WALL -> {
                 wallCollider.change(coordinates, rotation, shape, add)
-                if (blockrange) {
+                if (entry.blockrange) {
                     wallProjectileCollider.change(coordinates, rotation, shape, add)
                 }
             }
-            shape.id in 9..12 && blockwalk -> {
-                var width = entry.width
-                var length = entry.length
-                if (rotation.id == 1 || rotation.id == 3) {
-                    width = entry.length
-                    length = entry.width
+            GROUND -> {
+                when (rotation) {
+                    NORTH, SOUTH -> locCollider.change(coordinates, entry.length, entry.width, entry.blockrange, add)
+                    else -> locCollider.change(coordinates, entry.width, entry.length, entry.blockrange, add)
                 }
-                locCollider.change(coordinates, width, length, blockrange, add)
             }
-            shape.id == 22 && blockwalk -> {
-                val interactable = when (entry.interactive) {
+            GROUND_DECOR -> {
+                val intractable = when (entry.interactive) {
                     -1 -> entry.ops != null
-                    else -> entry.interactable
+                    else -> entry.intractable
                 }
-                if (interactable) {
+                if (intractable) {
                     floorCollider.change(coordinates, add)
-                } else {
-                    floorCollider.change(coordinates, false)
                 }
             }
         }

@@ -13,8 +13,8 @@ value class MapSquareLocLayer(
     
     companion object {
         val WALL = MapSquareLocLayer(0)
-        val WALLDECOR = MapSquareLocLayer(1)
+        val WALL_DECOR = MapSquareLocLayer(1)
         val GROUND = MapSquareLocLayer(2)
-        val GROUNDECOR = MapSquareLocLayer(3)
+        val GROUND_DECOR = MapSquareLocLayer(3)
     }
 }

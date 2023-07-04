@@ -16,4 +16,8 @@ class Collider(
             zoneFlags.remove(coordinates.x, coordinates.z, coordinates.plane, mask)
         }
     }
+
+    fun setCollision(coordinates: Coordinates, mask: Int) {
+        zoneFlags[coordinates.x, coordinates.z, coordinates.plane] = mask
+    }
 }

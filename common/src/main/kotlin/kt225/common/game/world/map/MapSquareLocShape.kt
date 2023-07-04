@@ -17,7 +17,7 @@ value class MapSquareLocShape(
      * If this MapSquareLocShape is a wall decor shape.
      */
     inline val isWallDecor: Boolean 
-        get() = layer == MapSquareLocLayer.WALLDECOR
+        get() = layer == MapSquareLocLayer.WALL_DECOR
 
     /**
      * If this MapSquareLocShape is a roof shape.
@@ -29,7 +29,7 @@ value class MapSquareLocShape(
      * If this MapSquareLocShape is a roof edge shape.
      */
     inline val isGroundDecor: Boolean 
-        get() = layer == MapSquareLocLayer.GROUNDECOR
+        get() = layer == MapSquareLocLayer.GROUND_DECOR
 
     /**
      * Returns the MapSquareLocLayer associated with this MapSquareLocShape.
@@ -37,9 +37,9 @@ value class MapSquareLocShape(
     inline val layer: MapSquareLocLayer 
         get() = when (id) {
             in WALL_STRAIGHT..WALL_SQUARE_CORNER -> MapSquareLocLayer.WALL
-            in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH -> MapSquareLocLayer.WALLDECOR
+            in WALLDECOR_STRAIGHT_NOOFFSET..WALLDECOR_DIAGONAL_BOTH -> MapSquareLocLayer.WALL_DECOR
             in WALL_DIAGONAL..ROOFEDGE_SQUARE_CORNER -> MapSquareLocLayer.GROUND
-            GROUND_DECOR.id -> MapSquareLocLayer.GROUNDECOR
+            GROUND_DECOR.id -> MapSquareLocLayer.GROUND_DECOR
             else -> throw AssertionError("Shape id must be between 0 and 22.")
         }
 

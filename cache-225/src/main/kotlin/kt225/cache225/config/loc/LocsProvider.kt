@@ -69,7 +69,7 @@ class LocsProvider @Inject constructor(
             19 -> {
                 val interactive = buffer.g1
                 if (interactive == 1) {
-                    entry.interactable = true
+                    entry.intractable = true
                 }
                 entry.interactive = interactive
             }

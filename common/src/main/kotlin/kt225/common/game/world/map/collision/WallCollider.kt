@@ -2,7 +2,15 @@ package kt225.common.game.world.map.collision
 
 import kt225.common.game.world.Coordinates
 import kt225.common.game.world.map.MapSquareLocRotation
+import kt225.common.game.world.map.MapSquareLocRotation.Companion.EAST
+import kt225.common.game.world.map.MapSquareLocRotation.Companion.NORTH
+import kt225.common.game.world.map.MapSquareLocRotation.Companion.SOUTH
+import kt225.common.game.world.map.MapSquareLocRotation.Companion.WEST
 import kt225.common.game.world.map.MapSquareLocShape
+import kt225.common.game.world.map.MapSquareLocShape.Companion.WALL_DIAGONAL_CORNER
+import kt225.common.game.world.map.MapSquareLocShape.Companion.WALL_L
+import kt225.common.game.world.map.MapSquareLocShape.Companion.WALL_SQUARE_CORNER
+import kt225.common.game.world.map.MapSquareLocShape.Companion.WALL_STRAIGHT
 import org.rsmod.pathfinder.flag.CollisionFlag.WALL_EAST
 import org.rsmod.pathfinder.flag.CollisionFlag.WALL_NORTH
 import org.rsmod.pathfinder.flag.CollisionFlag.WALL_NORTH_EAST
@@ -20,59 +28,59 @@ class WallCollider(
 ) {
     fun change(location: Coordinates, rotation: MapSquareLocRotation, shape: MapSquareLocShape, add: Boolean) {
         when (shape) {
-            MapSquareLocShape.WALL_STRAIGHT -> when (rotation) {
-                MapSquareLocRotation.WEST -> {
+            WALL_STRAIGHT -> when (rotation) {
+                WEST -> {
                     collider.changeCollision(location, WALL_WEST, add)
                     collider.changeCollision(location.transform(-1, 0), WALL_EAST, add)
                 }
-                MapSquareLocRotation.NORTH -> {
+                NORTH -> {
                     collider.changeCollision(location, WALL_NORTH, add)
                     collider.changeCollision(location.transform(0, 1), WALL_SOUTH, add)
                 }
-                MapSquareLocRotation.EAST -> {
+                EAST -> {
                     collider.changeCollision(location, WALL_EAST, add)
                     collider.changeCollision(location.transform(1, 0), WALL_WEST, add)
                 }
-                MapSquareLocRotation.SOUTH -> {
+                SOUTH -> {
                     collider.changeCollision(location, WALL_SOUTH, add)
                     collider.changeCollision(location.transform(0, -1), WALL_NORTH, add)
                 }
             }
-            MapSquareLocShape.WALL_DIAGONAL_CORNER, MapSquareLocShape.WALL_SQUARE_CORNER -> when (rotation) {
-                MapSquareLocRotation.WEST -> {
+            WALL_DIAGONAL_CORNER, WALL_SQUARE_CORNER -> when (rotation) {
+                WEST -> {
                     collider.changeCollision(location, WALL_NORTH_WEST, add)
                     collider.changeCollision(location.transform(-1, 1), WALL_SOUTH_EAST, add)
                 }
-                MapSquareLocRotation.NORTH -> {
+                NORTH -> {
                     collider.changeCollision(location, WALL_NORTH_EAST, add)
                     collider.changeCollision(location.transform(1, 1), WALL_SOUTH_WEST, add)
                 }
-                MapSquareLocRotation.EAST -> {
+                EAST -> {
                     collider.changeCollision(location, WALL_SOUTH_EAST, add)
                     collider.changeCollision(location.transform(1, -1), WALL_NORTH_WEST, add)
                 }
-                MapSquareLocRotation.SOUTH -> {
+                SOUTH -> {
                     collider.changeCollision(location, WALL_SOUTH_WEST, add)
                     collider.changeCollision(location.transform(-1, -1), WALL_NORTH_EAST, add)
                 }
             }
-            MapSquareLocShape.WALL_L -> when (rotation) {
-                MapSquareLocRotation.WEST -> {
+            WALL_L -> when (rotation) {
+                WEST -> {
                     collider.changeCollision(location, WALL_NORTH or WALL_WEST, add)
                     collider.changeCollision(location.transform(-1, 0), WALL_EAST, add)
                     collider.changeCollision(location.transform(0, 1), WALL_SOUTH, add)
                 }
-                MapSquareLocRotation.NORTH -> {
+                NORTH -> {
                     collider.changeCollision(location, WALL_NORTH or WALL_EAST, add)
                     collider.changeCollision(location.transform(0, 1), WALL_SOUTH, add)
                     collider.changeCollision(location.transform(1, 0), WALL_WEST, add)
                 }
-                MapSquareLocRotation.EAST -> {
+                EAST -> {
                     collider.changeCollision(location, WALL_SOUTH or WALL_EAST, add)
                     collider.changeCollision(location.transform(1, 0), WALL_WEST, add)
                     collider.changeCollision(location.transform(0, -1), WALL_NORTH, add)
                 }
-                MapSquareLocRotation.SOUTH -> {
+                SOUTH -> {
                     collider.changeCollision(location, WALL_SOUTH or WALL_WEST, add)
                     collider.changeCollision(location.transform(0, -1), WALL_NORTH, add)
                     collider.changeCollision(location.transform(-1, 0), WALL_EAST, add)
