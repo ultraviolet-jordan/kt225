@@ -98,14 +98,15 @@ class CollisionManager(
         val blockwalk = entry.blockwalk
         val shape = obj.shape
         val rotation = obj.rotation
+
         when {
-            shape.isWall && blockwalk -> {
+            shape.id in 0..3 && blockwalk -> {
                 wallCollider.change(coordinates, rotation, shape, add)
                 if (blockrange) {
                     wallProjectileCollider.change(coordinates, rotation, shape, add)
                 }
             }
-            shape.isGround && blockwalk -> {
+            shape.id in 9..12 && blockwalk -> {
                 var width = entry.width
                 var length = entry.length
                 if (rotation.id == 1 || rotation.id == 3) {
@@ -114,13 +115,15 @@ class CollisionManager(
                 }
                 locCollider.change(coordinates, width, length, blockrange, add)
             }
-            shape.isGroundDecor && blockwalk -> {
+            shape.id == 22 && blockwalk -> {
                 val interactable = when (entry.interactive) {
-                    -1 -> shape == MapSquareLocShape.CENTREPIECE_STRAIGHT || entry.ops != null
+                    -1 -> entry.ops != null
                     else -> entry.interactable
                 }
                 if (interactable) {
                     floorCollider.change(coordinates, add)
+                } else {
+                    floorCollider.change(coordinates, false)
                 }
             }
         }
