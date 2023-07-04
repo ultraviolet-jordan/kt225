@@ -12,13 +12,13 @@ dependencyResolutionManagement {
         create("deps") {
             // Dependency versions.
             version("kotlin", "1.9.0-RC")
-            version("ktor", "2.3.1")
+            version("ktor", "2.3.2")
             version("slf4j", "2.0.7")
             version("versions", "0.47.0")
-            version("guice", "1.6.0")
+            version("guice", "3.0.0")
             version("jnr", "2.2.14")
             version("commons-compress", "1.23.0")
-            version("pathfinder", "2.4.2")
+            version("pathfinder", "2.4.3")
 
             // Dependency plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
