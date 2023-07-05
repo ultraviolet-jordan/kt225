@@ -25,4 +25,3 @@ fun ZoneFlags.remove(coordinates: Coordinates, mask: Int) {
 operator fun ZoneFlags.set(coordinates: Coordinates, mask: Int) {
     set(coordinates.x, coordinates.z, coordinates.plane, mask)
 }
-
