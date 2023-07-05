@@ -23,55 +23,55 @@ import org.rsmod.pathfinder.flag.CollisionFlag.WALL_WEST_PROJECTILE_BLOCKER
 tailrec fun ZoneFlags.changeWallCornerL(coordinates: Coordinates, rotation: MapSquareLocRotation, blockproj: Boolean, add: Boolean) {
     when (rotation) {
         WEST -> {
-            val east = coordinates.transform(-1, 0)
-            val south = coordinates.transform(0, 1)
+            val west = coordinates.transform(-1, 0)
+            val north = coordinates.transform(0, 1)
             if (blockproj) {
                 change(add, coordinates, WALL_WEST_PROJECTILE_BLOCKER or WALL_NORTH_PROJECTILE_BLOCKER)
-                change(add, east, WALL_EAST_PROJECTILE_BLOCKER)
-                change(add, south, WALL_SOUTH_PROJECTILE_BLOCKER)
+                change(add, west, WALL_EAST_PROJECTILE_BLOCKER)
+                change(add, north, WALL_SOUTH_PROJECTILE_BLOCKER)
             } else {
                 change(add, coordinates, WALL_NORTH or WALL_WEST)
-                change(add, east, WALL_EAST)
-                change(add, south, WALL_SOUTH)
+                change(add, west, WALL_EAST)
+                change(add, north, WALL_SOUTH)
             }
         }
         NORTH -> {
-            val south = coordinates.transform(0, 1)
-            val west = coordinates.transform(1, 0)
+            val north = coordinates.transform(0, 1)
+            val east = coordinates.transform(1, 0)
             if (blockproj) {
                 change(add, coordinates, WALL_NORTH_PROJECTILE_BLOCKER or WALL_EAST_PROJECTILE_BLOCKER)
-                change(add, south, WALL_SOUTH_PROJECTILE_BLOCKER)
-                change(add, west, WALL_WEST_PROJECTILE_BLOCKER)
+                change(add, north, WALL_SOUTH_PROJECTILE_BLOCKER)
+                change(add, east, WALL_WEST_PROJECTILE_BLOCKER)
             } else {
                 change(add, coordinates, WALL_NORTH or WALL_EAST)
-                change(add, south, WALL_SOUTH)
-                change(add, west, WALL_WEST)
+                change(add, north, WALL_SOUTH)
+                change(add, east, WALL_WEST)
             }
         }
         EAST -> {
-            val west = coordinates.transform(1, 0)
-            val north = coordinates.transform(0, -1)
+            val east = coordinates.transform(1, 0)
+            val south = coordinates.transform(0, -1)
             if (blockproj) {
                 change(add, coordinates, WALL_EAST_PROJECTILE_BLOCKER or WALL_SOUTH_PROJECTILE_BLOCKER)
-                change(add, west, WALL_WEST_PROJECTILE_BLOCKER)
-                change(add, north, WALL_NORTH_PROJECTILE_BLOCKER)
+                change(add, east, WALL_WEST_PROJECTILE_BLOCKER)
+                change(add, south, WALL_NORTH_PROJECTILE_BLOCKER)
             } else {
                 change(add, coordinates, WALL_SOUTH or WALL_EAST)
-                change(add, west, WALL_WEST)
-                change(add, north, WALL_NORTH)
+                change(add, east, WALL_WEST)
+                change(add, south, WALL_NORTH)
             }
         }
         SOUTH -> {
-            val north = coordinates.transform(0, -1)
-            val east = coordinates.transform(-1, 0)
+            val south = coordinates.transform(0, -1)
+            val west = coordinates.transform(-1, 0)
             if (blockproj) {
                 change(add, coordinates, WALL_SOUTH_PROJECTILE_BLOCKER or WALL_WEST_PROJECTILE_BLOCKER)
-                change(add, north, WALL_NORTH_PROJECTILE_BLOCKER)
-                change(add, east, WALL_EAST_PROJECTILE_BLOCKER)
+                change(add, south, WALL_NORTH_PROJECTILE_BLOCKER)
+                change(add, west, WALL_EAST_PROJECTILE_BLOCKER)
             } else {
                 change(add, coordinates, WALL_SOUTH or WALL_WEST)
-                change(add, north, WALL_NORTH)
-                change(add, east, WALL_EAST)
+                change(add, south, WALL_NORTH)
+                change(add, west, WALL_EAST)
             }
         }
     }
