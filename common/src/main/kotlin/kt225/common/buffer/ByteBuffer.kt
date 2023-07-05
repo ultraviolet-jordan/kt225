@@ -41,6 +41,20 @@ inline val ByteBuffer.flip: ByteBuffer
     get() = flip()
 
 /**
+ * Returns the signed byte at the current position.
+ * Does not move the position.
+ */
+inline val ByteBuffer.peekSigned: Int
+    get() = this[position].toInt()
+
+/**
+ * Returns the unsigned byte at the current position.
+ * Does not move the position.
+ */
+inline val ByteBuffer.peekUnsigned: Int
+    get() = peekSigned and 0xff
+
+/**
  * Get 1 byte from this ByteBuffer.
  */
 inline val ByteBuffer.g1: Int 
@@ -93,14 +107,14 @@ inline val ByteBuffer.g8: Long
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmarts: Int 
-    get() = if ((this[position].toInt() and 0xff) < 128) g1 else g2 - 32768
+    get() = if (peekUnsigned < 128) g1 else g2 - 32768
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmart: Int 
-    get() = if ((this[position].toInt() and 0xff) < 128) g1 - 64 else g2 - 49152
+    get() = if (peekUnsigned < 128) g1 - 64 else g2 - 49152
 
 /**
  * Get a string from this ByteBuffer.
@@ -285,7 +299,9 @@ fun ByteBuffer.skip(amount: Int) {
 }
 
 tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
-    if (this[position + length].toInt() == terminator) return length
+    if (this[position + length].toInt() == terminator) {
+        return length
+    }
     return lengthToByte(terminator, length + 1)
 }
 
