@@ -8,9 +8,10 @@ import kt225.cache.media.sprite.Sprites
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.g3
+import kt225.common.buffer.hasRemaining
 import kt225.common.string.jagNameHash
 import java.nio.ByteBuffer
-import java.util.Arrays
+import java.util.*
 
 /**
  * @author Jordan Abraham
@@ -58,7 +59,7 @@ class SpritesProvider @Inject constructor(
     }
     
     private tailrec fun MutableList<Sprite>.decodeSprite(index: ByteBuffer, buffer: ByteBuffer, palette: IntArray, offset: Int) {
-        if (!buffer.hasRemaining()) {
+        if (!buffer.hasRemaining) {
             return
         }
         val deltaX = index.g1

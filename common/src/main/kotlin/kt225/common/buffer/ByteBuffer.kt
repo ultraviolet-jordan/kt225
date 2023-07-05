@@ -15,6 +15,12 @@ inline val ByteBuffer.remaining: Int
     get() = remaining()
 
 /**
+ * Tells whether there are any elements between the current position and the limit.
+ */
+inline val ByteBuffer.hasRemaining: Boolean
+    get() = hasRemaining()
+
+/**
  * Get 1 byte from this ByteBuffer.
  */
 inline val ByteBuffer.g1: Int 
