@@ -1,6 +1,7 @@
 package kt225.common.game.world.map.collision
 
 import kt225.common.game.world.Coordinates
+import org.rsmod.pathfinder.ZoneCoords
 import org.rsmod.pathfinder.ZoneFlags
 
 /**
@@ -24,4 +25,8 @@ fun ZoneFlags.remove(coordinates: Coordinates, mask: Int) {
 
 operator fun ZoneFlags.set(coordinates: Coordinates, mask: Int) {
     set(coordinates.x, coordinates.z, coordinates.plane, mask)
+}
+
+fun ZoneFlags.alloc(coordinates: Coordinates) {
+    alloc(ZoneCoords(coordinates.zoneX, coordinates.zoneZ, coordinates.plane))
 }

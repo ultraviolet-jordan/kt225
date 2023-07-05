@@ -34,7 +34,6 @@ class CollisionManager(
     private val floorCollider = FloorCollider(zoneFlags)
     private val wallCollider = WallCollider(zoneFlags)
     private val locCollider = LocCollider(zoneFlags)
-    private val openCollider = OpenCollider(zoneFlags)
     
     init {
         val area = MapSquare.AREA
@@ -50,11 +49,10 @@ class CollisionManager(
                 val z = remaining % 64
                 val absoluteX = x + mapSquareX
                 val absoluteZ = z + mapSquareZ
-                // We must initialize the entire mapsquare with flag 0x0 because of how the pathfinder works.
                 // There is a possibility of an entire zone not being initialized with zero clipping
                 // depending on if that zone contains anything to clip from the cache or not.
                 // So this way guarantees every zone in our mapsquares are properly initialized for the pathfinder.
-                openCollision(Coordinates(absoluteX, absoluteZ, plane))
+                zoneFlags.alloc(Coordinates(absoluteX, absoluteZ, plane))
 
                 val mapSquareLandEntryType = mapSquareLands[mapSquare.id] ?: continue
                 val originalCoords = MapSquareCoordinates(x, z, plane)
@@ -102,10 +100,6 @@ class CollisionManager(
 
     fun canTravel(coordinates: Coordinates, direction: EntityDirection, isNPC: Boolean): Boolean {
         return stepValidator.canTravel(coordinates, direction, isNPC)
-    }
-
-    private fun openCollision(coordinates: Coordinates) {
-        openCollider.open(coordinates)
     }
     
     private fun changeLandCollision(coordinates: Coordinates, add: Boolean) {
