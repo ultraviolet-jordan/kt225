@@ -87,10 +87,8 @@ inline val ByteBuffer.gsmart: Int
  * Moves the buffer position from the current position + string.length + 1
  */
 inline val ByteBuffer.gstr: String 
-    get() {
-        return String(gdata(lengthToByte(10))).also {
-            skip(1)
-        }
+    get() = String(gdata(lengthToByte(10))).also {
+        skip(1)
     }
 
 /**
