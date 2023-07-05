@@ -43,24 +43,13 @@ class MoveMiniMapPacketReader : PacketReader<MoveMiniMapPacket>(
         val ctrlDown = buffer.g1
         val startX = buffer.g2
         val startZ = buffer.g2
-
-        // The client does calculate the path, but we will not rely on the client
-        // for this information. We are strictly relying on the server for generating
-        // the path and keeping the server and client in sync properly.
-        // Here we only do math to grab the destination coordinates.
+        // Just grab the last one we need skip the rest.
+        // Not using the client generated path. We make our own.
         val checkpoints = (buffer.remaining - 14) shr 1
         if (checkpoints == 0) {
-            if (!buffer.readAntiCheatInput) {
-                return null
-            }
-            return MoveMiniMapPacket(ctrlDown, startX, startZ)
+            return if (buffer.readAntiCheatInput) MoveMiniMapPacket(ctrlDown, startX, startZ) else null
         }
         buffer.skip(checkpoints - 1 shl 1)
-        val destinationX = buffer.g1b + startX
-        val destinationZ = buffer.g1b + startZ
-        if (!buffer.readAntiCheatInput) {
-            return null
-        }
-        return MoveMiniMapPacket(ctrlDown, destinationX, destinationZ)
+        return if (buffer.readAntiCheatInput) MoveMiniMapPacket(ctrlDown, buffer.g1b + startX, buffer.g1b + startZ) else null
     }
 }
