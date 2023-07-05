@@ -103,7 +103,7 @@ value class Coordinates(
 
     companion object {
         val NONE = Coordinates(0)
-        val DEFAULT = Coordinates(3222, 3222, 0)
+        val DEFAULT = Coordinates(2969, 3311, 0)
         
         const val PLANE_BITS = 28
         const val PLANE_MASK = 0x3

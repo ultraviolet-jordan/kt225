@@ -8,7 +8,10 @@ import kt225.cache225.map.MapSquareLandEntryType
 import kt225.cache225.map.MapSquareLocEntryType
 import kt225.common.game.entity.EntityDirection
 import kt225.common.game.world.Coordinates
-import kt225.common.game.world.map.*
+import kt225.common.game.world.map.MapSquare
+import kt225.common.game.world.map.MapSquareCoordinates
+import kt225.common.game.world.map.MapSquareLand
+import kt225.common.game.world.map.MapSquareLoc
 import kt225.common.game.world.map.MapSquareLocLayer.Companion.GROUND
 import kt225.common.game.world.map.MapSquareLocLayer.Companion.GROUND_DECOR
 import kt225.common.game.world.map.MapSquareLocLayer.Companion.WALL
@@ -17,7 +20,6 @@ import kt225.common.game.world.map.MapSquareLocRotation.Companion.SOUTH
 import kt225.common.game.world.map.collision.*
 import org.rsmod.pathfinder.StepValidator
 import org.rsmod.pathfinder.ZoneFlags
-import org.rsmod.pathfinder.flag.CollisionFlag.BLOCK_NPCS
 
 /**
  * @author Jordan Abraham
@@ -25,16 +27,14 @@ import org.rsmod.pathfinder.flag.CollisionFlag.BLOCK_NPCS
 class CollisionManager(
     mapSquareLands: MapSquareLands<MapSquareLandEntryType>,
     mapSquareLocs: MapSquareLocs<MapSquareLocEntryType>,
-    private val zoneFlags: ZoneFlags,
+    zoneFlags: ZoneFlags,
     private val stepValidator: StepValidator,
-    private val locs: Locs<LocEntryType>,
-    collider: Collider = Collider(zoneFlags)
+    private val locs: Locs<LocEntryType>
 ) {
-    private val wallCollider = WallCollider(collider)
-    private val wallProjectileCollider = WallProjectileCollider(collider)
-    private val floorCollider = FloorCollider(collider)
-    private val locCollider = LocCollider(collider)
-    private val openCollider = OpenCollider(collider)
+    private val floorCollider = FloorCollider(zoneFlags)
+    private val wallCollider = WallCollider(zoneFlags)
+    private val locCollider = LocCollider(zoneFlags)
+    private val openCollider = OpenCollider(zoneFlags)
     
     init {
         val area = MapSquare.AREA
@@ -100,12 +100,8 @@ class CollisionManager(
         }
     }
 
-    fun collisionFlag(coordinates: Coordinates): Int {
-        return zoneFlags[coordinates.x, coordinates.z, coordinates.plane]
-    }
-
     fun canTravel(coordinates: Coordinates, direction: EntityDirection, isNPC: Boolean): Boolean {
-        return stepValidator.canTravel(coordinates.plane, coordinates.x, coordinates.z, direction.deltaX, direction.deltaZ, 1, if (isNPC) BLOCK_NPCS else 0)
+        return stepValidator.canTravel(coordinates, direction, isNPC)
     }
 
     private fun openCollision(coordinates: Coordinates) {
@@ -124,20 +120,14 @@ class CollisionManager(
             return
         }
 
+        val blockproj = entry.blockproj
         val shape = loc.shape
         val rotation = loc.rotation
         when (shape.layer) {
-            WALL -> {
-                wallCollider.change(coordinates, rotation, shape, add)
-                if (entry.blockrange) {
-                    wallProjectileCollider.change(coordinates, rotation, shape, add)
-                }
-            }
-            GROUND -> {
-                when (rotation) {
-                    NORTH, SOUTH -> locCollider.change(coordinates, entry.length, entry.width, entry.blockrange, add)
-                    else -> locCollider.change(coordinates, entry.width, entry.length, entry.blockrange, add)
-                }
+            WALL -> wallCollider.change(coordinates, rotation, shape, blockproj, add)
+            GROUND -> when (rotation) {
+                NORTH, SOUTH -> locCollider.change(coordinates, entry.length, entry.width, blockproj, add)
+                else -> locCollider.change(coordinates, entry.width, entry.length, blockproj, add)
             }
             GROUND_DECOR -> {
                 val intractable = when (entry.interactive) {

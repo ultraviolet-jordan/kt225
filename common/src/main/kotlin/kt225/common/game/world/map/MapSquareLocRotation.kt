@@ -10,7 +10,7 @@ value class MapSquareLocRotation(
     init {
         require(id in 0..3) { "Invalid id: $id" }
     }
-    
+
     companion object {
         val WEST = MapSquareLocRotation(0)
         val NORTH = MapSquareLocRotation(1)

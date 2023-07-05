@@ -1,6 +1,7 @@
 package kt225.common.game.world.map.collision
 
 import kt225.common.game.world.Coordinates
+import org.rsmod.pathfinder.ZoneFlags
 import org.rsmod.pathfinder.flag.CollisionFlag.OBJECT
 import org.rsmod.pathfinder.flag.CollisionFlag.OBJECT_PROJECTILE_BLOCKER
 
@@ -8,15 +9,15 @@ import org.rsmod.pathfinder.flag.CollisionFlag.OBJECT_PROJECTILE_BLOCKER
  * @author Jordan Abraham
  */
 class LocCollider(
-    private val collider: Collider
+    private val flags: ZoneFlags
 ) {
-    fun change(coordinates: Coordinates, width: Int, length: Int, blockrange: Boolean, add: Boolean) {
+    fun change(coordinates: Coordinates, width: Int, length: Int, blockproj: Boolean, add: Boolean) {
         var mask = OBJECT
-        if (blockrange) {
+        if (blockproj) {
             mask = mask or OBJECT_PROJECTILE_BLOCKER
         }
         repeat(width * length) {
-            collider.changeCollision(coordinates.transform(it % width, it / width), mask, add)
+            flags.change(add, coordinates.transform(it % width, it / width), mask)
         }
     }
 }

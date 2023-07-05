@@ -1,14 +1,15 @@
 package kt225.common.game.world.map.collision
 
 import kt225.common.game.world.Coordinates
+import org.rsmod.pathfinder.ZoneFlags
 
 /**
  * @author Jordan Abraham
  */
 class OpenCollider(
-    private val collider: Collider
+    private val flags: ZoneFlags
 ) {
     fun open(coordinates: Coordinates) {
-        collider.setCollision(coordinates, 0x0)
+        flags[coordinates] = 0x0
     }
 }

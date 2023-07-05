@@ -16,7 +16,7 @@ data class LocEntryType(
     var width: Int = 1,
     var length: Int = 1,
     var blockwalk: Boolean = true,
-    var blockrange: Boolean = true,
+    var blockproj: Boolean = true,
     var interactive: Int = -1,
     var intractable: Boolean = false,
     var hillskew: Boolean = false,
@@ -63,7 +63,7 @@ data class LocEntryType(
         if (width != other.width) return false
         if (length != other.length) return false
         if (blockwalk != other.blockwalk) return false
-        if (blockrange != other.blockrange) return false
+        if (blockproj != other.blockproj) return false
         if (interactive != other.interactive) return false
         if (intractable != other.intractable) return false
         if (hillskew != other.hillskew) return false
@@ -109,7 +109,7 @@ data class LocEntryType(
         result = 31 * result + width
         result = 31 * result + length
         result = 31 * result + blockwalk.hashCode()
-        result = 31 * result + blockrange.hashCode()
+        result = 31 * result + blockproj.hashCode()
         result = 31 * result + interactive
         result = 31 * result + intractable.hashCode()
         result = 31 * result + hillskew.hashCode()
