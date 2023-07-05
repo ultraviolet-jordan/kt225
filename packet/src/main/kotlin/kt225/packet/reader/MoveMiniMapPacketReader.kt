@@ -43,12 +43,12 @@ class MoveMiniMapPacketReader : PacketReader<MoveMiniMapPacket>(
         val ctrlDown = buffer.g1
         val startX = buffer.g2
         val startZ = buffer.g2
-        // Just grab the last one we need skip the rest.
-        // Not using the client generated path. We make our own.
         val checkpoints = (buffer.remaining - 14) shr 1
         if (checkpoints == 0) {
             return if (buffer.readAntiCheatInput) MoveMiniMapPacket(ctrlDown, startX, startZ) else null
         }
+        // Just grab the last one we need skip the rest.
+        // Not using the client generated path. We make our own.
         buffer.skip(checkpoints - 1 shl 1)
         return if (buffer.readAntiCheatInput) MoveMiniMapPacket(ctrlDown, buffer.g1b + startX, buffer.g1b + startZ) else null
     }
