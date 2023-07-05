@@ -28,11 +28,11 @@ class MoveGamePacketReader : PacketReader<MoveGamePacket>(
         // for this information. We are strictly relying on the server for generating
         // the path and keeping the server and client in sync properly.
         // Here we only do math to grab the destination coordinates.
-        val checkpoints = buffer.remaining() / 2
+        val checkpoints = buffer.remaining() shr 1
         if (checkpoints == 0) {
             return MoveGamePacket(ctrlDown, startX, startZ)
         }
-        buffer.skip((checkpoints - 1) * 2)
+        buffer.skip(checkpoints - 1 shl 1)
         val destinationX = buffer.g1b + startX
         val destinationZ = buffer.g1b + startZ
         return MoveGamePacket(ctrlDown, destinationX, destinationZ)
