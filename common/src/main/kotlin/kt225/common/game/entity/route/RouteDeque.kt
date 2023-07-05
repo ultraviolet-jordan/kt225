@@ -3,8 +3,7 @@ package kt225.common.game.entity.route
 import kt225.common.game.world.Coordinates
 import org.rsmod.pathfinder.Route
 import org.rsmod.pathfinder.RouteCoordinates
-import java.util.Deque
-import java.util.LinkedList
+import java.util.*
 import kotlin.math.sign
 
 /**

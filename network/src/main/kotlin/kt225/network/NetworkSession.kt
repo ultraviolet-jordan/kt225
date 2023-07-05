@@ -1,6 +1,8 @@
 package kt225.network
 
-import io.ktor.network.sockets.*
+import io.ktor.network.sockets.Socket
+import io.ktor.network.sockets.openReadChannel
+import io.ktor.network.sockets.openWriteChannel
 import kt225.common.network.Session
 import kt225.common.packet.Packet
 import kt225.common.packet.PacketBuilder

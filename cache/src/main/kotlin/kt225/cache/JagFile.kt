@@ -2,7 +2,15 @@ package kt225.cache
 
 import kt225.cache.compress.bzip2.bzip2Compress
 import kt225.cache.compress.bzip2.bzip2Decompress
-import kt225.common.buffer.*
+import kt225.common.buffer.g2
+import kt225.common.buffer.g3
+import kt225.common.buffer.g4
+import kt225.common.buffer.gdata
+import kt225.common.buffer.p2
+import kt225.common.buffer.p3
+import kt225.common.buffer.p4
+import kt225.common.buffer.pdata
+import kt225.common.buffer.remaining
 import kt225.common.string.jagNameHash
 import java.nio.ByteBuffer
 import java.util.zip.CRC32

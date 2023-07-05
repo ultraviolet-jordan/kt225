@@ -1,7 +1,7 @@
 package kt225.cache.config.loc
 
 import kt225.cache.EntryType
-import java.util.TreeMap
+import java.util.*
 
 /**
  * @author Jordan Abraham

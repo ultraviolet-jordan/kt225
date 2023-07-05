@@ -6,7 +6,6 @@ import java.nio.file.FileSystemNotFoundException
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.HashMap
 import java.util.zip.CRC32
 
 /**

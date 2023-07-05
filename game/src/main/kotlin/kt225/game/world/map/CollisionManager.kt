@@ -17,7 +17,11 @@ import kt225.common.game.world.map.MapSquareLocLayer.Companion.GROUND_DECOR
 import kt225.common.game.world.map.MapSquareLocLayer.Companion.WALL
 import kt225.common.game.world.map.MapSquareLocRotation.Companion.NORTH
 import kt225.common.game.world.map.MapSquareLocRotation.Companion.SOUTH
-import kt225.common.game.world.map.collision.*
+import kt225.common.game.world.map.collision.FloorCollider
+import kt225.common.game.world.map.collision.LocCollider
+import kt225.common.game.world.map.collision.WallCollider
+import kt225.common.game.world.map.collision.alloc
+import kt225.common.game.world.map.collision.canTravel
 import org.rsmod.pathfinder.StepValidator
 import org.rsmod.pathfinder.ZoneFlags
 

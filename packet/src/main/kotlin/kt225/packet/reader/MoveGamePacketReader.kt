@@ -3,7 +3,11 @@
 package kt225.packet.reader
 
 import com.google.inject.Singleton
-import kt225.common.buffer.*
+import kt225.common.buffer.g1
+import kt225.common.buffer.g1b
+import kt225.common.buffer.g2
+import kt225.common.buffer.remaining
+import kt225.common.buffer.skip
 import kt225.common.packet.PacketReader
 import kt225.packet.type.client.MoveGamePacket
 import java.nio.ByteBuffer
