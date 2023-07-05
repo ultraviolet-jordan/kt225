@@ -26,64 +26,64 @@ import org.rsmod.pathfinder.flag.CollisionFlag.WALL_WEST
 class WallCollider(
     private val collider: Collider
 ) {
-    fun change(location: Coordinates, rotation: MapSquareLocRotation, shape: MapSquareLocShape, add: Boolean) {
+    fun change(coordinates: Coordinates, rotation: MapSquareLocRotation, shape: MapSquareLocShape, add: Boolean) {
         when (shape) {
             WALL_STRAIGHT -> when (rotation) {
                 WEST -> {
-                    collider.changeCollision(location, WALL_WEST, add)
-                    collider.changeCollision(location.transform(-1, 0), WALL_EAST, add)
+                    collider.changeCollision(coordinates, WALL_WEST, add)
+                    collider.changeCollision(coordinates.transform(-1, 0), WALL_EAST, add)
                 }
                 NORTH -> {
-                    collider.changeCollision(location, WALL_NORTH, add)
-                    collider.changeCollision(location.transform(0, 1), WALL_SOUTH, add)
+                    collider.changeCollision(coordinates, WALL_NORTH, add)
+                    collider.changeCollision(coordinates.transform(0, 1), WALL_SOUTH, add)
                 }
                 EAST -> {
-                    collider.changeCollision(location, WALL_EAST, add)
-                    collider.changeCollision(location.transform(1, 0), WALL_WEST, add)
+                    collider.changeCollision(coordinates, WALL_EAST, add)
+                    collider.changeCollision(coordinates.transform(1, 0), WALL_WEST, add)
                 }
                 SOUTH -> {
-                    collider.changeCollision(location, WALL_SOUTH, add)
-                    collider.changeCollision(location.transform(0, -1), WALL_NORTH, add)
+                    collider.changeCollision(coordinates, WALL_SOUTH, add)
+                    collider.changeCollision(coordinates.transform(0, -1), WALL_NORTH, add)
                 }
             }
             WALL_DIAGONAL_CORNER, WALL_SQUARE_CORNER -> when (rotation) {
                 WEST -> {
-                    collider.changeCollision(location, WALL_NORTH_WEST, add)
-                    collider.changeCollision(location.transform(-1, 1), WALL_SOUTH_EAST, add)
+                    collider.changeCollision(coordinates, WALL_NORTH_WEST, add)
+                    collider.changeCollision(coordinates.transform(-1, 1), WALL_SOUTH_EAST, add)
                 }
                 NORTH -> {
-                    collider.changeCollision(location, WALL_NORTH_EAST, add)
-                    collider.changeCollision(location.transform(1, 1), WALL_SOUTH_WEST, add)
+                    collider.changeCollision(coordinates, WALL_NORTH_EAST, add)
+                    collider.changeCollision(coordinates.transform(1, 1), WALL_SOUTH_WEST, add)
                 }
                 EAST -> {
-                    collider.changeCollision(location, WALL_SOUTH_EAST, add)
-                    collider.changeCollision(location.transform(1, -1), WALL_NORTH_WEST, add)
+                    collider.changeCollision(coordinates, WALL_SOUTH_EAST, add)
+                    collider.changeCollision(coordinates.transform(1, -1), WALL_NORTH_WEST, add)
                 }
                 SOUTH -> {
-                    collider.changeCollision(location, WALL_SOUTH_WEST, add)
-                    collider.changeCollision(location.transform(-1, -1), WALL_NORTH_EAST, add)
+                    collider.changeCollision(coordinates, WALL_SOUTH_WEST, add)
+                    collider.changeCollision(coordinates.transform(-1, -1), WALL_NORTH_EAST, add)
                 }
             }
             WALL_L -> when (rotation) {
                 WEST -> {
-                    collider.changeCollision(location, WALL_NORTH or WALL_WEST, add)
-                    collider.changeCollision(location.transform(-1, 0), WALL_EAST, add)
-                    collider.changeCollision(location.transform(0, 1), WALL_SOUTH, add)
+                    collider.changeCollision(coordinates, WALL_NORTH or WALL_WEST, add)
+                    collider.changeCollision(coordinates.transform(-1, 0), WALL_EAST, add)
+                    collider.changeCollision(coordinates.transform(0, 1), WALL_SOUTH, add)
                 }
                 NORTH -> {
-                    collider.changeCollision(location, WALL_NORTH or WALL_EAST, add)
-                    collider.changeCollision(location.transform(0, 1), WALL_SOUTH, add)
-                    collider.changeCollision(location.transform(1, 0), WALL_WEST, add)
+                    collider.changeCollision(coordinates, WALL_NORTH or WALL_EAST, add)
+                    collider.changeCollision(coordinates.transform(0, 1), WALL_SOUTH, add)
+                    collider.changeCollision(coordinates.transform(1, 0), WALL_WEST, add)
                 }
                 EAST -> {
-                    collider.changeCollision(location, WALL_SOUTH or WALL_EAST, add)
-                    collider.changeCollision(location.transform(1, 0), WALL_WEST, add)
-                    collider.changeCollision(location.transform(0, -1), WALL_NORTH, add)
+                    collider.changeCollision(coordinates, WALL_SOUTH or WALL_EAST, add)
+                    collider.changeCollision(coordinates.transform(1, 0), WALL_WEST, add)
+                    collider.changeCollision(coordinates.transform(0, -1), WALL_NORTH, add)
                 }
                 SOUTH -> {
-                    collider.changeCollision(location, WALL_SOUTH or WALL_WEST, add)
-                    collider.changeCollision(location.transform(0, -1), WALL_NORTH, add)
-                    collider.changeCollision(location.transform(-1, 0), WALL_EAST, add)
+                    collider.changeCollision(coordinates, WALL_SOUTH or WALL_WEST, add)
+                    collider.changeCollision(coordinates.transform(0, -1), WALL_NORTH, add)
+                    collider.changeCollision(coordinates.transform(-1, 0), WALL_EAST, add)
                 }
             }
         }
