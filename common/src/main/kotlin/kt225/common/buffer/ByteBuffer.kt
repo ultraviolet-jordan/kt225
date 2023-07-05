@@ -9,6 +9,12 @@ import kotlin.math.min
  */
 
 /**
+ * Returns the number of elements between the current position and the limit.
+ */
+inline val ByteBuffer.remaining: Int
+    get() = remaining()
+
+/**
  * Get 1 byte from this ByteBuffer.
  */
 inline val ByteBuffer.g1: Int 

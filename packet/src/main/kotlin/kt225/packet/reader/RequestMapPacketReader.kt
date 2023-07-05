@@ -2,6 +2,7 @@ package kt225.packet.reader
 
 import com.google.inject.Singleton
 import kt225.common.buffer.g1
+import kt225.common.buffer.remaining
 import kt225.common.packet.PacketReader
 import kt225.common.packet.server.MapRequest
 import kt225.packet.type.client.RequestMapPacket
@@ -16,7 +17,7 @@ class RequestMapPacketReader : PacketReader<RequestMapPacket>(
     length = -1
 ) {
     override suspend fun readPacket(buffer: ByteBuffer, length: Int): RequestMapPacket? {
-        val size = buffer.remaining() / 3
+        val size = buffer.remaining / 3
         if (size == 0) {
             return null
         }

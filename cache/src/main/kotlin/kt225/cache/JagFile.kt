@@ -2,14 +2,7 @@ package kt225.cache
 
 import kt225.cache.compress.bzip2.bzip2Compress
 import kt225.cache.compress.bzip2.bzip2Decompress
-import kt225.common.buffer.g2
-import kt225.common.buffer.g3
-import kt225.common.buffer.g4
-import kt225.common.buffer.gdata
-import kt225.common.buffer.p2
-import kt225.common.buffer.p3
-import kt225.common.buffer.p4
-import kt225.common.buffer.pdata
+import kt225.common.buffer.*
 import kt225.common.string.jagNameHash
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
@@ -59,7 +52,7 @@ abstract class JagFile(
 
     fun unpack() {
         val jag = ByteBuffer.wrap(bytes)
-        require(jag.remaining() >= 6) { "Invalid input byte array." }
+        require(jag.remaining >= 6) { "Invalid input byte array." }
         val decompressed = jag.g3
         val compressed = jag.g3
         val isCompressed = decompressed != compressed
@@ -68,14 +61,14 @@ abstract class JagFile(
                 accumulator.compressedWhole = true
                 bzip2Decompress(jag.gdata(compressed))
             }
-            else -> jag.gdata(jag.remaining())
+            else -> jag.gdata(jag.remaining)
         }
         if (isCompressed) {
             require(decompressed == bytes.size) { "Invalid compressed data." }
         }
         accumulator.attach(bytes)
         val entries = ByteBuffer.wrap(bytes)
-        require(entries.remaining() >= 2) { "Invalid buffer length." }
+        require(entries.remaining >= 2) { "Invalid buffer length." }
         val length = entries.g2
         entries.unpackEntries(length)
     }
@@ -109,7 +102,7 @@ abstract class JagFile(
         if (index == length) {
             return
         }
-        require(remaining() >= 10) { "Invalid buffer length." }
+        require(remaining >= 10) { "Invalid buffer length." }
         val nameHash = g4
         val decompressed = g3
         val compressed = g3

@@ -3,10 +3,7 @@
 package kt225.packet.reader
 
 import com.google.inject.Singleton
-import kt225.common.buffer.g1
-import kt225.common.buffer.g1b
-import kt225.common.buffer.g2
-import kt225.common.buffer.skip
+import kt225.common.buffer.*
 import kt225.common.packet.PacketReader
 import kt225.packet.type.client.MoveMiniMapPacket
 import java.nio.ByteBuffer
@@ -28,7 +25,7 @@ class MoveMiniMapPacketReader : PacketReader<MoveMiniMapPacket>(
         // for this information. We are strictly relying on the server for generating
         // the path and keeping the server and client in sync properly.
         // Here we only do math to grab the destination coordinates.
-        val checkpoints = (buffer.remaining() - 14) shr 1
+        val checkpoints = (buffer.remaining - 14) shr 1
         if (checkpoints == 0) {
             if (!buffer.readAntiCheatInput()) {
                 return null
