@@ -26,6 +26,9 @@ inline val ByteBuffer.hasRemaining: Boolean
 inline val ByteBuffer.position: Int
     get() = position()
 
+/**
+ * Returns this buffer's limit.
+ */
 inline val ByteBuffer.limit: Int
     get() = limit()
 
