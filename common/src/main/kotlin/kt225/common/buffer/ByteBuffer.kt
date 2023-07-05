@@ -256,12 +256,7 @@ fun ByteBuffer.pbit(count: Int, value: Int) {
 
 fun ByteBuffer.skip(amount: Int) {
     require(amount >= 0)
-    val newPosition = position() + amount
-    if (newPosition > limit() || newPosition < 0) {
-        position(limit())
-        return
-    }
-    position(newPosition)
+    position(position() + amount)
 }
 
 tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
