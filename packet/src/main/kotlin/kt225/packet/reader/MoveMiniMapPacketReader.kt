@@ -28,31 +28,37 @@ class MoveMiniMapPacketReader : PacketReader<MoveMiniMapPacket>(
         // for this information. We are strictly relying on the server for generating
         // the path and keeping the server and client in sync properly.
         // Here we only do math to grab the destination coordinates.
-        val remaining = buffer.remaining()
-        if (remaining != 0) {
-            buffer.skip(remaining - 14 - 2)
+        val checkpoints = (buffer.remaining() - 14) / 2
+        if (checkpoints == 0) {
+            if (!buffer.readAntiCheatInput()) {
+                return null
+            }
+            return MoveMiniMapPacket(ctrlDown, startX, startZ)
         }
-        val destinationX = if (buffer.remaining() != 0) buffer.g1b + startX else startX
-        val destinationZ = if (buffer.remaining() != 0) buffer.g1b + startZ else startZ
-        
-        // Anti-cheat MiniMap Input
-        buffer.skip(1) // clickX
-        buffer.skip(1) // clickX
-        buffer.skip(2) // cameraYaw
-        if (buffer.g1b != 57) { // 57
-            return null
-        }
-        buffer.skip(1) // antiCheatAngle
-        buffer.skip(1) // zoom
-        if (buffer.g1b != 89) { // 89
-            return null
-        }
-        buffer.skip(2) // currentX
-        buffer.skip(2) // currentZ
-        buffer.skip(1) // clickedMiniMap
-        if (buffer.g1b != 63) { // 63
+        buffer.skip((checkpoints - 1) * 2)
+        val destinationX = buffer.g1b + startX
+        val destinationZ = buffer.g1b + startZ
+        if (!buffer.readAntiCheatInput()) {
             return null
         }
         return MoveMiniMapPacket(ctrlDown, destinationX, destinationZ)
+    }
+    
+    private fun ByteBuffer.readAntiCheatInput(): Boolean {
+        skip(1) // clickX
+        skip(1) // clickX
+        skip(2) // cameraYaw
+        if (g1b != 57) { // 57
+            return false
+        }
+        skip(1) // antiCheatAngle
+        skip(1) // zoom
+        if (g1b != 89) { // 89
+            return false
+        }
+        skip(2) // currentX
+        skip(2) // currentZ
+        skip(1) // clickedMiniMap
+        return g1b == 63 // 63
     }
 }
