@@ -1,8 +1,6 @@
 package kt225.network
 
-import io.ktor.network.sockets.Socket
-import io.ktor.network.sockets.openReadChannel
-import io.ktor.network.sockets.openWriteChannel
+import io.ktor.network.sockets.*
 import kt225.common.network.Session
 import kt225.common.packet.Packet
 import kt225.common.packet.PacketBuilder
@@ -25,18 +23,11 @@ class NetworkSession(
     clientPacketLengths: IntArray
 ) : Session(socket, socket.openReadChannel(), socket.openWriteChannel(), builders, readers, handlers, codecs.encoders, codecs.decoders, crcs, clientPacketLengths) {
     override suspend fun accept() {
-        try {
-            codec(
-                type = ServerSeedEncoder::class,
-                message = ServerSeedResponse(
-                    seed = ((Math.random() * 99999999.0).toLong() shl 32) + (Math.random() * 99999999.0).toLong()
-                )
+        codec(
+            type = ServerSeedEncoder::class,
+            message = ServerSeedResponse(
+                seed = ((Math.random() * 99999999.0).toLong() shl 32) + (Math.random() * 99999999.0).toLong()
             )
-        } catch (exception: Exception) {
-            exception.printStackTrace()
-            // TODO Disconnect the client/player.
-        } finally {
-            socket.close()
-        }
+        )
     }
 }

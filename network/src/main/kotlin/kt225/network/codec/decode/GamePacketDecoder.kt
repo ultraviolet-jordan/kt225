@@ -2,8 +2,8 @@ package kt225.network.codec.decode
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import io.ktor.server.application.ApplicationEnvironment
-import io.ktor.utils.io.ByteReadChannel
+import io.ktor.server.application.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.time.withTimeout
 import kt225.common.crypto.IsaacRandom
 import kt225.common.network.CodecDecoder
@@ -22,12 +22,18 @@ class GamePacketDecoder @Inject constructor(
     private val logger = applicationEnvironment.log
 
     override suspend fun decode(session: Session, channel: ByteReadChannel) {
-        while (true) {
-            val client = session.client ?: break
-            val packet = withTimeout(Duration.ofSeconds(30)) {
-                channel.awaitPacket(session, client.clientIsaac)
-            } ?: continue
-            client.readPacket(packet)
+        try {
+            while (true) {
+                val client = session.client ?: break
+                val packet = withTimeout(Duration.ofSeconds(30)) {
+                    channel.awaitPacket(session, client.clientIsaac)
+                } ?: continue
+                client.readPacket(packet)
+            }
+        } catch (exception: Exception) {
+            logger.error(exception.stackTraceToString())
+        } finally {
+            session.socket.close()
         }
     }
 
