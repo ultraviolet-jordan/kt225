@@ -3,6 +3,7 @@ package kt225.game
 import com.google.inject.Singleton
 import kt225.common.buffer.ip2
 import kt225.common.buffer.p1
+import kt225.common.buffer.position
 import kt225.common.game.SynchronizerEntityRenderer
 import kt225.common.game.entity.player.Player
 import kt225.common.game.entity.render.HighDefinitionRenderBlock
@@ -36,9 +37,9 @@ class PlayerSynchronizerRenderer : SynchronizerEntityRenderer<Player>(
             if (block == null) {
                 continue
             }
-            val start = buffer.position()
+            val start = buffer.position
             block.builder.buildRenderBlock(buffer, block.renderType)
-            val end = buffer.position()
+            val end = buffer.position
             player.renderer.capture(block, buffer.slice(start, end - start))
         }
         return buffer.array()

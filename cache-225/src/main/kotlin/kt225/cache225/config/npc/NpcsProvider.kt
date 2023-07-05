@@ -14,6 +14,7 @@ import kt225.common.buffer.gstr
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.pjstr
+import kt225.common.buffer.position
 import java.nio.ByteBuffer
 
 /**
@@ -37,9 +38,9 @@ class NpcsProvider @Inject constructor(
         val datBuffer = ByteBuffer.allocate(250_000)
         datBuffer.p2(entries.size)
         entries.values.forEach {
-            val position = datBuffer.position()
+            val position = datBuffer.position
             encode(datBuffer, it)
-            idxBuffer.p2(datBuffer.position() - position) // The length of the encoded bytes.
+            idxBuffer.p2(datBuffer.position - position) // The length of the encoded bytes.
         }
         datBuffer.flip()
         idxBuffer.flip()

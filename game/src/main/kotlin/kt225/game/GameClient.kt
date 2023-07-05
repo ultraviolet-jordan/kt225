@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
+import kt225.common.buffer.position
 import kt225.common.crypto.IsaacRandom
 import kt225.common.game.Client
 import kt225.common.network.Session
@@ -65,11 +66,11 @@ class GameClient(
             builder.buildPacket(packet, buffer)
             return
         }
-        val startPos = buffer.position()
+        val startPos = buffer.position
         val offset = startPos + if (builder.length == -1) 1 else 2
         buffer.position(offset)
         builder.buildPacket(packet, buffer)
-        val endPos = buffer.position()
+        val endPos = buffer.position
         val size = endPos - offset
         buffer.position(startPos)
         when (builder.length) {

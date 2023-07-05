@@ -21,6 +21,12 @@ inline val ByteBuffer.hasRemaining: Boolean
     get() = hasRemaining()
 
 /**
+ * Returns this buffer's position.
+ */
+inline val ByteBuffer.position: Int
+    get() = position()
+
+/**
  * Get 1 byte from this ByteBuffer.
  */
 inline val ByteBuffer.g1: Int 
@@ -73,14 +79,14 @@ inline val ByteBuffer.g8: Long
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmarts: Int 
-    get() = if ((this[position()].toInt() and 0xff) < 128) g1 else g2 - 32768
+    get() = if ((this[position].toInt() and 0xff) < 128) g1 else g2 - 32768
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmart: Int 
-    get() = if ((this[position()].toInt() and 0xff) < 128) g1 - 64 else g2 - 49152
+    get() = if ((this[position].toInt() and 0xff) < 128) g1 - 64 else g2 - 49152
 
 /**
  * Get a string from this ByteBuffer.
@@ -120,10 +126,10 @@ fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger) {
  * This function must only be called from [ByteBuffer.accessBits]
  */
 fun ByteBuffer.gbit(count: Int): Int {
-    val position = position()
+    val position = this.position
     // Constantly mark and reset.
     reset()
-    val marked = position()
+    val marked = this.position
     // Keeps the mark positioned at the starting byte index.
     mark()
     val index = marked + (position - marked)
@@ -226,7 +232,7 @@ fun ByteBuffer.pdata(bytes: ByteArray, position: Int = position(), length: Int =
  * It is up to the caller of this function to flip the buffer for reading.
  */
 fun ByteBuffer.rsaenc(exponent: BigInteger, modulus: BigInteger) {
-    val length = position()
+    val length = position
     position(0)
     val enc = BigInteger(gdata(length)).modPow(exponent, modulus).toByteArray()
     position(0)
@@ -239,10 +245,10 @@ fun ByteBuffer.rsaenc(exponent: BigInteger, modulus: BigInteger) {
  * This function must only be called from [ByteBuffer.accessBits]
  */
 fun ByteBuffer.pbit(count: Int, value: Int) {
-    val position = position()
+    val position = this.position
     // Constantly mark and reset.
     reset()
-    val marked = position()
+    val marked = this.position
     // Keeps the mark positioned at the starting byte index.
     mark()
     val index = marked + (position - marked)
@@ -258,7 +264,7 @@ fun ByteBuffer.skip(amount: Int) {
 }
 
 tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
-    if (this[position() + length].toInt() == terminator) return length
+    if (this[position + length].toInt() == terminator) return length
     return lengthToByte(terminator, length + 1)
 }
 
@@ -293,10 +299,10 @@ inline fun ByteBuffer.accessBits(function: ByteBuffer.() -> Unit) {
  * Use [ByteBuffer.accessBits] which will automatically accessBytes after invocation.
  */
 fun ByteBuffer.accessBytes() {
-    val position = position()
+    val position = this.position
     reset()
     // The marked starting byte index to calculate from the ending position.
-    val marked = position()
+    val marked = this.position
     val index = marked + (position - marked)
     position((index + 7) / 8)
 }

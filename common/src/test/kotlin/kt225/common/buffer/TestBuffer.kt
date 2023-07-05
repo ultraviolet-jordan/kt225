@@ -138,7 +138,7 @@ class TestBuffer {
             pbit(7, 13)
         }
         // Only 2 bytes required for 9 bits.
-        assertEquals(buffer.position(), 2)
+        assertEquals(buffer.position, 2)
         buffer.position(0)
         buffer.accessBits {
             val x = gbit(1)
@@ -183,7 +183,7 @@ class TestBuffer {
             buffer.pbit(2, 0)
         }
         // Only 1 byte required for 2 bits.
-        assertEquals(buffer.position(), 1)
+        assertEquals(buffer.position, 1)
         buffer.position(0)
         buffer.accessBits {
             assertEquals(0, gbit(2))
