@@ -243,8 +243,10 @@ fun ByteBuffer.pbit(count: Int, value: Int) {
 }
 
 fun ByteBuffer.skip(amount: Int) {
+    require(amount >= 0)
     val newPosition = position() + amount
-    if (newPosition > limit()) {
+    if (newPosition > limit() || newPosition < 0) {
+        position(limit())
         return
     }
     position(newPosition)
