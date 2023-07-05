@@ -7,6 +7,7 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.loc.Locs
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.g2
@@ -41,10 +42,8 @@ class LocsProvider @Inject constructor(
             encode(datBuffer, it)
             idxBuffer.p2(datBuffer.position - position) // The length of the encoded bytes.
         }
-        datBuffer.flip()
-        idxBuffer.flip()
-        config.add("loc.dat", datBuffer)
-        config.add("loc.idx", idxBuffer)
+        config.add("loc.dat", datBuffer.flip)
+        config.add("loc.idx", idxBuffer.flip)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: LocEntryType): LocEntryType {

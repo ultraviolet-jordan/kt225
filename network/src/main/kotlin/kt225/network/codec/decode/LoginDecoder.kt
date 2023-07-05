@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.utils.io.ByteReadChannel
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g4
 import kt225.common.buffer.gstr
@@ -30,7 +31,7 @@ class LoginDecoder @Inject constructor(
         val length = channel.readByte().toInt() and 0xff
         val buffer = ByteBuffer.allocate(length)
         val bytes = channel.readFully(buffer).also {
-            buffer.flip()
+            buffer.flip
         }
         if (bytes != length) {
             session.close()

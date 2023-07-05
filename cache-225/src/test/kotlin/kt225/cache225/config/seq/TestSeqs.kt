@@ -6,6 +6,7 @@ import kt225.cache.CacheModule
 import kt225.cache.config.Config
 import kt225.cache.config.seq.Seqs
 import kt225.cache225.Cache225Module
+import kt225.common.buffer.flip
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -31,8 +32,7 @@ class TestSeqs {
         seqs.values.forEach {
             val buffer = ByteBuffer.allocate(1000)
             provider.encode(buffer, it)
-            buffer.flip()
-            val decoded = provider.decode(buffer, SeqEntryType(it.id))
+            val decoded = provider.decode(buffer.flip, SeqEntryType(it.id))
 
             assertEquals(it.id, decoded.id)
             assertEquals(it.framecount, decoded.framecount)

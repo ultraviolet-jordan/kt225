@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.seq.Seqs
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.p1
@@ -33,7 +34,7 @@ class SeqsProvider @Inject constructor(
         entries.values.forEach {
             encode(buffer, it)
         }
-        buffer.flip()
+        buffer.flip
         config.add("seq.dat", buffer)
     }
     

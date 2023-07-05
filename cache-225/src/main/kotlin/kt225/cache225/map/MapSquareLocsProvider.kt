@@ -7,6 +7,7 @@ import com.google.inject.Singleton
 import kt225.cache.map.MapLocs
 import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquareLocs
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.gsmarts
 import kt225.common.buffer.p1
@@ -49,7 +50,7 @@ class MapSquareLocsProvider @Inject constructor(
 
             val buffer = ByteBuffer.allocate(100_000)
             encode(buffer, entry)
-            buffer.flip()
+            buffer.flip
 
             val compressed = buffer.compress()
             val crc = CRC32().also { it.update(compressed) }.value.toInt()

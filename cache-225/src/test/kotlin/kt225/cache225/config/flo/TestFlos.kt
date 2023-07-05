@@ -6,6 +6,7 @@ import kt225.cache.CacheModule
 import kt225.cache.config.Config
 import kt225.cache.config.flo.Flos
 import kt225.cache225.Cache225Module
+import kt225.common.buffer.flip
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,8 +31,7 @@ class TestFlos {
         flos.values.forEach {
             val buffer = ByteBuffer.allocate(250)
             provider.encode(buffer, it)
-            buffer.flip()
-            val decoded = provider.decode(buffer, FloEntryType(it.id))
+            val decoded = provider.decode(buffer.flip, FloEntryType(it.id))
             
             assertEquals(it.id, decoded.id)
             assertEquals(it.rgb, decoded.rgb)

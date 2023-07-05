@@ -7,6 +7,7 @@ import com.google.inject.Singleton
 import kt225.cache.map.MapLands
 import kt225.cache.map.MapResource
 import kt225.cache.map.MapSquareLands
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.p1
@@ -46,9 +47,8 @@ class MapSquareLandsProvider @Inject constructor(
 
             val buffer = ByteBuffer.allocate(100_000)
             encode(buffer, entry)
-            buffer.flip()
 
-            val compressed = buffer.compress()
+            val compressed = buffer.flip.compress()
             val crc = CRC32().also { it.update(compressed) }.value.toInt()
             val existing = maps.firstOrNull { it.id == id && it.name == name }
             val index = maps.indexOf(existing)

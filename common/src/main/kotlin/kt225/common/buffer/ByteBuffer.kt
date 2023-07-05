@@ -33,6 +33,14 @@ inline val ByteBuffer.limit: Int
     get() = limit()
 
 /**
+ * Flips this buffer. 
+ * The limit is set to the current position and then the position is set to zero. 
+ * If the mark is defined then it is discarded.
+ */
+inline val ByteBuffer.flip: ByteBuffer
+    get() = flip()
+
+/**
  * Get 1 byte from this ByteBuffer.
  */
 inline val ByteBuffer.g1: Int 
@@ -102,6 +110,13 @@ inline val ByteBuffer.gstr: String
     get() = String(gdata(lengthToByte(10))).also {
         skip(1)
     }
+
+/**
+ * Get bytes from this ByteBuffer.
+ * The position of this buffer is moved to the current position + the length.
+ */
+inline val ByteBuffer.gdata: ByteArray
+    get() = gdata()
 
 /**
  * Get bytes from this ByteBuffer.

@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.time.withTimeout
+import kt225.common.buffer.flip
 import kt225.common.crypto.IsaacRandom
 import kt225.common.network.CodecDecoder
 import kt225.common.network.Session
@@ -80,7 +81,7 @@ class GamePacketDecoder @Inject constructor(
             logger.info("Packet buffer read bytes mismatch. Read bytes was $readBytes and payload length was $clientLength")
             return null
         }
-        val packet = reader.readPacket(buffer.flip(), clientLength) ?: return null
+        val packet = reader.readPacket(buffer.flip, clientLength) ?: return null
 
         logger.info("Incoming Packet: Id=$id, ServerLength=$serverLength, ClientLength=$clientLength")
         return packet

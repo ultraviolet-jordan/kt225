@@ -6,6 +6,7 @@ import kt225.cache.CacheModule
 import kt225.cache.config.Config
 import kt225.cache.config.idk.Idks
 import kt225.cache225.Cache225Module
+import kt225.common.buffer.flip
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -31,8 +32,7 @@ class TestIdks {
         idks.values.forEach {
             val buffer = ByteBuffer.allocate(250)
             provider.encode(buffer, it)
-            buffer.flip()
-            val decoded = provider.decode(buffer, IdkEntryType(it.id))
+            val decoded = provider.decode(buffer.flip, IdkEntryType(it.id))
 
             assertEquals(it.id, decoded.id)
             assertEquals(it.type, decoded.type)

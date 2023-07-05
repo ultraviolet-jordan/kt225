@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.varp.Varps
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.g4
@@ -37,8 +38,7 @@ class VarpsProvider @Inject constructor(
         entries.values.forEach {
             encode(buffer, it)
         }
-        buffer.flip()
-        config.add("varp.dat", buffer)
+        config.add("varp.dat", buffer.flip)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: VarpEntryType): VarpEntryType {

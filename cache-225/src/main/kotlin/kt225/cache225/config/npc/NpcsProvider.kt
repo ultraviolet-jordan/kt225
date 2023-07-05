@@ -7,6 +7,7 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.npc.Npcs
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.g2
@@ -42,10 +43,8 @@ class NpcsProvider @Inject constructor(
             encode(datBuffer, it)
             idxBuffer.p2(datBuffer.position - position) // The length of the encoded bytes.
         }
-        datBuffer.flip()
-        idxBuffer.flip()
-        config.add("npc.dat", datBuffer)
-        config.add("npc.idx", idxBuffer)
+        config.add("npc.dat", datBuffer.flip)
+        config.add("npc.idx", idxBuffer.flip)
     }
 
     override fun decode(buffer: ByteBuffer, entry: NpcEntryType): NpcEntryType {

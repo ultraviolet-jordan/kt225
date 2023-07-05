@@ -7,6 +7,7 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.obj.Objs
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.g2
@@ -44,10 +45,8 @@ class ObjsProvider @Inject constructor(
             encode(datBuffer, it)
             idxBuffer.p2(datBuffer.position - position) // The length of the encoded bytes.
         }
-        datBuffer.flip()
-        idxBuffer.flip()
-        config.add("obj.dat", datBuffer)
-        config.add("obj.idx", idxBuffer)
+        config.add("obj.dat", datBuffer.flip)
+        config.add("obj.idx", idxBuffer.flip)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: ObjEntryType): ObjEntryType {

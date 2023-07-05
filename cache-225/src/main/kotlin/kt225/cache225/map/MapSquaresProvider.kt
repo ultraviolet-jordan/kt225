@@ -4,6 +4,7 @@ import kt225.cache.EntryProvider
 import kt225.cache.EntryType
 import kt225.cache.compress.bzip2.bzip2Compress
 import kt225.cache.compress.bzip2.bzip2Decompress
+import kt225.common.buffer.flip
 import kt225.common.buffer.g4
 import kt225.common.buffer.gdata
 import kt225.common.buffer.limit
@@ -23,12 +24,11 @@ interface MapSquaresProvider<E : EntryType, T : MutableMap<Int, E>> : EntryProvi
     }
 
     fun ByteBuffer.compress(): ByteArray {
-        val bytes = gdata()
+        val bytes = gdata
         val compressed = bzip2Compress(bytes)
         val buffer = ByteBuffer.allocate(compressed.size + 4)
         buffer.p4(bytes.size)
         buffer.pdata(compressed)
-        buffer.flip()
-        return buffer.gdata()
+        return buffer.flip.gdata
     }
 }

@@ -2,6 +2,7 @@ package kt225.cache
 
 import kt225.cache.compress.bzip2.bzip2Compress
 import kt225.cache.compress.bzip2.bzip2Decompress
+import kt225.common.buffer.flip
 import kt225.common.buffer.g2
 import kt225.common.buffer.g3
 import kt225.common.buffer.g4
@@ -43,7 +44,7 @@ abstract class JagFile(
     }
 
     fun add(hash: Int, buffer: ByteBuffer): Boolean {
-        return accumulator.write(hash, buffer.gdata())
+        return accumulator.write(hash, buffer.gdata)
     }
 
     fun remove(name: String): Boolean {
@@ -88,8 +89,7 @@ abstract class JagFile(
         entries.p2(keys.size)
         val offset = entries.packEntries(keys)
         entries.position(offset)
-        entries.flip()
-        val entriesBytes = entries.gdata(offset)
+        val entriesBytes = entries.flip.gdata(offset)
         val jag = ByteBuffer.allocate(entriesBytes.size + 6)
         jag.p3(entriesBytes.size)
         val bytes = when {
@@ -98,8 +98,7 @@ abstract class JagFile(
         }
         jag.p3(bytes.size)
         jag.pdata(bytes)
-        jag.flip()
-        return jag.gdata()
+        return jag.flip.gdata
     }
 
     private tailrec fun ByteBuffer.unpackEntries(

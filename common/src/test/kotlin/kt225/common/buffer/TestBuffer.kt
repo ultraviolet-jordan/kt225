@@ -17,8 +17,7 @@ class TestBuffer {
     fun `test 1`() {
         val buffer = ByteBuffer.allocate(1)
         buffer.p1(255)
-        buffer.flip()
-        val result = buffer.g1
+        val result = buffer.flip.g1
         assertEquals(255, result)
     }
 
@@ -26,8 +25,7 @@ class TestBuffer {
     fun `test 1 signed`() {
         val buffer = ByteBuffer.allocate(1)
         buffer.p1(69)
-        buffer.flip()
-        val result = buffer.g1b
+        val result = buffer.flip.g1b
         assertEquals(69, result)
     }
 
@@ -35,8 +33,7 @@ class TestBuffer {
     fun `test 2`() {
         val buffer = ByteBuffer.allocate(2)
         buffer.p2(65535)
-        buffer.flip()
-        val result = buffer.g2
+        val result = buffer.flip.g2
         assertEquals(65535, result)
     }
 
@@ -44,8 +41,7 @@ class TestBuffer {
     fun `test 2 LE`() {
         val buffer = ByteBuffer.allocate(2)
         buffer.ip2(65535)
-        buffer.flip()
-        val result = buffer.ig2
+        val result = buffer.flip.ig2
         assertEquals(65535, result)
     }
 
@@ -53,8 +49,7 @@ class TestBuffer {
     fun `test 3`() {
         val buffer = ByteBuffer.allocate(3)
         buffer.p3(696969)
-        buffer.flip()
-        val result = buffer.g3
+        val result = buffer.flip.g3
         assertEquals(696969, result)
     }
 
@@ -62,8 +57,7 @@ class TestBuffer {
     fun `test 4`() {
         val buffer = ByteBuffer.allocate(4)
         buffer.p4(Int.MAX_VALUE)
-        buffer.flip()
-        val result = buffer.g4
+        val result = buffer.flip.g4
         assertEquals(Int.MAX_VALUE, result)
     }
 
@@ -71,8 +65,7 @@ class TestBuffer {
     fun `test 8`() {
         val buffer = ByteBuffer.allocate(8)
         buffer.p8(Long.MAX_VALUE)
-        buffer.flip()
-        val result = buffer.g8
+        val result = buffer.flip.g8
         assertEquals(Long.MAX_VALUE, result)
     }
 
@@ -80,8 +73,7 @@ class TestBuffer {
     fun `test smart`() {
         val byte = ByteBuffer.allocate(2)
         byte.psmart(2)
-        byte.flip()
-        val result = byte.gsmart
+        val result = byte.flip.gsmart
         assertEquals(2, result)
     }
 
@@ -89,8 +81,7 @@ class TestBuffer {
     fun `test smart signed`() {
         val byte = ByteBuffer.allocate(2)
         byte.psmarts(69)
-        byte.flip()
-        val result = byte.gsmarts
+        val result = byte.flip.gsmarts
         assertEquals(69, result)
     }
 
@@ -99,8 +90,7 @@ class TestBuffer {
         val expected = "Hello this is a test string."
         val buffer = ByteBuffer.allocate(expected.length + 1)
         buffer.pjstr(expected)
-        buffer.flip()
-        val result = buffer.gstr
+        val result = buffer.flip.gstr
         assertEquals(expected, result)
     }
 
@@ -109,8 +99,7 @@ class TestBuffer {
         val expected = Random.nextBytes(255)
         val buffer = ByteBuffer.allocate(expected.size)
         buffer.pdata(expected)
-        buffer.flip()
-        val result = buffer.gdata()
+        val result = buffer.flip.gdata
         assertContentEquals(expected, result)
     }
 
@@ -122,8 +111,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(65 + 1)
         buffer.p1(69)
         buffer.rsaenc(BigInteger(public), BigInteger(modulus))
-        buffer.flip()
-        buffer.rsadec(BigInteger(private), BigInteger(modulus))
+        buffer.flip.rsadec(BigInteger(private), BigInteger(modulus))
         val result = buffer.g1
         assertEquals(69, result)
     }

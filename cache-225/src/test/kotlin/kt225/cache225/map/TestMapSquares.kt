@@ -10,6 +10,7 @@ import kt225.cache.map.MapLocsProvider
 import kt225.cache.map.MapSquareLands
 import kt225.cache.map.MapSquareLocs
 import kt225.cache225.Cache225Module
+import kt225.common.buffer.flip
 import kt225.common.game.world.Coordinates
 import kt225.common.game.world.map.MapSquareLoc
 import kt225.common.game.world.map.MapSquareLocLayer
@@ -46,9 +47,8 @@ class TestMapSquares {
         val lumbridge = mapSquareLands[12850]!!
         val buffer = ByteBuffer.allocate(50_000)
         mapSquareLandsProvider.encode(buffer, lumbridge)
-        buffer.flip()
         
-        val decoded = mapSquareLandsProvider.decode(buffer, MapSquareLandEntryType(lumbridge.mapSquare))
+        val decoded = mapSquareLandsProvider.decode(buffer.flip, MapSquareLandEntryType(lumbridge.mapSquare))
         assertEquals(lumbridge.mapSquare, decoded.mapSquare)
         assertEquals(lumbridge.lands.size, decoded.lands.size)
         assertContentEquals(lumbridge.lands, decoded.lands)
@@ -64,9 +64,8 @@ class TestMapSquares {
             val entry = mapSquareEntry.value
             val buffer = ByteBuffer.allocate(100_000)
             mapSquareLandsProvider.encode(buffer, entry)
-            buffer.flip()
 
-            val decoded = mapSquareLandsProvider.decode(buffer, MapSquareLandEntryType(entry.mapSquare))
+            val decoded = mapSquareLandsProvider.decode(buffer.flip, MapSquareLandEntryType(entry.mapSquare))
             assertEquals(entry.mapSquare, decoded.mapSquare)
             assertEquals(entry.lands.size, decoded.lands.size)
             assertContentEquals(entry.lands, decoded.lands)
@@ -83,9 +82,8 @@ class TestMapSquares {
         
         val buffer = ByteBuffer.allocate(50_000)
         mapSquareLocsProvider.encode(buffer, lumbridge)
-        buffer.flip()
 
-        val decoded = mapSquareLocsProvider.decode(buffer, MapSquareLocEntryType(lumbridge.mapSquare))
+        val decoded = mapSquareLocsProvider.decode(buffer.flip, MapSquareLocEntryType(lumbridge.mapSquare))
         assertEquals(lumbridge.mapSquare, decoded.mapSquare)
         assertEquals(lumbridge.locs.size, decoded.locs.size)
         assertContentEquals(lumbridge.locs.toLongArray(), decoded.locs.toLongArray())
@@ -104,9 +102,8 @@ class TestMapSquares {
             val entry = mapSquareEntry.value
             val buffer = ByteBuffer.allocate(50_000)
             mapSquareLocsProvider.encode(buffer, entry)
-            buffer.flip()
 
-            val decoded = mapSquareLocsProvider.decode(buffer, MapSquareLocEntryType(entry.mapSquare))
+            val decoded = mapSquareLocsProvider.decode(buffer.flip, MapSquareLocEntryType(entry.mapSquare))
             assertEquals(entry.mapSquare, decoded.mapSquare)
             assertEquals(entry.locs.size, decoded.locs.size)
             assertContentEquals(entry.locs.toLongArray(), decoded.locs.toLongArray())

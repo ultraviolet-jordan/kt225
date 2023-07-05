@@ -2,6 +2,7 @@ package kt225.game
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kt225.common.buffer.flip
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.position
@@ -85,7 +86,7 @@ class GameClient(
         val writeChannel = session.writeChannel
         if (writeChannel.isClosedForWrite) return
         runBlocking(Dispatchers.IO) {
-            writeChannel.writeFully(buffer.flip())
+            writeChannel.writeFully(buffer.flip)
         }
         writeChannel.flush()
     }

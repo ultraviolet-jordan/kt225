@@ -6,6 +6,7 @@ import kt225.cache.CacheModule
 import kt225.cache.config.Config
 import kt225.cache.config.varp.Varps
 import kt225.cache225.Cache225Module
+import kt225.common.buffer.flip
 import java.nio.ByteBuffer
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,8 +33,7 @@ class TestVarps {
         varps.values.forEach {
             val buffer = ByteBuffer.allocate(100)
             provider.encode(buffer, it)
-            buffer.flip()
-            val decoded = provider.decode(buffer, VarpEntryType(it.id))
+            val decoded = provider.decode(buffer.flip, VarpEntryType(it.id))
 
             assertEquals(it.id, decoded.id)
             assertEquals(it.opcode1, decoded.opcode1)

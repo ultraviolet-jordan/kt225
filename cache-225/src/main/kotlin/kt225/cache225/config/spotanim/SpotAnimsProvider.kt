@@ -7,6 +7,7 @@ import com.google.inject.Singleton
 import kt225.cache.EntryProvider
 import kt225.cache.config.Config
 import kt225.cache.config.spotanim.SpotAnims
+import kt225.common.buffer.flip
 import kt225.common.buffer.g1
 import kt225.common.buffer.g2
 import kt225.common.buffer.p1
@@ -35,8 +36,7 @@ class SpotAnimsProvider @Inject constructor(
         entries.values.forEach {
             encode(buffer, it)
         }
-        buffer.flip()
-        config.add("spotanim.dat", buffer)
+        config.add("spotanim.dat", buffer.flip)
     }
 
     override tailrec fun decode(buffer: ByteBuffer, entry: SpotAnimEntryType): SpotAnimEntryType {
