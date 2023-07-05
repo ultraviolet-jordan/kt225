@@ -26,6 +26,9 @@ inline val ByteBuffer.hasRemaining: Boolean
 inline val ByteBuffer.position: Int
     get() = position()
 
+inline val ByteBuffer.limit: Int
+    get() = limit()
+
 /**
  * Get 1 byte from this ByteBuffer.
  */
@@ -135,7 +138,7 @@ fun ByteBuffer.gbit(count: Int): Int {
     val index = marked + (position - marked)
     val value = gbit(count, index shr 3, index % 8, 0)
     val nextPosition = position + count
-    require(nextPosition <= limit()) { "Buffer does not have enough capacity for byte -> bit positioning." }
+    require(nextPosition <= limit) { "Buffer does not have enough capacity for byte -> bit positioning." }
     position(nextPosition)
     return value
 }
@@ -254,7 +257,7 @@ fun ByteBuffer.pbit(count: Int, value: Int) {
     val index = marked + (position - marked)
     pbit(value, count, index shr 3, index % 8)
     val nextPosition = position + count
-    require(nextPosition <= limit()) { "Buffer does not have enough capacity for byte -> bit positioning." }
+    require(nextPosition <= limit) { "Buffer does not have enough capacity for byte -> bit positioning." }
     position(nextPosition)
 }
 

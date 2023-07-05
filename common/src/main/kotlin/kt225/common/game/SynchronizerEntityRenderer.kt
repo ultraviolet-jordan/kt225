@@ -1,5 +1,6 @@
 package kt225.common.game
 
+import kt225.common.buffer.limit
 import kt225.common.game.entity.Entity
 import kt225.common.game.entity.animator.AnimatedBlock
 import kt225.common.game.entity.render.HighDefinitionRenderBlock
@@ -40,7 +41,7 @@ abstract class SynchronizerEntityRenderer<E : Entity>(
                 continue
             }
             size += when (block) {
-                is LowDefinitionRenderBlock -> block.persisted.limit()
+                is LowDefinitionRenderBlock -> block.persisted.limit
                 is HighDefinitionRenderBlock -> block.builder.bytesLength(block.renderType)
                 else -> throw AssertionError("Block is not in correct instance.")
             }

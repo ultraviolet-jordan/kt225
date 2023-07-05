@@ -6,6 +6,7 @@ import kt225.cache.compress.bzip2.bzip2Compress
 import kt225.cache.compress.bzip2.bzip2Decompress
 import kt225.common.buffer.g4
 import kt225.common.buffer.gdata
+import kt225.common.buffer.limit
 import kt225.common.buffer.p4
 import kt225.common.buffer.pdata
 import java.nio.ByteBuffer
@@ -16,8 +17,8 @@ import java.nio.ByteBuffer
 interface MapSquaresProvider<E : EntryType, T : MutableMap<Int, E>> : EntryProvider<E, T> {
     fun ByteBuffer.decompress(): ByteBuffer {
         val decompressed = g4
-        val buffer = ByteBuffer.wrap(bzip2Decompress(gdata(limit() - 4)))
-        require(decompressed == buffer.limit())
+        val buffer = ByteBuffer.wrap(bzip2Decompress(gdata(limit - 4)))
+        require(decompressed == buffer.limit)
         return buffer
     }
 
