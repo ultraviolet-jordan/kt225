@@ -5,9 +5,8 @@ import dev.misfitlabs.kotlinguice4.multibindings.KotlinMultibinder
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.server.engine.ApplicationEngine
 import kt225.http.routing.ApplicationRouting
+import kt225.http.routing.asset.AssetRouting
 import kt225.http.routing.client.ClientRouting
-import kt225.http.routing.client.IndexResource
-import kt225.http.routing.client.IndexResourceProvider
 import kt225.http.routing.config.ConfigResource
 import kt225.http.routing.config.ConfigResourceProvider
 import kt225.http.routing.config.ConfigRouting
@@ -54,9 +53,10 @@ class HttpModule(
         bind<TexturesResource>().toProvider<TexturesResourceProvider>()
         bind<TitleResource>().toProvider<TitleResourceProvider>()
         bind<WordEncResource>().toProvider<WordEncResourceProvider>()
-        bind<IndexResource>().toProvider<IndexResourceProvider>()
         
         KotlinMultibinder.newSetBinder<ApplicationRouting>(kotlinBinder).apply {
+            addBinding().to<AssetRouting>()
+            addBinding().to<ClientRouting>()
             addBinding().to<ConfigRouting>()
             addBinding().to<CRCRouting>()
             addBinding().to<InterfaceRouting>()
@@ -67,7 +67,6 @@ class HttpModule(
             addBinding().to<TexturesRouting>()
             addBinding().to<TitleRouting>()
             addBinding().to<WordEncRouting>()
-            addBinding().to<ClientRouting>()
         }
     }
 }

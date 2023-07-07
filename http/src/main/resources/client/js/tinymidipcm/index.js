@@ -40,7 +40,7 @@ class TinyMidiPCM {
             const { dirname } = await import(/* webpackIgnore: true */ 'path');
             const { createRequire } = await import(
                 /* webpackIgnore: true */ 'module'
-            );
+                );
 
             globalThis.__dirname = dirname(import.meta.url);
             globalThis.require = createRequire(import.meta.url);
