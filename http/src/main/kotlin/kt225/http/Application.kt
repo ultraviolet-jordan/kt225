@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
         injector
             .findBindingsByType<ApplicationRouting>()
             .map { it.provider.get() }
-            .forEach { it.route(applicationEngine.application) }
+            .forEach { it.route() }
 
         with(applicationEngine.application, Application::installCallLoggingPlugin)
 

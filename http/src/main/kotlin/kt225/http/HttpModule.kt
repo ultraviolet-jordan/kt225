@@ -4,8 +4,8 @@ import dev.misfitlabs.kotlinguice4.KotlinModule
 import dev.misfitlabs.kotlinguice4.multibindings.KotlinMultibinder
 import io.ktor.server.application.ApplicationEnvironment
 import io.ktor.server.engine.ApplicationEngine
+import io.ktor.server.routing.Routing
 import kt225.http.routing.ApplicationRouting
-import kt225.http.routing.asset.AssetRouting
 import kt225.http.routing.client.ClientRouting
 import kt225.http.routing.config.ConfigResource
 import kt225.http.routing.config.ConfigResourceProvider
@@ -43,6 +43,7 @@ class HttpModule(
     override fun configure() {
         bind<ApplicationArguments>().toInstance(ApplicationArguments(args))
         bind<ApplicationEnvironment>().toProvider<ApplicationEnvironmentProvider>().asEagerSingleton()
+        bind<Routing>().toProvider<RoutingProvider>()
         bind<ApplicationEngine>().toProvider<ApplicationEngineProvider>().asEagerSingleton()
 
         bind<ConfigResource>().toProvider<ConfigResourceProvider>()
@@ -55,7 +56,6 @@ class HttpModule(
         bind<WordEncResource>().toProvider<WordEncResourceProvider>()
         
         KotlinMultibinder.newSetBinder<ApplicationRouting>(kotlinBinder).apply {
-            addBinding().to<AssetRouting>()
             addBinding().to<ClientRouting>()
             addBinding().to<ConfigRouting>()
             addBinding().to<CRCRouting>()
