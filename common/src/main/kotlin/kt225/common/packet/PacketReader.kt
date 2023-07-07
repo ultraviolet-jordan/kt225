@@ -9,5 +9,5 @@ abstract class PacketReader<out T : Packet>(
     val id: Int,
     val length: Int
 ) {
-    abstract suspend fun readPacket(buffer: ByteBuffer, length: Int): T?
+    abstract suspend fun readPacket(buffer: ByteBuffer, length: Int): T
 }
