@@ -1,6 +1,7 @@
 plugins {
     application
     alias(deps.plugins.jvm)
+    alias(deps.plugins.shadow)
 }
 
 dependencies {

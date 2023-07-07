@@ -19,10 +19,12 @@ dependencyResolutionManagement {
             version("jnr", "2.2.14")
             version("commons-compress", "1.23.0")
             version("pathfinder", "2.4.3")
+            version("shadow", "8.1.1")
 
             // Dependency plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
             plugin("versions", "com.github.ben-manes.versions").versionRef("versions")
+            plugin("shadow", "com.github.johnrengelman.shadow").versionRef("shadow")
 
             // Dependency libraries
             // Ktor Dependencies
