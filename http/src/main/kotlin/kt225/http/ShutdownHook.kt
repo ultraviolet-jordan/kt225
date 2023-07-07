@@ -16,5 +16,7 @@ class ShutdownHook(
         logger.info("Running shutdown hook...")
         logger.info("Shutting down the application engine...")
         applicationEngine.stop(3, 5, TimeUnit.SECONDS)
+        
+        // Force kill it here? Ye
     }
 }

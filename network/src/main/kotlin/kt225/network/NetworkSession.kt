@@ -25,11 +25,17 @@ class NetworkSession(
     clientPacketLengths: IntArray
 ) : Session(socket, socket.openReadChannel(), socket.openWriteChannel(), builders, readers, handlers, codecs.encoders, codecs.decoders, crcs, clientPacketLengths) {
     override suspend fun accept() {
-        codec(
-            type = ServerSeedEncoder::class,
-            message = ServerSeedResponse(
-                seed = ((Math.random() * 99999999.0).toLong() shl 32) + (Math.random() * 99999999.0).toLong()
+        try {
+            codec(
+                type = ServerSeedEncoder::class,
+                message = ServerSeedResponse(
+                    seed = ((Math.random() * 99999999.0).toLong() shl 32) + (Math.random() * 99999999.0).toLong()
+                )
             )
-        )
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        } finally {
+            socket.close()
+        }
     }
 }

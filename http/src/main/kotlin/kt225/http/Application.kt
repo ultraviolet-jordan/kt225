@@ -25,10 +25,6 @@ fun main(args: Array<String>) {
         val applicationEngine = injector.getInstance<ApplicationEngine>()
         val cache = injector.getInstance<Cache>()
 
-        with(applicationEngine.application, Application::installCallLoggingPlugin)
-
-        Runtime.getRuntime().addShutdownHook(ShutdownHook(applicationEnvironment.log, applicationEngine))
-
         cache.release()
         System.gc()
 
@@ -37,6 +33,9 @@ fun main(args: Array<String>) {
             .map { it.provider.get() }
             .forEach { it.route(applicationEngine.application) }
 
+        with(applicationEngine.application, Application::installCallLoggingPlugin)
+
+        Runtime.getRuntime().addShutdownHook(ShutdownHook(applicationEnvironment.log, applicationEngine))
         applicationEngine.start(wait = true)
     } catch (exception: Exception) {
         exception.printStackTrace()

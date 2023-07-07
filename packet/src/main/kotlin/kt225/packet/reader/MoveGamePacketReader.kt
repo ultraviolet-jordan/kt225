@@ -20,7 +20,7 @@ class MoveGamePacketReader : PacketReader<MoveGamePacket>(
     id = 181,
     length = -1
 ) {
-    override suspend fun readPacket(buffer: ByteBuffer, length: Int): MoveGamePacket? {
+    override suspend fun readPacket(buffer: ByteBuffer, length: Int): MoveGamePacket {
         val ctrlDown = buffer.g1
         val startX = buffer.g2
         val startZ = buffer.g2

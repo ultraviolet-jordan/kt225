@@ -84,7 +84,9 @@ class GameClient(
 
     private fun flush(buffer: ByteBuffer) {
         val writeChannel = session.writeChannel
-        if (writeChannel.isClosedForWrite) return
+        if (writeChannel.isClosedForWrite) {
+            return
+        }
         runBlocking(Dispatchers.IO) {
             writeChannel.writeFully(buffer.flip)
         }

@@ -41,7 +41,9 @@ class GameWorld(
 
         loginRequests.forEach {
             require(it is Player)
-            players[players.indexOf(null)] = it
+            val index = players.indexOf(null)
+            players[index] = it
+            it.index = index
             it.init(Coordinates.DEFAULT)
             it.login()
         }
