@@ -18,7 +18,7 @@ abstract class Session(
     val readChannel: ByteReadChannel,
     val writeChannel: ByteWriteChannel,
     val builders: Map<KClass<*>, PacketBuilder<Packet>>,
-    val readers: Map<Int, PacketReader<Packet>>,
+    val readers: Array<PacketReader<Packet>?>,
     val handlers: Map<KClass<*>, PacketHandler<Packet>>,
     val encoders: Set<CodecEncoder<CodecEncoderType>>,
     val decoders: Set<CodecDecoder>,

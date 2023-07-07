@@ -13,8 +13,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kt225.cache.Cache
 import kt225.common.game.Server
-import kt225.common.packet.Packet
-import kt225.common.packet.PacketReader
 import kt225.network.NetworkSession
 import kt225.network.NetworkSessionCodecs
 import java.util.concurrent.TimeUnit
@@ -31,7 +29,7 @@ class GameServer @Inject constructor(
     private val gamePacketConfiguration: GamePacketConfiguration,
     private val networkSessionCodecHandlers: NetworkSessionCodecs
 ) : Server {
-    private val readers = gamePacketConfiguration.readers.associateBy(PacketReader<Packet>::id)
+    private val readers = Array(255) { gamePacketConfiguration.readers.firstOrNull { reader -> reader.id == it } }
     private val clientPacketLengths = applicationEnvironment.config.property("game.packet.lengths").getList().map(String::toInt).toIntArray()
 
     override fun bind() = runBlocking {

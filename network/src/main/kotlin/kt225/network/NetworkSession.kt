@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 class NetworkSession(
     socket: Socket,
     builders: Map<KClass<*>, PacketBuilder<Packet>>,
-    readers: Map<Int, PacketReader<Packet>>,
+    readers: Array<PacketReader<Packet>?>,
     handlers: Map<KClass<*>, PacketHandler<Packet>>,
     codecs: NetworkSessionCodecs,
     crcs: IntArray,
