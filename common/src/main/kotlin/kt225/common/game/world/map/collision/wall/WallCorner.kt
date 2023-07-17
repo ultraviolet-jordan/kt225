@@ -21,48 +21,30 @@ import org.rsmod.pathfinder.flag.CollisionFlag.WALL_SOUTH_WEST_PROJECTILE_BLOCKE
  * @author Jordan Abraham
  */
 tailrec fun ZoneFlags.changeWallCorner(coordinates: Coordinates, rotation: MapSquareLocRotation, blockproj: Boolean, add: Boolean) {
+    val northWest = if (blockproj) WALL_NORTH_WEST_PROJECTILE_BLOCKER else WALL_NORTH_WEST
+    val southEast = if (blockproj) WALL_SOUTH_EAST_PROJECTILE_BLOCKER else WALL_SOUTH_EAST
+    val northEast = if (blockproj) WALL_NORTH_EAST_PROJECTILE_BLOCKER else WALL_NORTH_EAST
+    val southWest = if (blockproj) WALL_SOUTH_WEST_PROJECTILE_BLOCKER else WALL_SOUTH_WEST
+
     when (rotation) {
         WEST -> {
-            val northWest = coordinates.transform(-1, 1)
-            if (blockproj) {
-                change(add, coordinates, WALL_NORTH_WEST_PROJECTILE_BLOCKER)
-                change(add, northWest, WALL_SOUTH_EAST_PROJECTILE_BLOCKER)
-            } else {
-                change(add, coordinates, WALL_NORTH_WEST)
-                change(add, northWest, WALL_SOUTH_EAST)
-            }
+            change(add, coordinates, northWest)
+            change(add, coordinates.transform(-1, 1), southEast)
         }
         NORTH -> {
-            val northEast = coordinates.transform(1, 1)
-            if (blockproj) {
-                change(add, coordinates, WALL_NORTH_EAST_PROJECTILE_BLOCKER)
-                change(add, northEast, WALL_SOUTH_WEST_PROJECTILE_BLOCKER)
-            } else {
-                change(add, coordinates, WALL_NORTH_EAST)
-                change(add, northEast, WALL_SOUTH_WEST)
-            }
+            change(add, coordinates, northEast)
+            change(add, coordinates.transform(1, 1), southWest)
         }
         EAST -> {
-            val southEast = coordinates.transform(1, -1)
-            if (blockproj) {
-                change(add, coordinates, WALL_SOUTH_EAST_PROJECTILE_BLOCKER)
-                change(add, southEast, WALL_NORTH_WEST_PROJECTILE_BLOCKER)
-            } else {
-                change(add, coordinates, WALL_SOUTH_EAST)
-                change(add, southEast, WALL_NORTH_WEST)
-            }
+            change(add, coordinates, southEast)
+            change(add, coordinates.transform(1, -1), northWest)
         }
         SOUTH -> {
-            val southWest = coordinates.transform(-1, -1)
-            if (blockproj) {
-                change(add, coordinates, WALL_SOUTH_WEST_PROJECTILE_BLOCKER)
-                change(add, southWest, WALL_NORTH_EAST_PROJECTILE_BLOCKER)
-            } else {
-                change(add, coordinates, WALL_SOUTH_WEST)
-                change(add, southWest, WALL_NORTH_EAST)
-            }
+            change(add, coordinates, southWest)
+            change(add, coordinates.transform(-1, -1), northEast)
         }
     }
+
     if (blockproj) {
         // If we just blocked projectiles, then block normally next.
         return changeWallCorner(coordinates, rotation, false, add)
