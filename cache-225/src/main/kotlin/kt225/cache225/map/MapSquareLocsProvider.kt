@@ -30,7 +30,7 @@ class MapSquareLocsProvider @Inject constructor(
     override fun get(): MapSquareLocs<MapSquareLocEntryType> {
         val locs = MapSquareLocs<MapSquareLocEntryType>()
         
-        maps.filter { it.name.startsWith("l") }.parallelStream().forEach {
+        maps.filter { it.name.startsWith("l") }.forEach {
             val mapSquare = MapSquare(it.id, it.x, it.z)
             val entry = MapSquareLocEntryType(mapSquare.packed)
             decode(ByteBuffer.wrap(it.bytes).decompress(), entry)

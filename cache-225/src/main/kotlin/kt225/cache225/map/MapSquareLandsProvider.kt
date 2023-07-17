@@ -27,7 +27,7 @@ class MapSquareLandsProvider @Inject constructor(
     override fun get(): MapSquareLands<MapSquareLandEntryType> {
         val lands = MapSquareLands<MapSquareLandEntryType>()
 
-        maps.filter { it.name.startsWith("m") }.parallelStream().forEach {
+        maps.filter { it.name.startsWith("m") }.forEach {
             val mapSquare = MapSquare(it.id, it.x, it.z)
             val entry = MapSquareLandEntryType(mapSquare.packed)
             decode(ByteBuffer.wrap(it.bytes).decompress(), entry)
