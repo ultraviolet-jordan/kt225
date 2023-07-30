@@ -27,7 +27,7 @@ class SpriteGlossary : Map<Int, String> by mapOf(
     -938346352 to "combaticons3.dat",
     -427405255 to "compass.dat",
     529843337 to "cross.dat",
-    22834782 to "gnomeball_buttons",
+    22834782 to "gnomeball_buttons.dat",
     -288954319 to "headicons.dat",
     -1502153170 to "hitmarks.dat",
     -1568083395 to "invback.dat",
