@@ -287,14 +287,25 @@ fun ByteBuffer.pdata(bytes: ByteArray, position: Int = position(), length: Int =
     pad(length)
 }
 
+/**
+ * Put a packet size header of size 1 into this ByteBuffer.
+ */
 fun ByteBuffer.psize1(value: Int) {
     put(position - value - 1, value.toByte())
 }
 
+/**
+ * Put a packet size header of size 2 into this ByteBuffer.
+ */
 fun ByteBuffer.psize2(value: Int) {
-//    putShort(position - value - 2, value.toShort())
-    put(position - value - 2, (value shr 8).toByte())
-    put(position - value - 1, value.toByte())
+    putShort(position - value - 2, value.toShort())
+}
+
+/**
+ * Put a packet size header of size 4 into this ByteBuffer.
+ */
+fun ByteBuffer.psize4(value: Int) {
+    putInt(position - value - 4, value)
 }
 
 /**
