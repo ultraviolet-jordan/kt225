@@ -16,6 +16,7 @@ import kt225.game.world.map.ZoneFlagsProvider
 import org.rsmod.pathfinder.PathFinder
 import org.rsmod.pathfinder.StepValidator
 import org.rsmod.pathfinder.ZoneFlags
+import java.security.interfaces.RSAPrivateCrtKey
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
 
@@ -39,5 +40,6 @@ class GameModule(
         bind<ExecutorService>().toProvider<EntityPoolExecutorProvider>().asEagerSingleton()
         bind<ServerSocket>().toProvider<ServerSocketProvider>().asEagerSingleton()
         bind<SynchronizerEntityRenderer<Player>>().to<PlayerSynchronizerRenderer>().asEagerSingleton()
+        bind<RSAPrivateCrtKey>().toProvider<RSAPrivateCrtKeyProvider>()
     }
 }

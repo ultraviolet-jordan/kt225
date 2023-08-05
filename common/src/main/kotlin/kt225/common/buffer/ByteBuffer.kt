@@ -2,6 +2,7 @@ package kt225.common.buffer
 
 import java.math.BigInteger
 import java.nio.ByteBuffer
+import java.security.interfaces.RSAPrivateCrtKey
 import kotlin.math.min
 
 /**
@@ -148,9 +149,23 @@ fun ByteBuffer.gdata(size: Int = limit(), position: Int = position(), length: In
  * Directly decrypt this ByteBuffer with RSA.
  * The position is set to 0 after this function is called.
  */
-fun ByteBuffer.rsadec(exponent: BigInteger, modulus: BigInteger) {
+fun ByteBuffer.rsadec(pem: RSAPrivateCrtKey) {
+    val p = pem.primeP
+    val q = pem.primeQ
+    val dP = pem.primeExponentP
+    val dQ = pem.primeExponentQ
+    val qInv = pem.crtCoefficient
+
     val length = g1
-    val dec = BigInteger(gdata(length)).modPow(exponent, modulus).toByteArray()
+    val bytes = gdata(length)
+    val data = BigInteger(1, bytes)
+
+    val m1 = data.mod(p).modPow(dP, p)
+    val m2 = data.mod(q).modPow(dQ, q)
+
+    val h = qInv * (m1 - m2) % p
+    val dec = (m2 + h * q).toByteArray()
+
     position(0)
     pdata(dec)
     position(0)
@@ -266,10 +281,11 @@ fun ByteBuffer.pdata(bytes: ByteArray, position: Int = position(), length: Int =
  * The position is set to the length of the encrypted bytes.
  * It is up to the caller of this function to flip the buffer for reading.
  */
-fun ByteBuffer.rsaenc(exponent: BigInteger, modulus: BigInteger) {
+fun ByteBuffer.rsaenc(pem: RSAPrivateCrtKey) {
     val length = position
     position(0)
-    val enc = BigInteger(gdata(length)).modPow(exponent, modulus).toByteArray()
+    // raw rsa encryption.
+    val enc = BigInteger(gdata(length)).modPow(pem.publicExponent, pem.modulus).toByteArray()
     position(0)
     p1(enc.size)
     pdata(enc)

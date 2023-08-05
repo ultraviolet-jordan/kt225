@@ -8,6 +8,7 @@ dependencies {
     implementation(deps.bundles.ktor)
     implementation(deps.guice)
     implementation(deps.pathfinder)
+    implementation(deps.bouncycastle)
 
     implementation(project(":cache"))
     implementation(project(":cache-225"))

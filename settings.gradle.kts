@@ -20,6 +20,7 @@ dependencyResolutionManagement {
             version("commons-compress", "1.23.0")
             version("pathfinder", "2.4.3")
             version("shadow", "8.1.1")
+            version("bouncycastle", "1.76")
 
             // Dependency plugins
             plugin("jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
@@ -40,6 +41,7 @@ dependencyResolutionManagement {
             library("jnr", "com.github.jnr", "jnr-ffi").versionRef("jnr")
             library("commons-compress", "org.apache.commons", "commons-compress").versionRef("commons-compress")
             library("pathfinder", "com.github.blurite", "pathfinder").versionRef("pathfinder")
+            library("bouncycastle", "org.bouncycastle", "bcprov-jdk18on").versionRef("bouncycastle")
 
             // Dependency bundles
             listOf(
