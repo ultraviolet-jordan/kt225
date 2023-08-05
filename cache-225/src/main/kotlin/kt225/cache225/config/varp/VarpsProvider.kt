@@ -13,7 +13,7 @@ import kt225.common.buffer.gstr
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.p4
-import kt225.common.buffer.pjstr
+import kt225.common.buffer.pstr
 import java.nio.ByteBuffer
 
 /**
@@ -67,7 +67,7 @@ class VarpsProvider @Inject constructor(
         buffer.pTrue(entry.opcode6, 6)
         buffer.pNotZero(entry.opcode7, 7, ByteBuffer::p4)
         buffer.pTrue(entry.opcode8, 8)
-        buffer.pNotNull(entry.opcode10, 10, ByteBuffer::pjstr)
+        buffer.pNotNull(entry.opcode10, 10, ByteBuffer::pstr)
         buffer.p1(0)
     }
 }

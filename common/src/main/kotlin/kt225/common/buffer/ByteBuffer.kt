@@ -2,6 +2,7 @@ package kt225.common.buffer
 
 import java.math.BigInteger
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.security.interfaces.RSAPrivateCrtKey
 import kotlin.math.min
 
@@ -34,8 +35,8 @@ inline val ByteBuffer.limit: Int
     get() = limit()
 
 /**
- * Flips this buffer. 
- * The limit is set to the current position and then the position is set to zero. 
+ * Flips this buffer.
+ * The limit is set to the current position and then the position is set to zero.
  * If the mark is defined then it is discarded.
  */
 inline val ByteBuffer.flip: ByteBuffer
@@ -59,7 +60,7 @@ inline val ByteBuffer.peekb: Int
  * Get 1 byte from this ByteBuffer.
  */
 inline val ByteBuffer.g1: Int 
-    get() = get().toInt() and 0xff
+    get() = g1b and 0xff
 
 /**
  * Get 1 signed byte from this ByteBuffer.
@@ -71,7 +72,7 @@ inline val ByteBuffer.g1b: Int
  * Get 2 bytes from this ByteBuffer.
  */
 inline val ByteBuffer.g2: Int 
-    get() = getShort().toInt() and 0xffff
+    get() = g2b and 0xffff
 
 /**
  * Get 2 signed bytes from this ByteBuffer.
@@ -83,13 +84,15 @@ inline val ByteBuffer.g2b: Int
  * Get 2 bytes from this ByteBuffer LE.
  */
 inline val ByteBuffer.ig2: Int 
-    get() = (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8)
+    get() = order(ByteOrder.LITTLE_ENDIAN).g2.also {
+        order(ByteOrder.BIG_ENDIAN)
+    }
 
 /**
  * Get 3 bytes from this ByteBuffer.
  */
 inline val ByteBuffer.g3: Int 
-    get() = (get().toInt() and 0xff shl 16) or (getShort().toInt() and 0xffff)
+    get() = (get().toInt() and 0xff shl 16) or g2
 
 /**
  * Get 4 bytes from this ByteBuffer.
@@ -101,7 +104,9 @@ inline val ByteBuffer.g4: Int
  * Get 4 bytes from this ByteBuffer LE.
  */
 inline val ByteBuffer.ig4: Int
-    get() = (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8) or (get().toInt() and 0xff shl 16) or (get().toInt() and 0xff shl 24)
+    get() = order(ByteOrder.LITTLE_ENDIAN).g4.also {
+        order(ByteOrder.BIG_ENDIAN)
+    }
 
 /**
  * Get 8 bytes from this ByteBuffer.
@@ -114,14 +119,14 @@ inline val ByteBuffer.g8: Long
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmarts: Int
-    get() = if (peek < 128) g1 else g2 - 32768
+    get() = if (peek <= Byte.MAX_VALUE) g1 else g2 - 32768
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmart: Int 
-    get() = if (peek < 128) g1 - 64 else g2 - 49152
+    get() = if (peek <= Byte.MAX_VALUE) g1 - 64 else g2 - 49152
 
 /**
  * Get a string from this ByteBuffer.
@@ -129,6 +134,15 @@ inline val ByteBuffer.gsmart: Int
  */
 inline val ByteBuffer.gstr: String 
     get() = String(gdata(lengthToByte(10))).also {
+        pad(1)
+    }
+
+/**
+ * Get a j string from this ByteBuffer.
+ * Moves the buffer position from the current position + string.length + 1
+ */
+inline val ByteBuffer.gjstr: String
+    get() = String(gdata(lengthToByte(0))).also {
         pad(1)
     }
 
@@ -209,8 +223,9 @@ fun ByteBuffer.p2(value: Int) {
  * Puts 2 bytes into this ByteBuffer LE.
  */
 fun ByteBuffer.ip2(value: Int) {
-    put(value.toByte())
-    put((value shr 8).toByte())
+    order(ByteOrder.LITTLE_ENDIAN)
+    p2(value)
+    order(ByteOrder.BIG_ENDIAN)
 }
 
 /**
@@ -218,7 +233,7 @@ fun ByteBuffer.ip2(value: Int) {
  */
 fun ByteBuffer.p3(value: Int) {
     put((value shr 16).toByte())
-    putShort(value.toShort())
+    p2(value)
 }
 
 /**
@@ -232,10 +247,9 @@ fun ByteBuffer.p4(value: Int) {
  * Puts 4 bytes into this ByteBuffer LE.
  */
 fun ByteBuffer.ip4(value: Int) {
-    put(value.toByte())
-    put((value shr 8).toByte())
-    put((value shr 16).toByte())
-    put((value shr 24).toByte())
+    order(ByteOrder.LITTLE_ENDIAN)
+    p4(value)
+    order(ByteOrder.BIG_ENDIAN)
 }
 
 /**
@@ -250,10 +264,10 @@ fun ByteBuffer.p8(value: Long) {
  * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
  */
 fun ByteBuffer.psmarts(value: Int) {
-    if (value >= 128) {
-        putShort((value + 32768).toShort())
+    if (value > Byte.MAX_VALUE) {
+        p2(value + 32768)
     } else {
-        put(value.toByte())
+        p1(value)
     }
 }
 
@@ -262,18 +276,27 @@ fun ByteBuffer.psmarts(value: Int) {
  * Puts 2 bytes into this ByteBuffer if the value is >= 128 and < 65535
  */
 fun ByteBuffer.psmart(value: Int) {
-    if (value >= 128) {
-        putShort((value + 49152).toShort())
+    if (value > Byte.MAX_VALUE) {
+        p2(value + 49152)
     } else {
-        put((value + 64).toByte())
+        p1(value + 64)
     }
+}
+
+/**
+ * Put a j string into this ByteBuffer.
+ * Moves the buffer position from the current position + string.length + 1
+ */
+fun ByteBuffer.pjstr(value: String) {
+    put(value.toByteArray())
+    put(0)
 }
 
 /**
  * Put a string into this ByteBuffer.
  * Moves the buffer position from the current position + string.length + 1
  */
-fun ByteBuffer.pjstr(value: String) {
+fun ByteBuffer.pstr(value: String) {
     put(value.toByteArray())
     put(10)
 }

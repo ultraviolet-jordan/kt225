@@ -99,11 +99,20 @@ class TestBuffer {
     }
 
     @Test
-    fun `test string`() {
+    fun `test str`() {
+        val expected = "Hello this is a test string."
+        val buffer = ByteBuffer.allocate(expected.length + 1)
+        buffer.pstr(expected)
+        val result = buffer.flip.gstr
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `test j str`() {
         val expected = "Hello this is a test string."
         val buffer = ByteBuffer.allocate(expected.length + 1)
         buffer.pjstr(expected)
-        val result = buffer.flip.gstr
+        val result = buffer.flip.gjstr
         assertEquals(expected, result)
     }
 

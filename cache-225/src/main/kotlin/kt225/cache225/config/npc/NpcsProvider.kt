@@ -14,7 +14,7 @@ import kt225.common.buffer.g2
 import kt225.common.buffer.gstr
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
-import kt225.common.buffer.pjstr
+import kt225.common.buffer.pstr
 import kt225.common.buffer.position
 import java.nio.ByteBuffer
 
@@ -98,8 +98,8 @@ class NpcsProvider @Inject constructor(
             buffer.p1(it.size)
             it.forEach(buffer::p2)
         }
-        buffer.pNotNull(entry.name, 2, ByteBuffer::pjstr)
-        buffer.pNotNull(entry.desc, 3, ByteBuffer::pjstr)
+        buffer.pNotNull(entry.name, 2, ByteBuffer::pstr)
+        buffer.pNotNull(entry.desc, 3, ByteBuffer::pstr)
         if (entry.size != 1) {
             buffer.p1(12)
             buffer.p1(entry.size)
@@ -120,7 +120,7 @@ class NpcsProvider @Inject constructor(
         entry.ops?.let {
             require(it.size <= 5)
             it.forEachIndexed { index, op ->
-                buffer.pNotNull(op, index + 30, ByteBuffer::pjstr)
+                buffer.pNotNull(op, index + 30, ByteBuffer::pstr)
             }
         }
         entry.recol_s?.let {

@@ -16,7 +16,7 @@ import kt225.common.buffer.gstr
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.p4
-import kt225.common.buffer.pjstr
+import kt225.common.buffer.pstr
 import kt225.common.buffer.position
 import java.nio.ByteBuffer
 
@@ -121,8 +121,8 @@ class ObjsProvider @Inject constructor(
 
     override fun encode(buffer: ByteBuffer, entry: ObjEntryType) {
         buffer.pNotZero(entry.model, 1, ByteBuffer::p2)
-        buffer.pNotNull(entry.name, 2, ByteBuffer::pjstr)
-        buffer.pNotNull(entry.desc, 3, ByteBuffer::pjstr)
+        buffer.pNotNull(entry.name, 2, ByteBuffer::pstr)
+        buffer.pNotNull(entry.desc, 3, ByteBuffer::pstr)
         if (entry.zoom2d != 2000) {
             buffer.p1(4)
             buffer.p2(entry.zoom2d)
@@ -152,13 +152,13 @@ class ObjsProvider @Inject constructor(
         entry.ops?.let {
             require(it.size <= 5)
             it.forEachIndexed { index, op ->
-                buffer.pNotNull(op, index + 30, ByteBuffer::pjstr)
+                buffer.pNotNull(op, index + 30, ByteBuffer::pstr)
             }
         }
         entry.iops?.let {
             require(it.size <= 5)
             it.forEachIndexed { index, op ->
-                buffer.pNotNull(op, index + 35, ByteBuffer::pjstr)
+                buffer.pNotNull(op, index + 35, ByteBuffer::pstr)
             }
         }
         entry.recol_s?.let {

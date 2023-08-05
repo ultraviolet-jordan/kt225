@@ -13,7 +13,7 @@ import kt225.common.buffer.gstr
 import kt225.common.buffer.p1
 import kt225.common.buffer.p2
 import kt225.common.buffer.p3
-import kt225.common.buffer.pjstr
+import kt225.common.buffer.pstr
 import java.nio.ByteBuffer
 
 /**
@@ -59,7 +59,7 @@ class FlosProvider @Inject constructor(
         buffer.pNotNegative1(entry.texture, 2, ByteBuffer::p1)
         buffer.pTrue(entry.opcode3, 3)
         buffer.pFalse(entry.occlude, 5)
-        buffer.pNotNull(entry.name, 6, ByteBuffer::pjstr)
+        buffer.pNotNull(entry.name, 6, ByteBuffer::pstr)
         buffer.p1(0)
     }
 }
