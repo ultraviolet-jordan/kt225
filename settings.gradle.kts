@@ -12,7 +12,7 @@ dependencyResolutionManagement {
         create("deps") {
             // Dependency versions.
             version("kotlin", "1.9.0")
-            version("ktor", "2.3.2")
+            version("ktor", "2.3.3")
             version("slf4j", "2.0.7")
             version("versions", "0.47.0")
             version("guice", "3.0.0")
