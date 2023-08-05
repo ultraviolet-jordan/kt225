@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
  */
 @Singleton
 class PlayerInfoPacketBuilder @Inject constructor(
-    private val synchronizerEntityRenderer: SynchronizerEntityRenderer<Player>
+    synchronizerEntityRenderer: SynchronizerEntityRenderer<Player>
 ) : PacketBuilder<PlayerInfoPacket>(
     id = 184,
     length = -2
@@ -36,16 +36,17 @@ class PlayerInfoPacketBuilder @Inject constructor(
     }
 
     private fun ByteBuffer.updateLocalPlayer(index: Int, viewport: Viewport) {
-        val rendering = highDefinitionRenders[index] != null
-        val animatedBlock = animatorRenders[index]
-        if (animatedBlock == null) {
-            pbit(1, 0)
-            return
+        with(animatorRenders[index]) {
+            if (this == null) {
+                pbit(1, 0)
+                return
+            }
+            pbit(1, 1)
+            val builder = this.builder
+            pbit(2, builder.index)
+            builder.buildAnimatorBlock(this@updateLocalPlayer, this.animatorType)
         }
-        pbit(1, 1)
-        pbit(2, animatedBlock.builder.index)
-        animatedBlock.builder.buildAnimatorBlock(this, animatedBlock.animatorType)
-        if (rendering) {
+        if (highDefinitionRenders[index] != null) {
             viewport.localRenderUpdates.add(index)
         }
     }

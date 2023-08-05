@@ -4,8 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kt225.common.buffer.flip
 import kt225.common.buffer.p1
-import kt225.common.buffer.p2
+import kt225.common.buffer.pad
 import kt225.common.buffer.position
+import kt225.common.buffer.psize1
+import kt225.common.buffer.psize2
 import kt225.common.crypto.IsaacRandom
 import kt225.common.game.Client
 import kt225.common.network.Session
@@ -14,6 +16,7 @@ import kt225.common.packet.PacketGroup
 import java.nio.ByteBuffer
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.absoluteValue
 
 /**
  * @author Jordan Abraham
@@ -62,24 +65,21 @@ class GameClient(
 
     private fun write(buffer: ByteBuffer, packet: Packet) {
         val builder = session.builders[packet::class] ?: return
+        val length = builder.length
         buffer.p1(builder.id + serverIsaac.nextInt)
-        if (builder.length != -1 && builder.length != -2) {
+        if (length != -1 && length != -2) {
             builder.buildPacket(packet, buffer)
             return
         }
-        val startPos = buffer.position
-        val offset = startPos + if (builder.length == -1) 1 else 2
-        buffer.position(offset)
+        val abs = length.absoluteValue
+        val pos = buffer.position
+        buffer.pad(abs)
         builder.buildPacket(packet, buffer)
-        val endPos = buffer.position
-        val size = endPos - offset
-        buffer.position(startPos)
-        when (builder.length) {
-            -1 -> buffer.p1(size)
-            -2 -> buffer.p2(size)
-            else -> throw IllegalStateException("Builder length can only be -1 or -2 here.")
+        if (length == -1) {
+            buffer.psize1(buffer.position - pos - abs)
+        } else {
+            buffer.psize2(buffer.position - pos - abs)
         }
-        buffer.position(endPos)
     }
 
     private fun flush(buffer: ByteBuffer) {

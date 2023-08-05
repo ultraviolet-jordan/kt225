@@ -7,7 +7,7 @@ import kt225.common.buffer.g1
 import kt225.common.buffer.g1b
 import kt225.common.buffer.g2
 import kt225.common.buffer.remaining
-import kt225.common.buffer.skip
+import kt225.common.buffer.pad
 import kt225.common.packet.PacketReader
 import kt225.packet.type.client.MoveGamePacket
 import java.nio.ByteBuffer
@@ -30,7 +30,7 @@ class MoveGamePacketReader : PacketReader<MoveGamePacket>(
         }
         // Just grab the last one we need skip the rest.
         // Not using the client generated path. We make our own.
-        buffer.skip(checkpoints - 1 shl 1)
+        buffer.pad(checkpoints - 1 shl 1)
         return MoveGamePacket(ctrlDown, buffer.g1b + startX, buffer.g1b + startZ)
     }
 }

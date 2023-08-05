@@ -67,6 +67,14 @@ class TestBuffer {
     }
 
     @Test
+    fun `test 4 LE`() {
+        val buffer = ByteBuffer.allocate(4)
+        buffer.ip4(Int.MAX_VALUE)
+        val result = buffer.flip.ig4
+        assertEquals(Int.MAX_VALUE, result)
+    }
+
+    @Test
     fun `test 8`() {
         val buffer = ByteBuffer.allocate(8)
         buffer.p8(Long.MAX_VALUE)
@@ -114,7 +122,7 @@ class TestBuffer {
         val buffer = ByteBuffer.allocate(65 + 1)
         buffer.p1(69)
         buffer.rsaenc(rsaPrivateCrtKey)
-        buffer.flip.rsadec(rsaPrivateCrtKey)
+        buffer.rsadec(rsaPrivateCrtKey)
         val result = buffer.g1
         assertEquals(69, result)
     }

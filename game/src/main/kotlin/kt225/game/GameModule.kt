@@ -40,6 +40,6 @@ class GameModule(
         bind<ExecutorService>().toProvider<EntityPoolExecutorProvider>().asEagerSingleton()
         bind<ServerSocket>().toProvider<ServerSocketProvider>().asEagerSingleton()
         bind<SynchronizerEntityRenderer<Player>>().to<PlayerSynchronizerRenderer>().asEagerSingleton()
-        bind<RSAPrivateCrtKey>().toProvider<RSAPrivateCrtKeyProvider>()
+        bind<RSAPrivateCrtKey>().toProvider<RSAPrivateCrtKeyProvider>().asEagerSingleton()
     }
 }

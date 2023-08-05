@@ -42,18 +42,18 @@ inline val ByteBuffer.flip: ByteBuffer
     get() = flip()
 
 /**
- * Returns the signed byte at the current position.
- * Does not move the position.
- */
-inline val ByteBuffer.peekSigned: Int
-    get() = this[position].toInt()
-
-/**
  * Returns the unsigned byte at the current position.
  * Does not move the position.
  */
-inline val ByteBuffer.peekUnsigned: Int
-    get() = peekSigned and 0xff
+inline val ByteBuffer.peek: Int
+    get() = peekb and 0xff
+
+/**
+ * Returns the signed byte at the current position.
+ * Does not move the position.
+ */
+inline val ByteBuffer.peekb: Int
+    get() = this[position].toInt()
 
 /**
  * Get 1 byte from this ByteBuffer.
@@ -98,6 +98,12 @@ inline val ByteBuffer.g4: Int
     get() = getInt()
 
 /**
+ * Get 4 bytes from this ByteBuffer LE.
+ */
+inline val ByteBuffer.ig4: Int
+    get() = (get().toInt() and 0xff) or (get().toInt() and 0xff shl 8) or (get().toInt() and 0xff shl 16) or (get().toInt() and 0xff shl 24)
+
+/**
  * Get 8 bytes from this ByteBuffer.
  */
 inline val ByteBuffer.g8: Long 
@@ -107,15 +113,15 @@ inline val ByteBuffer.g8: Long
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
-inline val ByteBuffer.gsmarts: Int 
-    get() = if (peekUnsigned < 128) g1 else g2 - 32768
+inline val ByteBuffer.gsmarts: Int
+    get() = if (peek < 128) g1 else g2 - 32768
 
 /**
  * Get 1 byte from this ByteBuffer if the next byte is < 128.
  * Get 2 bytes from this ByteBuffer if the next byte is >= 128 and < 65535
  */
 inline val ByteBuffer.gsmart: Int 
-    get() = if (peekUnsigned < 128) g1 - 64 else g2 - 49152
+    get() = if (peek < 128) g1 - 64 else g2 - 49152
 
 /**
  * Get a string from this ByteBuffer.
@@ -123,7 +129,7 @@ inline val ByteBuffer.gsmart: Int
  */
 inline val ByteBuffer.gstr: String 
     get() = String(gdata(lengthToByte(10))).also {
-        skip(1)
+        pad(1)
     }
 
 /**
@@ -138,11 +144,10 @@ inline val ByteBuffer.gdata: ByteArray
  * The position of this buffer is moved to the current position + the length.
  */
 fun ByteBuffer.gdata(size: Int = limit(), position: Int = position(), length: Int = size): ByteArray {
-    val array = ByteArray(size).also {
+    return ByteArray(size).also {
         get(position, it, 0, length) // Doesn't move position.
+        pad(length)
     }
-    skip(length)
-    return array
 }
 
 /**
@@ -156,18 +161,14 @@ fun ByteBuffer.rsadec(pem: RSAPrivateCrtKey) {
     val dQ = pem.primeExponentQ
     val qInv = pem.crtCoefficient
 
-    val length = g1
-    val bytes = gdata(length)
-    val data = BigInteger(1, bytes)
-
+    val data = BigInteger(1, gdata(g1))
     val m1 = data.mod(p).modPow(dP, p)
     val m2 = data.mod(q).modPow(dQ, q)
 
     val h = qInv * (m1 - m2) % p
-    val dec = (m2 + h * q).toByteArray()
 
     position(0)
-    pdata(dec)
+    pdata((m2 + h * q).toByteArray())
     position(0)
 }
 
@@ -183,7 +184,7 @@ fun ByteBuffer.gbit(count: Int): Int {
     // Keeps the mark positioned at the starting byte index.
     mark()
     val index = marked + (position - marked)
-    val value = gbit(count, index shr 3, index % 8, 0)
+    val value = gbit(count, index shr 3, index and 7, 0)
     val nextPosition = position + count
     require(nextPosition <= limit) { "Buffer does not have enough capacity for byte -> bit positioning." }
     position(nextPosition)
@@ -225,6 +226,16 @@ fun ByteBuffer.p3(value: Int) {
  */
 fun ByteBuffer.p4(value: Int) {
     putInt(value)
+}
+
+/**
+ * Puts 4 bytes into this ByteBuffer LE.
+ */
+fun ByteBuffer.ip4(value: Int) {
+    put(value.toByte())
+    put((value shr 8).toByte())
+    put((value shr 16).toByte())
+    put((value shr 24).toByte())
 }
 
 /**
@@ -273,7 +284,17 @@ fun ByteBuffer.pjstr(value: String) {
  */
 fun ByteBuffer.pdata(bytes: ByteArray, position: Int = position(), length: Int = bytes.size) {
     put(position, bytes, 0, length) // Doesn't move position.
-    skip(length)
+    pad(length)
+}
+
+fun ByteBuffer.psize1(value: Int) {
+    put(position - value - 1, value.toByte())
+}
+
+fun ByteBuffer.psize2(value: Int) {
+//    putShort(position - value - 2, value.toShort())
+    put(position - value - 2, (value shr 8).toByte())
+    put(position - value - 1, value.toByte())
 }
 
 /**
@@ -285,10 +306,11 @@ fun ByteBuffer.rsaenc(pem: RSAPrivateCrtKey) {
     val length = position
     position(0)
     // raw rsa encryption.
-    val enc = BigInteger(gdata(length)).modPow(pem.publicExponent, pem.modulus).toByteArray()
+    val enc = BigInteger(1, gdata(length)).modPow(pem.publicExponent, pem.modulus)
     position(0)
-    p1(enc.size)
-    pdata(enc)
+    p1((enc.bitLength() + 7 ushr 3) + 1)
+    pdata(enc.toByteArray())
+    position(0)
 }
 
 /**
@@ -303,13 +325,13 @@ fun ByteBuffer.pbit(count: Int, value: Int) {
     // Keeps the mark positioned at the starting byte index.
     mark()
     val index = marked + (position - marked)
-    pbit(value, count, index shr 3, index % 8)
+    pbit(value, count, index shr 3, index and 7)
     val nextPosition = position + count
     require(nextPosition <= limit) { "Buffer does not have enough capacity for byte -> bit positioning." }
     position(nextPosition)
 }
 
-fun ByteBuffer.skip(amount: Int) {
+fun ByteBuffer.pad(amount: Int) {
     require(amount >= 0)
     position(position() + amount)
 }
@@ -337,7 +359,7 @@ tailrec fun ByteBuffer.lengthToByte(terminator: Int, length: Int = 0): Int {
  * for future invocations of this function.
  */
 inline fun ByteBuffer.accessBits(function: ByteBuffer.() -> Unit) {
-    position(position() * 8)
+    position(position() shl 3)
     // The mark. The all powerful. Keeps track of the current byte index.
     // Avoids total object creation annihilation since player/npc update uses this every tick.
     // Contemporary solutions use some type of helper "BitAccess" class to wrap the buffer for bit accessing.
@@ -357,7 +379,7 @@ fun ByteBuffer.accessBytes() {
     // The marked starting byte index to calculate from the ending position.
     val marked = this.position
     val index = marked + (position - marked)
-    position((index + 7) / 8)
+    position(index + 7 ushr 3)
 }
 
 private tailrec fun ByteBuffer.pbit(value: Int, remainingBits: Int, byteIndex: Int, bitIndex: Int) {
@@ -370,15 +392,14 @@ private tailrec fun ByteBuffer.pbit(value: Int, remainingBits: Int, byteIndex: I
     val max = (1 shl bitsToWrite) - 1
     // The relevant bits from the value.
     val byteValue = (value ushr (remainingBits - bitsToWrite)) and max
-    // The relevant bits in the current byte.
-    // The runescape client pre generates this array.
-    val mask = max shl (bitOffset - bitsToWrite)
-    // The current byte from the buffer.
-    val currentValue = get(byteIndex).toInt()
     // The current byte with the new bits.
-    val newValue = currentValue and mask.inv() or (byteValue shl (bitOffset - bitsToWrite))
-    put(byteIndex, newValue.toByte())
-    return pbit(value, remainingBits - bitsToWrite, byteIndex + 1, 0)
+    put(byteIndex, (get(byteIndex).toInt() and (max shl (bitOffset - bitsToWrite)).inv() or (byteValue shl (bitOffset - bitsToWrite))).toByte())
+    return pbit(
+        value = value,
+        remainingBits = remainingBits - bitsToWrite,
+        byteIndex = byteIndex + 1,
+        bitIndex = 0
+    )
 }
 
 private tailrec fun ByteBuffer.gbit(remainingBits: Int, byteIndex: Int, bitIndex: Int, accumulator: Int): Int {
@@ -388,10 +409,11 @@ private tailrec fun ByteBuffer.gbit(remainingBits: Int, byteIndex: Int, bitIndex
     val bitOffset = 8 - bitIndex
     // The maximum number of bits that can be read from the current byte.
     val bitsToRead = min(remainingBits, bitOffset)
-    // The mask for extracting the relevant bits from the current byte.
-    val mask = (1 shl bitsToRead) - 1
     // The relevant bits from the current byte.
-    val byteValue = (get(byteIndex).toInt() ushr (bitOffset - bitsToRead)) and mask
-    val nextValue = (accumulator shl bitsToRead) or byteValue
-    return gbit(remainingBits - bitsToRead, byteIndex + 1, 0, nextValue)
+    return gbit(
+        remainingBits = remainingBits - bitsToRead,
+        byteIndex = byteIndex + 1,
+        bitIndex = 0,
+        accumulator = (accumulator shl bitsToRead) or ((get(byteIndex).toInt() ushr (bitOffset - bitsToRead)) and ((1 shl bitsToRead) - 1))
+    )
 }
