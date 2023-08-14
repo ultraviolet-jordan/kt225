@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package kt225.game.world.map
 
 import kt225.cache.config.loc.Locs
@@ -19,6 +21,7 @@ import kt225.common.game.world.map.MapSquareLocRotation.Companion.NORTH
 import kt225.common.game.world.map.MapSquareLocRotation.Companion.SOUTH
 import kt225.common.game.world.map.collision.FloorCollider
 import kt225.common.game.world.map.collision.LocCollider
+import kt225.common.game.world.map.collision.NpcCollider
 import kt225.common.game.world.map.collision.RoofCollider
 import kt225.common.game.world.map.collision.WallCollider
 import kt225.common.game.world.map.collision.alloc
@@ -40,6 +43,7 @@ class CollisionManager(
     private val wallCollider = WallCollider(zoneFlags)
     private val locCollider = LocCollider(zoneFlags)
     private val roofCollider = RoofCollider(zoneFlags)
+    private val npcCollider = NpcCollider(zoneFlags)
     
     init {
         initCollision()
@@ -99,16 +103,12 @@ class CollisionManager(
             }
         }
     }
-
-    fun canTravel(coordinates: Coordinates, direction: EntityDirection, isNPC: Boolean): Boolean {
-        return stepValidator.canTravel(coordinates, direction, isNPC)
-    }
     
-    private fun changeLandCollision(coordinates: Coordinates, add: Boolean) {
+    fun changeLandCollision(coordinates: Coordinates, add: Boolean) {
         floorCollider.change(coordinates, add)
     }
 
-    private fun changeLocCollision(loc: MapSquareLoc, coordinates: Coordinates, add: Boolean) {
+    fun changeLocCollision(loc: MapSquareLoc, coordinates: Coordinates, add: Boolean) {
         val entry = locs[loc.id] ?: return
 
         // Blockwalk is required to apply collision changes.
@@ -136,7 +136,15 @@ class CollisionManager(
         }
     }
 
-    private fun changeRoofCollision(coordinates: Coordinates, add: Boolean) {
+    fun changeRoofCollision(coordinates: Coordinates, add: Boolean) {
         roofCollider.change(coordinates, add);
+    }
+
+    fun changeNpcCollision(coordinates: Coordinates, add: Boolean) {
+        npcCollider.change(coordinates, add);
+    }
+
+    fun canTravel(coordinates: Coordinates, direction: EntityDirection, isNPC: Boolean): Boolean {
+        return stepValidator.canTravel(coordinates, direction, isNPC)
     }
 }
