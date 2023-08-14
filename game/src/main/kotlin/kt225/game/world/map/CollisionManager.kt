@@ -19,6 +19,7 @@ import kt225.common.game.world.map.MapSquareLocRotation.Companion.NORTH
 import kt225.common.game.world.map.MapSquareLocRotation.Companion.SOUTH
 import kt225.common.game.world.map.collision.FloorCollider
 import kt225.common.game.world.map.collision.LocCollider
+import kt225.common.game.world.map.collision.RoofCollider
 import kt225.common.game.world.map.collision.WallCollider
 import kt225.common.game.world.map.collision.alloc
 import kt225.common.game.world.map.collision.canTravel
@@ -38,6 +39,7 @@ class CollisionManager(
     private val floorCollider = FloorCollider(zoneFlags)
     private val wallCollider = WallCollider(zoneFlags)
     private val locCollider = LocCollider(zoneFlags)
+    private val roofCollider = RoofCollider(zoneFlags)
     
     init {
         initCollision()
@@ -66,9 +68,15 @@ class CollisionManager(
 
                 val coords = MapSquareCoordinates(x, z, plane)
                 val mapSquareLand = MapSquareLand(lands.lands[coords.packed])
+
+                if (mapSquareLand.collision and 0x4 != 0) {
+                    changeRoofCollision(Coordinates(absoluteX, absoluteZ, plane), true)
+                }
+
                 if (mapSquareLand.collision and 0x1 != 1) {
                     continue
                 }
+
                 val adjustedLand = MapSquareLand(lands.lands[MapSquareCoordinates(x, z, 1).packed])
                 val adjustedPlane = if (adjustedLand.collision and 0x2 == 2) plane - 1 else plane
                 if (adjustedPlane < 0) {
@@ -102,20 +110,19 @@ class CollisionManager(
 
     private fun changeLocCollision(loc: MapSquareLoc, coordinates: Coordinates, add: Boolean) {
         val entry = locs[loc.id] ?: return
-        val blockwalk = entry.blockwalk
+
         // Blockwalk is required to apply collision changes.
-        if (!blockwalk) {
+        if (!entry.blockwalk) {
             return
         }
 
-        val blockproj = entry.blockproj
         val shape = loc.shape
         val rotation = loc.rotation
         when (shape.layer) {
-            WALL -> wallCollider.change(coordinates, rotation, shape, blockproj, add)
+            WALL -> wallCollider.change(coordinates, rotation, shape, entry.blockproj, add)
             GROUND -> when (rotation) {
-                NORTH, SOUTH -> locCollider.change(coordinates, entry.length, entry.width, blockproj, add)
-                else -> locCollider.change(coordinates, entry.width, entry.length, blockproj, add)
+                NORTH, SOUTH -> locCollider.change(coordinates, entry.length, entry.width, entry.blockproj, add)
+                else -> locCollider.change(coordinates, entry.width, entry.length, entry.blockproj, add)
             }
             GROUND_DECOR -> {
                 val intractable = when (entry.interactive) {
@@ -127,5 +134,9 @@ class CollisionManager(
                 }
             }
         }
+    }
+
+    private fun changeRoofCollision(coordinates: Coordinates, add: Boolean) {
+        roofCollider.change(coordinates, add);
     }
 }
